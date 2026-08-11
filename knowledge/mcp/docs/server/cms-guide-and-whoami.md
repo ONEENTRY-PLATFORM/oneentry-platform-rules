@@ -13,7 +13,7 @@ Returns a short markdown briefing, generated from the live state of the server:
 - the mode and base URL, and the write policy in one sentence;
 - how many operations the catalog holds;
 - how many documents and sections the knowledge index holds, and where they came from;
-- the loop to follow, and the instruction never to invent a path;
+- the loop to follow, a pointer to `mcp/docs/server/doc-map`, and the instruction never to invent a path;
 - the API map: the top tags with an operation count each;
 - the hard limits — Admin API only, the permanently confirm-gated paths, response capping;
 - any catalog warnings.
