@@ -63,11 +63,83 @@ Legitimate, and worth doing deliberately. A new group starts with no permissions
 
 Before creating one, check whether an existing group already expresses the distinction you need. Groups multiply easily and are tedious to consolidate.
 
+## Put a user into a group
+
+Membership is written on the user, not on the group. There is no add-member call on a group; use `AdminUsersController_update` — `PUT /api/admin/users/{id}` — with `groupIds`.
+
+The field is a **full replacement**, not an addition. Send every group the user should end up in, including the ones they already have.
+
+- `groupIds: [1, 4]` — the user ends up in exactly groups 1 and 4.
+- `groupIds: []` — every membership is removed.
+- field omitted entirely — membership is left as it is.
+
+`authProviderId` is required in the body and must be the provider the user actually signed up through; anything else answers 404. An id in `groupIds` that no group carries answers 400 and writes nothing at all, so a rejected call never leaves a half-applied set.
+
+```json
+{
+  "authProviderId": 1,
+  "langCode": "en_US",
+  "isActive": true,
+  "groupIds": [1, 4]
+}
+```
+
+The same call also writes `formData` and `notificationData` from whatever the body carries, so omitting them replaces them with empty values. Read the user first and send those fields back unchanged unless you mean to change them.
+
+## Add a sign-in provider for a social network
+
+Every social provider is created with `type: "oauth"`. There is no per-network type value — `"apple"` or `"yandex"` as a `type` is rejected. The network is named in the settings instead, under `oauthProvider`.
+
+```json
+{
+  "type": "oauth",
+  "identifier": "apple-signin",
+  "localizeInfos": { "en_US": { "title": "Sign in with Apple" } }
+}
+```
+
+Create the provider first, then set its settings with the update call. Settings with no `oauthProvider` are treated as Google, so providers configured before the other networks existed keep working untouched.
+
+`oauthAuthUrl` is required for every network, and it is the only setting a Content API reader can see. Secrets you store are never returned there.
+
+## Which settings each social network needs
+
+Ask the instance rather than guessing: `AdminUsersAuthProviderController_getOauthCatalog` — `GET /api/admin/users-auth-providers/oauth-catalog` — lists every supported network with the settings keys it requires.
+
+```json
+[
+  {
+    "key": "apple",
+    "tokenUrl": "https://appleid.apple.com/auth/token",
+    "requiredFields": [
+      "oauthClientId", "oauthAuthUrl",
+      "oauthTeamId", "oauthKeyId", "oauthPrivateKey"
+    ],
+    "optionalFields": ["oauthTokenUrl"]
+  }
+]
+```
+
+Most networks need `oauthClientId`, `oauthSecret` and `oauthAuthUrl`. Apple is the exception, and the catalog shows it: it takes key material — `oauthTeamId`, `oauthKeyId` and a private key — and asks for no `oauthSecret`, because the short-lived secret Apple requires is produced for each sign-in rather than stored. A hand-made value in `oauthSecret` is ignored for Apple.
+
+`oauthTokenUrl` is optional everywhere and overrides the network's standard endpoint when set.
+
+## Why a social sign-in answers 400
+
+- **The network reported an address it has not verified.** The sign-in is refused so an unverified address cannot claim an existing account. Ask the person to confirm their address with the network, then retry.
+- **The settings name a network the instance does not support.** Compare `oauthProvider` against the catalog; the value is case-sensitive.
+- **`oauthAuthUrl` is missing**, or the authorization code was issued for a different redirect address than the one sent with it.
+
+A returning person is recognised by the account id the network reports rather than by their address, so changing an email address at the network does not create a second account. One supported network reports no address at all; those accounts get a generated identifier instead. Signing in through two different networks still produces two separate users, even for one address.
+
 ## Common mistakes
 
 - **Creating a permission that already exists.** Adjust the existing record.
+- **Inventing a `type` for a social network.** It is always `oauth`, plus `oauthProvider`.
 - **Creating a second `guest` group.** Succeeds silently, achieves nothing.
 - **Granting an admin permission to fix a Content API 403.** Different model.
+- **Sending only the groups you want to add.** `groupIds` replaces the set.
+- **Updating a user without echoing back its form data.** It is overwritten.
 - **Missing a read restriction** and investigating the data instead.
 - **Putting user details into a report.** Personal data stays in the instance.
 
