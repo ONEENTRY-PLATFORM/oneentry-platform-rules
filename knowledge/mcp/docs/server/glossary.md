@@ -77,3 +77,13 @@ Entries are alphabetical within each group.
 **attributesSets vs attributeValues** — the first is what you send, the second is what you read. Different shapes, same underlying data.
 
 **id vs marker** — an id is a number that is meaningful on exactly one instance. A marker is a string that is meaningful on all of them. A 404 on an id someone gave you is usually this distinction.
+
+## Catalog and catalogue are different things
+
+The word carries three senses here, and searching for it lands on the wrong one more often than not. This corpus keeps them apart by spelling:
+
+- **catalog** (American) — the **operation** catalog: the list of Admin API operations this server can call. Documented in `mcp/docs/server/api-catalog`.
+- **catalogue** (British) — the **product** catalogue: products, their pages, their statuses and filters. Documented in `mcp/docs/api/products`.
+- **`catalog`** in backticks — a literal identifier: the admin panel module named `catalog`, and the `catalog_page` general type.
+
+If a search for "catalog" returns nothing but server documentation and you wanted products, search for **products** — that is the word that names the entity, and the entity is what the documents are organised around.

@@ -98,6 +98,35 @@ GET   /products/512          → there it is
 
 That is normal, not a failure.
 
+## An omitted field can mean clear it
+
+Most updates merge: a field you leave out is left as it was. **Some do not**, and on those an omitted field is applied as "set it to nothing". Nothing in the schema distinguishes the two, and both answer `200`.
+
+The known cases, all of them relationship fields:
+
+| entity | field | what omitting it does |
+|---|---|---|
+| page | `parentId` | moves the page to the root and decrements the old parent's `childrenCount` |
+| block | `blockPages` | detaches the block from every page it was on |
+| menu item | parent reference | flattens the item to the top level |
+| user | `formData`, `notificationData` | replaces them with empty values |
+
+Products, `generalTypeId` and `attributeSetId` merge — the rule is not "PUT always replaces", and treating it that way makes you resend fields you have not read and get wrong.
+
+The habit that covers all of it: **read the entity, change what you meant to change, send it back whole**. Then read it again and check the fields that were *not* in your body. Three bugs that look unrelated — a page that jumped to the root, a block that vanished from its page, a menu that reorganised itself — are this one cause.
+
+→ `mcp/docs/api/pages` · `mcp/docs/api/blocks` · `mcp/docs/api/silent-no-ops`
+
+## Verify with the read your consumer uses
+
+An entity can often be read more than one way, and the ways do not always agree. The raw record shows what you wrote. The projection a site or the admin panel reads shows what it will actually get, after locale resolution and shaping.
+
+Checking your write through the endpoint you wrote to therefore proves very little: you see your own input echoed back, including input that is the wrong shape and that no consumer will ever read.
+
+So when a document names a *consumer* read — `/forms/marker/{marker}` for form fields, the listing operation for a product status — verify through that one. `cms_api_describe` names it under `verifyWith` where the pairing is known.
+
+→ `mcp/docs/api/silent-no-ops` · `mcp/docs/api/verification-recipes`
+
 ## Read the entity back after creating it
 
 One habit that covers three separate traps: the silent flat-attribute map, the eventual-consistency gap, and any field the instance normalised differently from what you sent.

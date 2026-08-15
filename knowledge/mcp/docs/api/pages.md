@@ -56,6 +56,16 @@ cms_api_search { "query": "pages position" }
 
 A page created without `localizeInfos` may be accepted and is unusable — it appears untitled in the admin panel and has nothing to render.
 
+## Update a page
+
+`parentId` is honoured on create. It is the **update** that is dangerous: an update whose body has no `parentId` is applied as "move this page to the root", and it also decrements the former parent's `childrenCount` and recomputes the position. The call answers `200`, and the page is now somewhere else.
+
+Read the page, change what you meant to change, send it back whole, then read it again and check `parentId` — not the fields you set, the ones you did not.
+
+`generalTypeId` and `attributesSets` do not behave this way; omitting them leaves them alone. There is no single rule covering both, which is exactly why this needs stating.
+
+→ `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it`
+
 ## Attaching blocks
 
 Blocks are attached to a page rather than owned by it: the same block can appear on several pages. The page payload carries the attachment, and the block itself lives in the blocks area.
@@ -83,5 +93,6 @@ The delete operation may accept flags controlling what happens to dependent cont
 - **Assuming a page URL is a route.** It is an identifier for the API, not a path on a website.
 - **Using an id from another instance.** Page ids are local; the page URL is the portable handle.
 - **Reordering by patching position.** Use the position operation.
+- **Updating a page without carrying `parentId` back.** The page silently moves to the root.
 
 → `mcp/docs/api/verification-recipes#pages`

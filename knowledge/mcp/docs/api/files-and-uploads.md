@@ -6,15 +6,42 @@ The shape of a file attribute's value depends on how many files it holds, which 
 
 → `mcp/docs/api/attribute-types` · `mcp/docs/server/response-shaping`
 
+## This server cannot upload a file
+
+`cms_api_call` sends every request body as **JSON**. The upload operation wants `multipart/form-data`, so it cannot be called through this server at all. It is in the catalog because it exists, and `cms_api_describe` marks it `notExecutable` — no body shape, no retry and no encoding trick will help.
+
+Say so to the human rather than working around it silently. Whoever uploads outside MCP gives up everything this server provides on the way: the confirm gate, the local permission check, `dryRun`, and the audit line. If a task needs dozens of images, that is worth stating before it starts, not after.
+
+Everything below still applies to that outside upload — it is the same endpoint.
+
 ## Uploading
 
 ```text
 cms_api_search { "query": "files" }
 ```
 
-An upload returns a record describing the stored file: its identity, its name, and a download link. Keep the link — that is what an attribute value references and what a site renders.
+The binary goes in the multipart body; **everything else is a query parameter** — `type`, `entity`, `id`, `compress`, `edit` and `template`. The field name of the binary part is not enforced by the instance, so `file` and `files` both work.
+
+An upload returns a record describing the stored file: its identity, its name, a download link and — only under the conditions in the next section — a preview link. Keep the **whole record**; that is what an attribute value references and what a site renders.
 
 Uploads consume instance storage quota, so an upload made by mistake is not free. Do not re-upload a file to "make sure it worked"; read the record back instead.
+
+## No preview template no preview and no error
+
+`template` is **the numeric id of a `/template-previews` record**. It is not a flag, and `template=1` is not an incantation — it means "preview template number one", which on a fresh instance does not exist.
+
+A fresh instance has **no template-previews records at all**. Upload an image without a valid template id and the file is stored correctly, `previewLink` is simply absent, and nothing reports a problem. Thirty images later that is thirty images a site cannot render as thumbnails.
+
+So, once per instance, before the first image:
+
+1. `GET /template-previews`. If it is empty, create one — title, identifier, and the proportions you want generated.
+2. Note the **numeric id** from the response. A marker is not accepted here; a non-numeric `template` fails on the database type.
+3. Upload with `template=<that id>`.
+4. Read the returned record and confirm `previewLink` is present. If it is not, the template id is wrong — do not vary `type` and `entity` hoping for a different outcome, they have nothing to do with it.
+
+Previews are generated for `png`, `jpeg` and `jpg` only. Documents get no preview by design, which is why an upload of a PDF never carries one.
+
+→ `mcp/docs/api/templates-and-previews` · `mcp/docs/api/baseline-data`
 
 ## Referencing a file from an attribute
 
@@ -65,6 +92,9 @@ Do not assume a link you obtained on one instance works on another, and do not c
 
 ## Common mistakes
 
+- **Reading `template` as a boolean.** It is a record id, and there are no records on a fresh instance.
+- **Trying `type` × `entity` combinations when previews are missing.** The cause is the template, not those.
+- **Storing only the download link in the attribute.** Put the whole record there.
 - **Assuming the singular value shape.** It changes with the count.
 - **Re-uploading to check the first upload worked.** Read the record; uploads cost quota.
 - **Treating a stripped value as data loss.** The metadata is all there.

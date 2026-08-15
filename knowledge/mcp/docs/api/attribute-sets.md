@@ -86,7 +86,24 @@ The locale level is not only for values. Inside a set, an attribute's own locali
 
 Written one level flat — `"validators": { "requiredValidator": { "strict": true } }` — the attribute is accepted and the call succeeds, but the rule is stored where nothing reads it. The attribute then behaves as one with no validators: the validator map comes back empty for every locale, and a field you meant to make required is not enforced when the value is submitted.
 
-So after writing an attribute, read the set back and confirm each localized field sits under a locale code.
+So after writing an attribute, read the set back and confirm each localized field sits under a locale code — through the right read, which is the next section.
+
+## Two reads two answers
+
+An attribute set can be read two ways, and they do not show the same thing:
+
+| read | shows |
+|---|---|
+| the set **by id** | the raw stored schema — exactly what you sent, including a flat map |
+| the set's attributes **by marker**, and a form **by marker** | the projection a site and an SDK receive, resolved for one locale |
+
+The projection resolves each localized field for the requested locale. A flat `validators` map has nothing under that locale, so it comes back as `{}` — while `type`, `position` and `identifier`, which are not locale-scoped, come through unchanged. An attribute that looks fully populated in the raw read can therefore arrive at a site with no validators at all.
+
+**That asymmetry is the trap.** Reading the set by id after writing shows your own flat map back to you and looks like success. It is the projection that decides whether the site sees anything.
+
+So verify a validator through the read the consumer uses — the form by marker, or the set's attributes by marker — and check that `validators` is non-empty there. If it is empty while the raw read is full, the shape is flat: rewrite it under the locale key rather than concluding that validators are unsupported.
+
+→ `mcp/docs/server/payload-conventions#verify-with-the-read-your-consumer-uses` · `mcp/docs/api/silent-no-ops`
 
 ## Changing an attribute afterwards
 

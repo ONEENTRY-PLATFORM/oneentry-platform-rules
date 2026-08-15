@@ -12,7 +12,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 |---|---|
 | `mcp/operating-rules` | Before your first write. The short rules that decide whether a payload works |
 | `mcp/docs/server/getting-started` | Setting the server up, or making your first three calls |
-| `mcp/docs/api/baseline-data` | Before creating anything. What already exists on every instance |
+| `mcp/docs/api/baseline-data` | Before creating anything. What already exists on every instance, and what does not |
+| `mcp/docs/api/silent-no-ops` | Before reporting any write as done. The operations that answer success and do nothing |
 | `mcp/docs/server/payload-conventions` | Building any request body |
 
 ## Running the server
@@ -58,6 +59,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 |---|---|
 | `mcp/docs/server/agent-workflows` | You want the whole sequence for a common task |
 | `mcp/docs/api/verification-recipes` | You need to prove a change worked |
+| `mcp/docs/api/silent-no-ops` | A write answered 200 or 201 and you are about to call it done |
 | `mcp/docs/server/authoring-knowledge` | You are adding to or correcting this documentation |
 
 ## Content structure
@@ -123,4 +125,11 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does my filter return nothing | `mcp/docs/api/filters#only-indexed-attributes-can-be-filtered` |
 | Why does creating this fail as a duplicate | `mcp/docs/api/baseline-data#silent-duplicates-versus-hard-failures` |
 | Where is the product list operation | `mcp/docs/api/products#listing-products` |
+| Why does the product list complain about `langCode` | `mcp/docs/api/products#listing-products` |
+| Why did my write answer 200 and change nothing | `mcp/docs/api/silent-no-ops` |
+| Why are my validators empty when a site reads the form | `mcp/docs/api/attribute-sets#two-reads-two-answers` |
+| Why do my uploaded images have no preview | `mcp/docs/api/files-and-uploads#no-preview-template-no-preview-and-no-error` |
+| Why did my page jump to the root after an update | `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it` |
+| Why does creating a menu with pages answer 500 | `mcp/docs/api/menus#create-the-menu-empty` |
+| How do I upload a file through this server | `mcp/docs/api/files-and-uploads#this-server-cannot-upload-a-file` |
 | How do I delete something safely | `mcp/docs/server/confirm-and-dry-run` |

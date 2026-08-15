@@ -8,14 +8,19 @@ Two things about this area catch everyone: there is no plain list operation, and
 
 ## Listing products
 
-There is **no `GET /products`**. The listing operation is a `POST`:
+There is **no `GET /products`**. The listing operation is a `POST`, and the split between its query and its body is the part that catches everyone:
 
 ```text
 cms_api_call { "opId": "AdminProductsController_findAll",
-               "body": { "limit": 30, "offset": 0 } }
+               "query": { "limit": 30, "offset": 0, "langCode": "en_US" },
+               "body": [] }
 ```
 
-A `POST` for a read looks wrong and is correct here — the filter payload is too large for a query string. `cms_api_search` will show you the operation; do not go looking for a `GET` variant.
+**Paging and locale are query parameters. The body is an array of filter objects, and an empty array means no filter.** Sending `{ "limit": 30, "offset": 0, "langCode": "en_US" }` as the body answers `400 langCode must match /^[a-zA-Z_]{2,5}$/` — a message about the query parameter you did not send, describing a value that would have satisfied it. The body is bound to the filter array and never looked at for paging.
+
+A `POST` for a read looks wrong and is correct here: the filter array is too large for a query string. `cms_api_search` will show you the operation; do not go looking for a `GET` variant. The catalog classifies this one as a **read**, so it works on a read-only server.
+
+Do not wrap this call in a catch that turns a failure into an empty list. "The catalogue is empty" and "the request was malformed" then look the same, and the next run creates a second copy of everything.
 
 For a name lookup there is a lighter quick-search operation that returns a minimal projection. Use it to resolve a name to an id, then fetch the full product by id.
 
@@ -42,7 +47,9 @@ Two rules that are not visible in the schema:
 
 Read the product first and send the smallest body that expresses your change. A large speculative body fails as one opaque error; a small one tells you what is wrong.
 
-→ `mcp/operating-rules#operations-with-a-single-supported-path`
+That advice is safe **for products**, whose update merges what you send. It is not safe everywhere: on pages and blocks an omitted field is applied as "clear it". Check the entity's own document before you shrink a body.
+
+→ `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it` · `mcp/operating-rules#operations-with-a-single-supported-path`
 
 ## Prices and the price attribute
 
@@ -64,9 +71,13 @@ Resolve the parent page before creating a product, and prefer the page URL over 
 
 ## Statuses
 
-A product carries a status resolved by marker, which is what a site uses to decide whether it can be bought. Statuses are instance data — read them, do not assume markers like "in stock".
+A product carries a status resolved by marker, which is what a site uses to decide whether it can be bought. Statuses are instance data — read them, do not assume markers like "in stock". **A fresh instance has none**, so the first status is something you create.
 
-→ `mcp/docs/api/product-statuses`
+Set the status by including `statusId` in the ordinary product update. There is also a bulk `set-status` operation, and it is a trap worth knowing about: the status id goes in a field called **`id`**, not `statusId`. Given `statusId` the handler reads nothing, writes `NULL` over the status, and still answers `201 true`. It does not re-index either, so even a correct bulk write stays invisible to the listing operation until something else triggers a reindex.
+
+Whichever route you take, read the product back by id and look at `statusId`. The response status is not evidence.
+
+→ `mcp/docs/api/product-statuses` · `mcp/docs/api/silent-no-ops`
 
 ## Relations between products
 
@@ -76,13 +87,18 @@ Related, similar and recommended products come from relation templates and condi
 
 ## Filtering a product list
 
-The list operation accepts filters over attribute values, but only attributes that are indexed can be filtered on. A filter over a non-indexed attribute returns nothing rather than erroring, which reads as "no such products".
+Filters are the body of the list operation, and the body is an **array**: each element is one filter object, and `[]` asks for everything. Paging and locale stay in the query.
+
+Only attributes that are indexed can be filtered on. A filter over a non-indexed attribute returns nothing rather than erroring, which reads as "no such products".
 
 → `mcp/docs/api/filters` · `mcp/docs/api/index-attributes`
 
 ## Common mistakes
 
 - **Looking for `GET /products`.** It does not exist; the list is a `POST`.
+- **Paging in the body of the list call.** It belongs in the query, and the error message blames `langCode` for it.
+- **Swallowing a failed list into an empty result.** The next run creates duplicates of everything.
+- **Bulk `set-status` with a `statusId` field.** It nulls the status and answers success.
 - **Omitting `blocks` on an update, or sending `forms`.** Both are avoidable failures.
 - **A one-level attribute map.** Silently empty. Read back.
 - **Treating a `null` price as zero.**
