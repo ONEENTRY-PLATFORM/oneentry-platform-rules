@@ -41,9 +41,26 @@ That keeps the default intact for everything else and makes the change reversibl
 
 ## Template previews
 
-A preview renders a template against sample or real data so a human can see the result before it goes live. Previews are entities of their own, with their own operations, so a preview can be created, read and removed independently of what it previews.
+A template-previews record is two things at once, and the second one is easy to miss.
 
-Use them when a change is visual and the human's acceptance criterion is "does it look right" — that is not a question the API alone can answer.
+It renders a template against sample or real data so a human can see the result before it goes live. Previews are entities of their own, with their own operations, so a preview can be created, read and removed independently of what it previews. Use them when a change is visual and the human's acceptance criterion is "does it look right" — not a question the API alone can answer.
+
+It is **also the recipe by which uploaded images get their thumbnails**. Its `proportions` say what sizes to generate and how to align them, and its **numeric id** is what the `template` query parameter on an upload refers to.
+
+That second role is why this is not an optional nicety: a fresh instance has no template-previews records, uploads then produce no `previewLink`, and nothing anywhere reports it.
+
+## A fresh instance has none of these
+
+The dynamic block types ship with default *templates*. Template **previews** are not provisioned — `GET /template-previews` on a new instance answers `[]`.
+
+Create one before the first image upload:
+
+- an **identifier** and a title, as with every marker-addressed entity;
+- **`proportions`**, giving the horizontal, vertical and square variants you want, each with its size and alignment.
+
+Then read the list back and keep the numeric id. `template=<id>` on an upload is what makes previews appear; a marker is rejected on the database type, and an id that does not exist is ignored without an error on older instances.
+
+→ `mcp/docs/api/files-and-uploads#no-preview-template-no-preview-and-no-error` · `mcp/docs/api/baseline-data`
 
 ## Changing a template that is in use
 

@@ -19,6 +19,12 @@ Never construct an operation id by hand. Ids come from `cms_api_search`, and sha
 
 Pass the body as a real object. A JSON string that parses to an object is unwrapped for you, but relying on that is a habit that breaks the moment a body is legitimately a string.
 
+There is **no argument for a file**. The body is always serialised as JSON, so an operation declaring `multipart/form-data` — the file upload — cannot be called through this server at all; `cms_api_describe` marks it `notExecutable`. Report that to the human rather than trying encodings.
+
+`cms_api_describe` also returns an `example` object that is already shaped as these arguments. Where an operation splits its input across the query and the body in a way the two separate schemas do not make obvious, copy the example rather than assembling one.
+
+→ `mcp/docs/api/files-and-uploads#this-server-cannot-upload-a-file`
+
 ## Calling a read operation
 
 ```json

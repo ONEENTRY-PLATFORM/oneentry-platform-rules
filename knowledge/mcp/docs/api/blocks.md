@@ -39,6 +39,16 @@ Attachment lives with the page, not with the block, and carries a position withi
 
 Create or locate the block first, then attach it. Attaching a marker that does not exist yet leaves a reference resolving to nothing, and the page renders without it and without an error.
 
+## Updating a block does not leave its pages alone
+
+A block update whose body has no `blockPages` is applied as "this block is on no pages" — every attachment it had is removed, nesting included, and the call answers `200`. This is how a block disappears from a site after an edit that had nothing to do with placement.
+
+Read the block, keep its current `blockPages`, change what you meant to change, send it back whole. Then read it again and look at `blockPages`.
+
+`attributeSetId` is not affected — omitting it leaves it alone. The danger is specific to the page relationship.
+
+→ `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it`
+
 ## Ordering blocks on a page
 
 Blocks on a page are ordered. As everywhere in parent-scoped ordering, use the dedicated position operation rather than patching a field, so the surrounding blocks are renumbered correctly.

@@ -66,4 +66,12 @@ For those fields the `example` is the contract, and client-side validation of yo
 
 It describes shape, not meaning. It cannot tell you that attribute values are two levels deep, that a position is a lexorank string, or that a create you are about to make already exists on the instance.
 
+Three limits are worth knowing before you plan around the catalog:
+
+- **Present does not mean callable.** The file upload operation is listed because it exists, but its body is `multipart/form-data` and this server sends JSON only. `cms_api_describe` marks such an operation `notExecutable`.
+- **The document contradicts itself in places.** Where a field's `example` does not satisfy its own declared type, the catalog marks the field `x-example-mismatch` and lists it in `cms_api_describe`. The example is the contract; the type is the defect.
+- **Some behaviour is curated, not read.** A handful of operations carry a `note`, a `silentNoOp` or a `verifyWith` written by hand, because no schema can say which of two valid-looking bodies the instance accepts, or that a write answers success without doing anything.
+
 That is what the rest of this corpus is for: find the operation here, then read the document for the entity before building the body.
+
+→ `mcp/docs/api/silent-no-ops` · `mcp/docs/api/files-and-uploads`

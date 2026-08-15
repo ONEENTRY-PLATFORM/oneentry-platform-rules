@@ -12,12 +12,14 @@ Send the payload nested under `newForm`:
 
 ```json
 { "newForm": { "identifier": "contact-us",
+               "type": "data",
+               "processingType": "script",
                "localizeInfos": { "en_US": { "title": "Contact us" } } } }
 ```
 
-The API document shows the fields unwrapped. The wrapped form is the one the endpoint accepts; sending the fields flat fails.
+The API document shows the fields unwrapped. The wrapped body is the supported route and the one to use. A flat body has been observed to succeed on some instances; treat that as undefined rather than as an alternative — it is not what the endpoint documents, and it is not what the admin panel sends.
 
-This is the supported route — there is no alternative body that works.
+Include `type` even though the schema omits it — see below.
 
 → `mcp/operating-rules#operations-with-a-single-supported-path`
 
@@ -28,6 +30,22 @@ This is the supported route — there is no alternative body that works.
 - **fields**, defined as attributes with types, drawn from the same closed type list as everywhere else;
 - a **form type** and a **processing type**, which say what kind of form it is and what happens to a submission;
 - configuration: which entities it relates to, who may submit, and rating behaviour where relevant.
+
+## The form type is missing from the create schema
+
+`type` is a real column with a closed set of values, and it is **absent from the create schema**. It is nonetheless accepted and stored, so an agent that builds its body from the schema alone creates a form with `type: null` and is told nothing.
+
+| value | what it is for |
+|---|---|
+| `data` | a plain data-collection form — a contact form is this one |
+| `order` | a checkout or ordering form |
+| `sign_in_up` | authentication: sign-in and registration |
+| `collection` | a form that gathers entries into a collection |
+| `rating` | a rating or review form, with rating behaviour attached |
+
+Copy the values exactly. On instances that predate the fix for it, the database enum still carries the historical misspelling `sing_in_up`; if `sign_in_up` is rejected with an enum error, that instance has not been migrated — report it rather than guessing at spellings.
+
+`type` is also accepted on update, so a typeless form can be corrected without recreating it. Read the form back by identifier and check the field: a wrong or absent `type` is not reported at any point.
 
 ## Fields are attributes
 
@@ -66,7 +84,10 @@ Before confirming, count the submissions and tell the human the number. "Delete 
 
 ## Common mistakes
 
-- **Sending the create body unwrapped.** It must be nested under `newForm`.
+- **Sending the create body unwrapped.** Nest it under `newForm`.
+- **Building the body from the create schema alone.** `type` is not in it and the form ends up typeless.
+- **"Correcting" `sing_in_up` on an unmigrated instance.** The current value is `sign_in_up`; if that is rejected, the instance is behind — say so.
+- **Building field validation from a form read by marker without checking it.** Validators written flat are absent there.
 - **Hardcoding a form's fields.** Render from the definition.
 - **Treating an empty numeric field as zero.** It is `null`.
 - **Writing labels instead of option ids into a choice field.**
