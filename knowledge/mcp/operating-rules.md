@@ -61,6 +61,14 @@ Reading an entity **by id** shows your write immediately. List and search respon
 
 If a list does not yet show what you just created, re-read by id to confirm it exists. **Never repeat the write** — you will create a duplicate that consumes instance quota and has to be cleaned up by hand.
 
+## A 200 means accepted not applied
+
+Several endpoints take the whole body as one opaque value. A body of the wrong **shape** is then stored as happily as a right one, and the response is still `200` — there is no error to react to.
+
+So confirm a write by its effect: read the entity back **by id** and look at the field you set. If it is missing, your shape was wrong. Do not resend the same body, and do not conclude that the field is unsupported.
+
+The known case: `PUT /attributes-sets/{id}/schema` takes the schema object **itself** as the body. Wrapping it as `{ "schema": … }` answers `200 true` and then stores the wrapper — the set's attributes are replaced by a single key called `schema` and the previous schema is gone. Only a read-back reveals it.
+
 ## Prefer marker over id
 
 Blocks, forms, menus, templates, general types and modules are addressed by a `marker` or `identifier` that is stable across instances. A numeric `id` is not: an id taken from one instance is meaningless on another, and `404 Not found` on an id you were given is usually that mistake.
@@ -104,6 +112,7 @@ Do not retry hoping for more. Narrow the request with the operation's own `limit
 For the calls below, one route works and the obvious alternative does not. Use the supported one directly — a different body or a retry on the other route will not help.
 
 - **Create a form** — send the payload wrapped in `newForm`. The OpenAPI document shows the fields unwrapped; the wrapped form is the one the endpoint accepts.
+- **Replace an attribute set schema** — send the schema object itself, never wrapped in `{ "schema": … }`. The wrapped form answers 200 and destroys the existing schema.
 - **Update a product** — always include `blocks` (send `blocks: []` when you have nothing to set), and never include `forms`.
 - **Read locale codes** — use `AdminLocalesController_findAllActive`.
 - **List products** — the list operation is `POST /products/all`; there is no `GET /products`.

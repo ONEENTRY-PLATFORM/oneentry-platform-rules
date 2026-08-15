@@ -69,6 +69,25 @@ Before you do either:
 
 Dry run first, and read the set back to confirm the attribute's id before writing any values against it.
 
+## An attribute definition is locale keyed too
+
+The locale level is not only for values. Inside a set, an attribute's own localized fields are maps keyed by locale code first:
+
+```json
+{
+  "type": "text",
+  "identifier": "question",
+  "localizeInfos": { "en_US": { "title": "Your question" } },
+  "validators": { "en_US": { "requiredValidator": { "strict": true } } }
+}
+```
+
+`listTitles` and `additionalFields` follow the same shape.
+
+Written one level flat — `"validators": { "requiredValidator": { "strict": true } }` — the attribute is accepted and the call succeeds, but the rule is stored where nothing reads it. The attribute then behaves as one with no validators: the validator map comes back empty for every locale, and a field you meant to make required is not enforced when the value is submitted.
+
+So after writing an attribute, read the set back and confirm each localized field sits under a locale code.
+
 ## Changing an attribute afterwards
 
 Changing an attribute's **type** after values exist is the one change to treat as dangerous. Existing values were stored in the shape the old type implied, and there is no automatic conversion.

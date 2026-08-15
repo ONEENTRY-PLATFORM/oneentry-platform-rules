@@ -10,7 +10,7 @@ This is the content source for [`@oneentry/mcp-platform-server`](https://www.npm
 
 On startup the server resolves the configured ref (`main` by default), downloads the repository archive once, caches it by commit, and indexes the markdown. Editing a file here — through the GitHub UI, a pull request, whatever — takes effect on the next restart of any server, with no npm release.
 
-Five mechanics decide whether a document is usable:
+Five mechanics decide whether a document is usable:d
 
 1. **Only `knowledge/**/*.md` is indexed.** This `README.md` and `CLAUDE.md` are for humans and agents working on *this repository*; the server never sees them.
 2. **`docId` = the path under `knowledge/` without `.md`.** `knowledge/mcp/docs/api/orders.md` → `mcp/docs/api/orders`. A `<name>/index.md` collapses to `<name>`, which is why this repo never uses that filename.
