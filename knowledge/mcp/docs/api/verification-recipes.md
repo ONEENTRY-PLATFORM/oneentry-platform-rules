@@ -69,9 +69,11 @@ Assert: the tree reads back with the parent relationships intact — this is the
 
 ## Forms
 
-Create a form with the body wrapped under `newForm`, with an explicit `type` and two fields of different types, one of them carrying a `requiredValidator`.
+Create a form with the body wrapped under `newForm`, with an explicit `type` and two fields of different types, one of them carrying a `requiredValidator`. Then bind it to a module with a form update carrying `formModuleConfigs`, and submit against that binding.
 
-Assert: the form reads back by identifier with both fields and their types; **`type` is what you sent and not `null`**; **`validators` on the required field is present in the form read by marker**, which is the projection a site consumes — an empty map there means the validator was written flat and no visitor will ever be stopped by it; a submission recorded against it appears in the form data listing; a numeric field left empty reads as `null`, not zero.
+Assert: the form reads back by identifier with both fields and their types; **`type` is what you sent and not `null`**; **`validators` on the required field is present in the form read by marker**, which is the projection a site consumes — an empty map there means the validator was written flat and no visitor will ever be stopped by it; **the form reads back with a `formModuleConfigs` entry carrying an `id`** — without one there is nothing a submission can name; a submission created with that id and the form's marker appears in the form data listing; a numeric field left empty reads as `null`, not zero.
+
+Two negatives are worth the extra calls here, because both are failure modes people mistake for something else: a submission naming a config id from a different form is refused with `Incorrect formIdentifier for provided config`, and a form update that omits `formModuleConfigs` answers `200` while deleting the binding and the submission you just made. Run the second one only on a scratch form.
 
 The validator assertion is the one worth being pedantic about. It is the difference between a real check and one that only proves you can echo your own input back.
 
