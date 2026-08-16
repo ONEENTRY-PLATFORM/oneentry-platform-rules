@@ -29,7 +29,7 @@ Include `type` even though the schema omits it — see below.
 - **`localizeInfos`** — title and description per locale;
 - **fields**, defined as attributes with types, drawn from the same closed type list as everywhere else;
 - a **form type** and a **processing type**, which say what kind of form it is and what happens to a submission;
-- configuration: which entities it relates to, who may submit, and rating behaviour where relevant.
+- **module configs** — the bindings that say which module and which entities the form belongs to, who may submit, and how ratings behave. A form without one accepts nothing; see below.
 
 ## The form type is missing from the create schema
 
@@ -59,6 +59,73 @@ A site should render a form from its definition — field markers, types and lab
 
 When you are asked to "add a field to the contact form", that is a change to the form definition, not to any code.
 
+## A form must be bound to a module before it accepts submissions
+
+A form on its own is a definition and nothing else. What lets a submission exist is a **module config** — the object that binds the form to a module (pages, products, users…) and to entities inside it. Every submission names the config it was made against, so a form with no config accepts nothing at all, and the failure is a flat `400`.
+
+Creating a form does not create a config. The create operation has no field for one, so a fresh form has zero, and the first submission against it fails. Say that in your plan; it is not an error you discover later.
+
+The config is created through the **form update**, which carries a `formModuleConfigs` array the create body does not have:
+
+```json
+{ "formModuleConfigs": [ { "formId": 5,
+                           "moduleId": 4,
+                           "isGlobal": false,
+                           "entityIdentifiers": [ { "id": "contacts-page", "isNumeric": false, "childrenOn": false } ],
+                           "isClosed": false,
+                           "isModerate": false,
+                           "viewOnlyUserData": true,
+                           "commentOnlyUserData": false } ] }
+```
+
+- `formId` is the form you are updating, `moduleId` the module it is bound to — read the modules listing for the id, do not guess it.
+- `isGlobal: true` with an empty `entityIdentifiers` binds the form to every entity of that module. Otherwise list the entities: `id` numeric or textual with `isNumeric` saying which, and `childrenOn` to include an entity's children.
+- The pair `(formId, moduleId)` is unique. Sending the same pair again updates that config rather than adding a second one.
+
+So the working path from nothing to a stored submission is four calls:
+
+1. **create the form** — wrapped under `newForm`, with an explicit `type`;
+2. **update the form** with `formModuleConfigs` — this is the step that has no operation of its own and is the one people miss;
+3. **read the form by id** and take `formModuleConfigs[].id`. That number is the `formModuleConfigId` a submission needs, and reading it back is the only way to learn it;
+4. **create the form data**, naming both the form and the config.
+
+A submission body needs four things: `formIdentifier` (the form's marker), `formModuleConfigId` (the id from step 3), `moduleEntityIdentifier` (the entity the submission is *for* — a textual identifier, a numeric id for products, a login for users and admins), and the locale-keyed `formData`.
+
+**`formIdentifier` and `formModuleConfigId` must describe the same form.** The server loads the config, joins it back to its form, and compares identifiers. A mismatch — and equally a `formModuleConfigId` that matches no config at all, which is what you get when the form was never bound — answers:
+
+```
+400 Incorrect formIdentifier for provided config
+```
+
+The message names `formIdentifier` because that is the field it compares, but the field that is usually wrong is the config id. Read the form and check what configs it actually has before re-sending anything.
+
+### An update drops every config you do not send back
+
+`formModuleConfigs` is a full replacement list, not a patch. A form update that omits it is read as "this form has no configs": every existing binding is deleted, **and the submissions recorded against those bindings are deleted with them**. The call answers `200 true`.
+
+This makes an ordinary edit — retitling a form, changing its processing type — destructive by omission. Read the form first and send its current `formModuleConfigs` back unchanged unless changing them is the point of the update.
+
+→ `mcp/docs/api/silent-no-ops`
+
+## The order the errors arrive in
+
+The checks on a submission do not run in the order the payload is written, and the first error you see is not the only thing wrong. In order:
+
+| # | check | what it says when it fails |
+|---|---|---|
+| 1 | payload shape, locales, attribute markers | the marker or locale that does not belong to the form |
+| 2 | required fields | `required values are missing or incorrect: <marker>` |
+| 3 | field types, lists, validators, captcha | the offending field |
+| 4 | the form's `type` | `Form has incorrect type: <type>` |
+| 5 | the config, against `formIdentifier` | `Incorrect formIdentifier for provided config` |
+
+Steps 1–3 are field validation and steps 4–5 are the form itself, so **field errors arrive before the config error every time**. Fill in the missing field and the same request fails again on the config. That sequence reads like the config became a problem only afterwards; it did not. It was always required, and it was simply behind a check that failed earlier.
+
+Two consequences worth planning around:
+
+- **A typeless form can never accept a submission.** Step 4 rejects anything that is not `data` or `rating`, and a form created without `type` is `null`. That is the same trap as the create schema above, surfacing here as a submission failure rather than a create failure.
+- **On the admin API, steps 1–3 do not run.** Field validation is wired into the content API only. Submitting through the admin API means a missing required field is stored rather than rejected, and the config check is the first thing you meet. A `400` there is about the binding, not about the fields — and a submission that the admin API accepts is not evidence that a visitor's submission would pass.
+
 ## Reading submissions
 
 Form data operations list what was submitted, filter it, and fetch individual submissions. A submission carries the field values plus metadata about who submitted it and when.
@@ -86,6 +153,10 @@ Before confirming, count the submissions and tell the human the number. "Delete 
 
 - **Sending the create body unwrapped.** Nest it under `newForm`.
 - **Building the body from the create schema alone.** `type` is not in it and the form ends up typeless.
+- **Submitting to a form that was never bound to a module.** There is no config, so there is no `formModuleConfigId` that works. Bind it through the form update first.
+- **Taking `formIdentifier` and `formModuleConfigId` from different forms.** They are compared; read the config id off the form you are actually submitting to.
+- **Reading a field error as proof the config is optional.** Field checks simply run first.
+- **Updating a form without echoing `formModuleConfigs`.** The bindings and their submissions are deleted, and the call answers `200`.
 - **"Correcting" `sing_in_up` on an unmigrated instance.** The current value is `sign_in_up`; if that is rejected, the instance is behind — say so.
 - **Building field validation from a form read by marker without checking it.** Validators written flat are absent there.
 - **Hardcoding a form's fields.** Render from the definition.

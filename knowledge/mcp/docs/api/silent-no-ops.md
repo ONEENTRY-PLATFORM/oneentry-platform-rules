@@ -18,6 +18,7 @@ This document lists the known cases with the route that actually works. Read it 
 | page update with no `parentId` | `200` | the page is moved to the root and the old parent's `childrenCount` drops | read the page and send `parentId` back unchanged |
 | block update with no `blockPages` | `200` | every page attachment is removed | read the block and send its page list back unchanged |
 | form create with no `type` | `201` | the form is stored with `type: null`; the field is absent from the schema, so nothing reports it | send `type` anyway — it is accepted |
+| form update with no `formModuleConfigs` | `200 true` | every module binding is deleted, and the submissions recorded against them go too | read the form and send its current `formModuleConfigs` back unchanged |
 | entity create with a one-level `attributesSets` map | `201` | the attribute values are stored empty | build it two levels deep: locale, then `<type>_id<id>` |
 
 ## Why a read-back is the only detection
