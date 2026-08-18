@@ -82,7 +82,9 @@ The locale level is not only for values. Inside a set, an attribute's own locali
 }
 ```
 
-`listTitles` and `additionalFields` follow the same shape.
+`listTitles` follows the same shape: a locale key, then the list of options. What sits **inside** an option does not — the extra value of an option is flat, and `additionalFields` is a separate marker-keyed list that holds no option data at all. Both are worth reading about before writing a choice field.
+
+→ `mcp/docs/api/list-options-and-extra-values`
 
 Written one level flat — `"validators": { "requiredValidator": { "strict": true } }` — the attribute is accepted and the call succeeds, but the rule is stored where nothing reads it. The attribute then behaves as one with no validators: the validator map comes back empty for every locale, and a field you meant to make required is not enforced when the value is submitted.
 
@@ -104,6 +106,19 @@ The projection resolves each localized field for the requested locale. A flat `v
 So verify a validator through the read the consumer uses — the form by marker, or the set's attributes by marker — and check that `validators` is non-empty there. If it is empty while the raw read is full, the shape is flat: rewrite it under the locale key rather than concluding that validators are unsupported.
 
 → `mcp/docs/server/payload-conventions#verify-with-the-read-your-consumer-uses` · `mcp/docs/api/silent-no-ops`
+
+## Values outlive the attribute you removed
+
+Dropping an attribute from a set does not remove the values entities already hold under its key. They stay on every entity that had one, invisible in the admin panel and absent from public reads — and a read-modify-write cycle sends them straight back, so they reproduce themselves on every subsequent update.
+
+Two consequences worth planning for:
+
+- when you remove an attribute, strip its key from the entities in the same run, or say that you did not;
+- when you build an update from a read, compare the keys you are about to send against the current set and drop the ones it no longer defines.
+
+An attribute deleted before it was given a type leaves a key behind too, so the leftovers are not always recognisable as former attributes.
+
+→ `mcp/docs/api/bulk-content-migration#read-back-every-object-you-wrote`
 
 ## Changing an attribute afterwards
 

@@ -6,13 +6,13 @@ The shape of a file attribute's value depends on how many files it holds, which 
 
 → `mcp/docs/api/attribute-types` · `mcp/docs/server/response-shaping`
 
-## This server cannot upload a file
+## Uploading goes through two tools of its own
 
-`cms_api_call` sends every request body as **JSON**. The upload operation wants `multipart/form-data`, so it cannot be called through this server at all. It is in the catalog because it exists, and `cms_api_describe` marks it `notExecutable` — no body shape, no retry and no encoding trick will help.
+`cms_api_call` sends every request body as **JSON**, and the upload operation wants `multipart/form-data` — so it has two tools instead: `cms_upload_file` for a file on the machine running the server, `cms_import_file_from_url` for one the server fetches. `cms_api_describe` still marks the operation as not callable through `cms_api_call`, and points at them.
 
-Say so to the human rather than working around it silently. Whoever uploads outside MCP gives up everything this server provides on the way: the confirm gate, the local permission check, `dryRun`, and the audit line. If a task needs dozens of images, that is worth stating before it starts, not after.
+Both are writes: `--allow=write`, audited, `dryRun` supported, and both refuse a source outside the bounds the operator set. Uploading outside MCP is what gives up the confirm gate, the permission check and the audit line, so prefer the tools.
 
-Everything below still applies to that outside upload — it is the same endpoint.
+→ `mcp/docs/server/cms-upload-file`
 
 ## Uploading
 
@@ -41,6 +41,8 @@ So, once per instance, before the first image:
 
 Previews are generated for `png`, `jpeg` and `jpg` only. Documents get no preview by design, which is why an upload of a PDF never carries one.
 
+The preview is not only a thumbnail: the inline placeholder a site shows while the full image loads comes from the preview record, so an image without one cannot be rendered progressively. That is what makes the template id worth settling before the first upload rather than after the last.
+
 → `mcp/docs/api/templates-and-previews` · `mcp/docs/api/baseline-data`
 
 ## Referencing a file from an attribute
@@ -65,6 +67,20 @@ Handle both. An attribute holding one image today holds two the moment a content
 value is a list   → take the first element
 value is an object → use it directly
 ```
+
+## A file record has nowhere to keep alt text
+
+The stored record carries the file's identity, its name, its links, its size and its content type — and no `alt`, no `title`. There is nowhere in it to put the text a screen reader announces, and no image passes an accessibility review without one.
+
+The workable convention is a sibling attribute next to each image field, named the same way everywhere — decide the naming once per project and write it into the handover. Otherwise every project invents its own and no site can read alt text generically.
+
+## There is no batch delete
+
+Files are removed one at a time. Re-uploading a gallery therefore leaves the previous files in storage, consuming quota, and finding them afterwards means matching by name.
+
+So on a large run, settle the preview template and the file naming before the first upload rather than re-uploading to fix them.
+
+→ `mcp/docs/api/bulk-content-migration#uploading-many-files`
 
 ## Binary values are stripped from responses
 
@@ -100,5 +116,7 @@ Do not assume a link you obtained on one instance works on another, and do not c
 - **Treating a stripped value as data loss.** The metadata is all there.
 - **Deleting a file without finding its references.** Silent missing images.
 - **Copying a file reference between instances.** Upload again instead.
+- **Expecting an `alt` field on the record.** Use a sibling attribute.
+- **Re-uploading a gallery to fix a naming decision.** The old files stay.
 
 → `mcp/docs/api/verification-recipes`

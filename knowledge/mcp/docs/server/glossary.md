@@ -16,11 +16,15 @@ Entries are alphabetical within each group.
 
 **confirm token** — a 24-character single-use token, valid five minutes, bound to the exact call. Required for deletes and for the permanently gated paths.
 
+**curated body** — a body fragment verified on a live instance, returned by `cms_api_describe` beside the document's own example. Where the two disagree, the curated one is what the instance reads.
+
 **dry run** — `dryRun: true`. Returns the resolved request, the policy decision and the current state of the target, without sending anything.
 
 **instance** — one deployment of the OneEntry platform. Ids are not portable between instances; markers are.
 
 **loose field** — a body field whose declared type is not a JSON Schema type, marked `"x-loose": true`. Its `example` is the contract.
+
+**upload root** — the directory `cms_upload_file` may read from, set by the operator. A path outside it is refused with nothing read and nothing sent.
 
 **operation id** — the identifier you pass to `cms_api_call`, for example `AdminPagesController_findAllRoot`. Comes from `cms_api_search` and is never constructed by hand.
 

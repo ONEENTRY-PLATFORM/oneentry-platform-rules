@@ -72,10 +72,37 @@ If a human wants an existing order adjusted, that is a refund or a manual change
 
 A coupon is a discount gated behind a code the customer supplies. The code is the identifier customers type, so it needs to be unambiguous — and once it is distributed, it cannot be changed without invalidating what was distributed.
 
+## Which operation created a coupon decides its reuse
+
+Two operations create coupons and they produce opposite behaviour:
+
+| how the coupon was made | what you get |
+|---|---|
+| created from a code you supply | reusable — one code, valid for everyone, any number of times |
+| generated from a mask | single-use — each code stops working after the order that used it |
+
+`isReusable` is reported in the response and **not accepted in the create body**, so reuse follows from the operation rather than from a field you can set. There is no way to make a supplied code single-use.
+
+On a "15% off your first order" discount that difference is the whole meaning: one route gives fifteen per cent to everyone forever, the other gives each subscriber their own code that burns on use. Read the coupon back and check `isReusable` against what you promised the human.
+
+## A discount with no limits is a discount for everyone
+
+An empty `conditions` with no coupons applies to every order of every customer, without end. The object is created, the amount is right, a read confirms it — and the meaning is the opposite of what was asked for.
+
+State the discount in words first: "fifteen per cent off the first order for someone who subscribed" carries three limits, and none of them is expressed by the amount. Then check each one against the object:
+
+- **a coupon** is the gate — where coupons exist, the conditions apply only when one is used;
+- **single use** comes from mask generation, not from a supplied code;
+- **conditions** narrow which products, categories or totals are touched.
+
+One line to check before calling it configured: a discount that is not meant for everyone cannot have both `conditions` and its coupon list empty.
+
 ## Common mistakes
 
 - **Choosing `FIXED_PRICE` when `FIXED_AMOUNT` was meant.** One sets the price, the other reduces it.
 - **Confusing per-item and per-order applicability.** Very different totals.
 - **Conditioning on a non-indexed attribute.** Silently matches nothing.
-- **Creating a discount with no conditions.** It applies to everything.
+- **Creating a discount with no conditions and no coupons.** It applies to everything, for everyone.
+- **Creating a coupon from a supplied code and calling it one-shot.** It is reusable; generate from a mask.
+- **Sending `isReusable` in the create body.** It is not accepted there.
 - **Expecting a discount to change existing orders.** It does not, by design.

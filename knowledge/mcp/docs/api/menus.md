@@ -32,6 +32,7 @@ Practical consequences:
 
 - When you move or update an item, **carry its parent reference through unchanged** unless you are deliberately re-parenting. Dropping it flattens the item to the top level, which looks like the menu reorganising itself.
 - When you read an item to modify it, keep the whole parent information, not just an id.
+- The stored parent is a bare number with no kind attached, while page items and custom items are numbered separately. A custom item and a page item can therefore share a number, and children hung on it are returned under **both** — a menu then arrives with more items than it has. Before nesting anything, read the menu and check that its included pages and its custom items share no id; where they do, the route today is to recreate the custom item until its id differs, and to report the collision.
 
 This is the single most common way a menu gets quietly broken.
 
@@ -69,11 +70,26 @@ This 500 is known and expected, not an instance fault. The general rule for a 5x
 Top-down, one level at a time:
 
 1. Create the menu with an empty `pagesIds`.
-2. Attach the top-level items with an update, and read them back to learn their ids.
-3. Add each level of children against the parents you just read.
-4. Set the order last, using the position operation.
+2. Attach the pages with an update. `pagesIds` is a **flat set**: nesting is not taken from the page tree, so even pages whose parents are also in the menu come back at the top level.
+3. Add custom items for everything that is not a page — products, external addresses, column headings. An empty `value` is refused, so a heading with no link needs a placeholder target such as `#`.
+4. Nest each level with the position operations, against the parents you read back.
+
+Two things that bite here:
+
+- **The label is the page's `menuTitle`, not its title.** A menu built without setting `menuTitle` arrives carrying page headings instead of the wording the navigation is supposed to show.
+- **One page is one item.** `pagesIds` is a set, so a page that has to appear in two places gets a custom item with the same target for the second appearance. Listing it twice loses one of the two silently.
 
 Trying to create a nested structure in one payload, or bottom-up, produces items whose parents do not exist yet.
+
+## Ordering items is not reproducible today
+
+The position operations take a required `position` object even when the order does not matter — `{ "leftObjectId": null, "rightObjectId": null }`. Omitting it answers `5xx`, and an empty object is not enough.
+
+Re-parenting through those operations applies. **Sibling order does not:** the call answers success and the items keep the position they had, and public reads do not take order from stored positions either — page items arrive ordered by page id, custom items after them.
+
+So build the menu correct in composition and nesting, tell the human that item order cannot be set from the API today, and report it. Trying further bodies is what this costs if you do not.
+
+→ `mcp/docs/api/silent-no-ops`
 
 ## Delete a menu or an item
 
@@ -89,5 +105,8 @@ Both are confirm-gated where they are destructive. Read the tree before confirmi
 - **Patching a position field.** Use the position operation.
 - **Referring to a page by id.** Use the page URL.
 - **Removing a pinned item.** It returns; change the setting instead.
+- **Expecting `pagesIds` to carry nesting.** It does not; nest afterwards.
+- **Using a page's title as its menu label.** The label is `menuTitle`.
+- **Listing one page twice in `pagesIds`.** Use a custom item for the second place.
 
 → `mcp/docs/api/verification-recipes#menus`
