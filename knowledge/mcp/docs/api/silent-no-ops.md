@@ -20,12 +20,23 @@ This document lists the known cases with the route that actually works. Read it 
 | form create with no `type` | `201` | the form is stored with `type: null`; the field is absent from the schema, so nothing reports it | send `type` anyway — it is accepted |
 | form update with no `formModuleConfigs` | `200 true` | every module binding is deleted, and the submissions recorded against them go too | read the form and send its current `formModuleConfigs` back unchanged |
 | entity create with a one-level `attributesSets` map | `201` | the attribute values are stored empty | build it two levels deep: locale, then `<type>_id<id>` |
+| a menu item position operation | `200` | the item is re-parented but sibling order does not change, and public reads ignore stored order | there is none today — build composition and nesting, and report the order as unavailable |
+| an event created on an unsupported module | `201` | it is stored, reads back complete and never fires | pick one of the six supported modules; if the task needs another, say so |
+| a coupon created from a code you supply | `201` | it is reusable, not single-use, and `isReusable` is not accepted in the body | generate from a mask when each code must burn on use |
+| an attribute removed from a set | `200` | the values entities hold under its key stay, and a read-modify-write sends them back | strip the removed key from the entities in the same run |
+| an option extra value written under a locale key | `200` | it is stored and the admin panel shows the field as empty | put `type` and `value` flat in `extended`, with no locale level |
+| a batch write over many entities | `200` per call | one entity can be missed with nothing in the response to say which | re-read every entity you wrote and retry the mismatches |
+| any request once the admin session lapses | `200` with the login page as the body | nothing at all was written | re-authenticate; through this server that retry is automatic, and a second login page is reported |
 
 ## Why a read-back is the only detection
 
 Every row above is indistinguishable from success at the point of the call. There is no error to react to, no warning field, and no difference in the response body. The write is accepted; it is the *meaning* that is lost.
 
-So the only signal is reading the entity again — and reading it **the way its consumer will**. Six of these fail specifically when verified through the endpoint that was written to, because that endpoint echoes the input back, wrong shape included.
+So the only signal is reading the entity again — and reading it **the way its consumer will**. Most of these fail specifically when verified through the endpoint that was written to, because that endpoint echoes the input back, wrong shape included.
+
+Two rows are worse than that: a field that exists to drive the admin panel returns your own input from every read there is, so no request proves anything about it. For those, the proof is a human opening the screen — and saying the check is incomplete is the honest report when nobody can.
+
+→ `mcp/docs/api/bulk-content-migration#panel-facing-fields-cannot-be-verified-by-reading`
 
 `cms_api_describe` names the verifying read under `verifyWith` for the operations where the pairing is known, and repeats the caveat under `silentNoOp`. `cms_api_call` echoes both after a successful mutation.
 

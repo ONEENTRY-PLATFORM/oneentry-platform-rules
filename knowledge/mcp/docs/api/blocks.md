@@ -39,6 +39,10 @@ Attachment lives with the page, not with the block, and carries a position withi
 
 Create or locate the block first, then attach it. Attaching a marker that does not exist yet leaves a reference resolving to nothing, and the page renders without it and without an error.
 
+**Then read the page through the public route a site uses.** A page carrying an attached block has been observed to answer `5xx` on public reads while the admin read of both the page and the block stays perfectly healthy — the block itself is unreadable publicly too, and an empty block is enough to produce it. If that happens, detach the block so the site keeps working, keep the content in page attributes for now, and report it with the page URL and the block marker. Do not conclude the block was written wrongly: it was not.
+
+→ `mcp/docs/api/content-modelling#attribute-first-block-second-new-set-last`
+
 ## Updating a block does not leave its pages alone
 
 A block update whose body has no `blockPages` is applied as "this block is on no pages" — every attachment it had is removed, nesting included, and the call answers `200`. This is how a block disappears from a site after an edit that had nothing to do with placement.
@@ -85,5 +89,7 @@ A deleted block leaves those pages without it, silently.
 - **Editing content on a dynamic block.** Its contents come from settings, not from its own body.
 - **Patching a position field.** Use the position operation.
 - **A one-level attribute map.** Accepted, stored empty. Read back.
+- **Creating a block for a single page.** That is what an attribute is for.
+- **Checking only the admin read after attaching.** Read the page publicly too.
 
 → `mcp/docs/api/verification-recipes#blocks`

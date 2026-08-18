@@ -1,6 +1,6 @@
 # Operating rules for the OneEntry Admin API
 
-Read this before your first write. Every rule here has broken a real payload; each links to the document explaining it in full. When one applies to what you are about to do, follow the pointer before you build the body.
+Read this before your first write. Every rule here has broken a real payload, and each links to the document explaining it. When one applies, follow the pointer before you build the body.
 
 → `mcp/docs/server/doc-map` · `mcp/docs/server/payload-conventions`
 
@@ -9,15 +9,13 @@ Read this before your first write. Every rule here has broken a real payload; ea
 1. `cms_guide` once, at the start.
 2. `cms_docs_search` for the entity you are about to touch — **before** the payload, not after a 400.
 3. `cms_api_search` for the operation, then `cms_api_describe` for its shape.
-4. `cms_api_call` with `dryRun: true` for anything that mutates, then again with the confirm token if one was issued.
+4. `cms_api_call` with `dryRun: true` for anything that mutates, then again with the confirm token. Files go through `cms_upload_file` or `cms_import_file_from_url`.
 
 Never invent a path, an operation id or a body key. `cms_api_search` is the only authority on what exists.
 
 ## Trust the example not the type
 
-The API document carries field types that are not JSON Schema types. `cms_api_describe` normalises what it can and marks the rest `"x-loose": true`.
-
-For those, **the `example` is the contract** — copy its shape. Validation here is advisory; the instance is the real validator, so a call is never blocked over a field we could not check. A field flagged `x-example-mismatch` contradicts its own type, and the example wins there too.
+The API document carries field types that are not JSON Schema types. `cms_api_describe` normalises what it can and marks the rest `"x-loose": true`, and for those **the `example` is the contract**. A field flagged `x-example-mismatch` contradicts its own type, and the example wins there too; a `curatedBody` beats both.
 
 → `mcp/docs/server/cms-api-describe#loose-fields`
 
@@ -29,7 +27,7 @@ Titles and descriptive content live under `localizeInfos`, keyed by locale code:
 { "localizeInfos": { "en_US": { "title": "Summer sale" } } }
 ```
 
-Required on a product, effectively required on a page. Do not hardcode `en_US`: read the active locales with `AdminLocalesController_findAllActive` and write every one the content is meant to appear in.
+Required on a product, effectively required on a page. Never hardcode `en_US`: read the active locales and write every one the content is meant to appear in. The one structure that is **not** locale keyed is an option's extra value.
 
 → `mcp/docs/api/locales`
 
@@ -41,90 +39,90 @@ Required on a product, effectively required on a page. Do not hardcode `en_US`: 
 { "attributesSets": { "en_US": { "string_id42": "SKU-1" } } }
 ```
 
-The inner key is `<attribute type>_id<attribute id>`, read from the entity's attribute set. A flat one-level map is accepted, answers 201 and stores nothing — so read the entity back by id after creating it.
+The inner key is `<attribute type>_id<attribute id>`, from the entity's attribute set. A flat one-level map is accepted, answers 201 and stores nothing — read the entity back by id.
 
 → `mcp/docs/api/attribute-sets`
 
 ## Positions are lexorank or numeric depending on the endpoint
 
-Ordering is a lexorank **string** on parent-scoped Admin operations and a **number** on flat lists and the Content API. Never sort a lexorank numerically, and never reorder by patching the field — use that entity's position operation.
+Ordering is a lexorank **string** on parent-scoped Admin operations and a **number** on flat lists and public reads. Never sort a lexorank numerically, never reorder by patching the field, and never send a string one back to an update.
 
 → `mcp/docs/server/payload-conventions#position-is-a-lexorank-string-or-a-number`
 
 ## A read straight after a write can lag
 
-Reading an entity **by id** shows your write immediately. Lists and searches may not, for a few seconds.
-
-If a list does not show what you just created, re-read by id. **Never repeat the write** — you get a duplicate that consumes quota and has to be cleaned up by hand. And never swallow a failed read into an empty result: "empty" and "malformed" then look alike, and the next run recreates everything.
+Reading an entity **by id** shows your write immediately; lists and searches may lag by seconds. So re-read by id and **never repeat the write** — that makes a duplicate somebody cleans up by hand. Never swallow a failed read into an empty result either: the next run then recreates everything.
 
 ## A 200 means accepted not applied
 
-Several endpoints take the body as one opaque value, so a wrong **shape** is stored as happily as a right one and the answer is still `200`.
-
-Confirm a write by its effect, and **through the read its consumer uses**. The raw record echoes your input back, wrong shape included, while the projection a site receives shows nothing — verifying through the endpoint you wrote to proves little.
+Several endpoints take the body as one opaque value, so a wrong **shape** is stored as happily as a right one and the answer is still `200`. Confirm a write by its effect, **through the read its consumer uses** — the raw record echoes your input back, wrong shape included.
 
 → `mcp/docs/api/silent-no-ops`
 
 ## An omitted field can mean clear it
 
-Most updates merge. A few apply an omitted field as **"set it to nothing"**, and still answer `200`: a page without `parentId` moves to the root, a block without `blockPages` detaches from every page, a menu item without its parent reference flattens, a user without `formData` loses it.
+Most updates merge. A few apply an omitted field as **"set it to nothing"** and still answer `200`: a page loses `parentId` to the root, a block loses every page attachment, a menu item flattens, a form loses its bindings and their submissions. Products merge, so "PUT always replaces" is the wrong lesson.
 
-Products, `generalTypeId` and `attributeSetId` merge, so "PUT always replaces" is the wrong lesson. Read, change what you meant to, send it back whole — then check the fields that were **not** in your body.
+Read, change what you meant to, send it back whole — then check the fields that were **not** in your body.
 
 → `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it`
 
 ## Prefer marker over id
 
-Blocks, forms, menus, templates, general types and modules are addressed by a `marker` or `identifier` stable across instances. A numeric `id` is not, and a `404` on an id you were given is usually that. Where an operation accepts either, use the marker.
+Blocks, forms, menus, templates, general types and modules carry a `marker` or `identifier` stable across instances. A numeric `id` is not, and a `404` on an id you were handed is usually that. Where both are accepted, use the marker.
 
 ## Baseline data already exists do not recreate it
 
-Every instance arrives populated: user groups, modules, general types, attribute set and field types, locales, block types with their default templates, the singleton settings.
+Every instance arrives populated: user groups, modules, general types, attribute set and field types, locales, block types, the singleton settings. **List first, create second** — the dangerous duplicates (user groups, modules, attribute set types, settings) succeed silently.
 
-**List first, create second.** Some duplicates fail loudly, which is harmless. The dangerous ones — user groups, modules, attribute set types, settings — **succeed silently**.
-
-Two lists are the exception and start **empty**: product statuses and template previews. Nothing seeds them, nothing reports their absence, and without them no product is sellable and no upload gets a preview. There, create.
+Two lists start **empty**: product statuses and template previews. Nothing reports their absence, yet without them no product is sellable and no upload gets a preview. There, create.
 
 → `mcp/docs/api/baseline-data`
 
 ## Never touch these without a human saying so
 
-Mutations on the instance's own configuration — admins, modules, backups, settings — are permanently confirm-gated at every allow level. `cms_guide` prints the exact list.
-
-The gate is not a suggestion. State what you intend to change, show the human the dry run's `target`, and wait for a yes here.
+Mutations on the instance's own configuration — admins, modules, backups, settings — are confirm-gated at every allow level, and `cms_guide` prints the list. State what you intend to change, show the dry run's `target`, wait for a yes.
 
 → `mcp/docs/server/allow-levels#paths-that-are-always-confirm-gated`
 
 ## Permissions are checked before the request is sent
 
-Each operation declares the permission it needs, and this server refuses locally when the admin does not hold it. Nothing is sent, so nothing changed. A refusal means **ask for the grant** and stop — no retry and no sibling operation gets past it.
+Each operation declares the permission it needs, and this server refuses locally when the admin does not hold it — nothing is sent. **Ask for the grant** and stop: no retry and no sibling operation gets past it.
 
 → `mcp/docs/api/admins-and-permissions`
 
 ## Truncated responses are deliberate
 
-A large response comes back with a `_truncated` envelope reporting what was shown and what the total was. That is this server capping what it hands you, not the API. Do not retry hoping for more — narrow the request with the operation's own `limit`, `offset` and filters.
+A large response comes back with a `_truncated` envelope saying what was shown and what the total was — this server capping the answer, not the API. Do not retry for more; narrow the request with the operation's `limit`, `offset` and filters.
 
 → `mcp/docs/server/response-shaping`
 
 ## Operations with a single supported path
 
-One route works and the obvious alternative does not. Use it directly.
+One route works and the obvious alternative does not.
 
-- **Create a form** — wrap in `newForm`, with `type` (`data` for a contact form) though the schema omits it.
-- **Replace an attribute set schema** — send the schema object itself. Wrapped as `{ "schema": … }` it answers 200 and destroys it.
+- **Create a form** — wrapped in `newForm`, with `type`, which the schema omits.
+- **Replace an attribute set schema** — the schema object itself. Wrapped as `{ "schema": … }` it answers 200 and destroys it.
 - **Update a product** — include `blocks` (`[]` if nothing to set), never `forms`.
-- **Create a menu** — with `pagesIds: []`, attaching pages later. Non-empty on create answers 500.
-- **Set a product status** — `statusId` in the product update. Bulk `set-status` takes it in a field named `id`, and given `statusId` it nulls the status and answers `201 true`.
+- **Create a menu** — with `pagesIds: []`; non-empty answers 500. Nesting and labels come later.
+- **Set a product status** — `statusId` in the product update, not bulk `set-status`.
+- **Upload a file** — `cms_upload_file` or `cms_import_file_from_url`; `cms_api_call` sends JSON only.
 
 ## List products and other calls whose input is split
 
-`POST /products/all` is the only way to list products, and its input is split: **paging and `langCode` go in the query, the body is an array of filters** — `[]` for none. Sent in the body they are ignored, and the 400 blames `langCode` for a value you never sent.
-
-Copy `example` from `cms_api_describe` whole: separate `params` and `body` schemas do not assemble into an obvious call, and `example` is already one.
+`POST /products/all` is the only way to list products, and its input is split: **paging and `langCode` in the query, the body an array of filters** — `[]` for none. Sent in the body they are ignored, and the 400 blames `langCode` for a value you never sent. Copy `example` from `cms_api_describe` whole, and prefer `curatedBody` where it appears.
 
 A 5xx outside these two lists means stop and report it, with the operation id and the request.
 
+## Reading it back is not always verifying
+
+Two cases where the habit is not enough:
+
+- **A batch write** can miss one entity while every response reports success. Re-read **all** of them — for products, by ids in one call — and retry the mismatches. Calculated values such as ratings arrive after a delay: wait, then check again.
+- **A field that exists for the admin panel** — an option's extra value, a flag like `multiselect` — comes back from every read exactly as sent, while the panel still shows it empty. Get a human to look, or report the check as incomplete and say what is unverified.
+
+→ `mcp/docs/api/bulk-content-migration#panel-facing-fields-cannot-be-verified-by-reading`
+
 ## Where to look next
 
-`mcp/docs/server/doc-map` lists every document with a reason to read it. The corpus is **English** — search it in English whatever language you answer in.
+`mcp/docs/server/doc-map` lists every document with a reason to read it, and `mcp/docs/api/content-modelling` covers where content should go. The corpus is **English** — search it in English whatever language you answer in.

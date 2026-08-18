@@ -61,6 +61,21 @@ Resolve both against the instance. An id copied from another instance points som
 
 → `mcp/docs/api/attribute-sets`
 
+## One structure that is not locale keyed
+
+The locale-first rule has one exception worth memorising, because it is inside a structure that follows the rule everywhere else. The **extra value of a list option** is flat:
+
+```json
+{ "title": "Cherry", "value": "cherry", "position": 1,
+  "extended": { "type": "string", "value": "#d11241" } }
+```
+
+`listTitles` is keyed by locale. The option inside it is not, and `extended` carries `type` and `value` directly. Adding a locale level by analogy is accepted, reads back exactly as written, and shows as an empty field in the admin panel.
+
+The general lesson is the one to carry: a field that appears in neither the operation schema nor this corpus is not safely inferred from its neighbour. Find it documented, or verify it by looking at the result.
+
+→ `mcp/docs/api/list-options-and-extra-values`
+
 ## position is a lexorank string or a number
 
 Ordering comes in two forms, and which one you get depends on the endpoint:
@@ -109,6 +124,7 @@ The known cases, all of them relationship fields:
 | page | `parentId` | moves the page to the root and decrements the old parent's `childrenCount` |
 | block | `blockPages` | detaches the block from every page it was on |
 | menu item | parent reference | flattens the item to the top level |
+| form | `formModuleConfigs` | deletes every binding and the submissions made against them |
 | user | `formData`, `notificationData` | replaces them with empty values |
 
 Products, `generalTypeId` and `attributeSetId` merge — the rule is not "PUT always replaces", and treating it that way makes you resend fields you have not read and get wrong.

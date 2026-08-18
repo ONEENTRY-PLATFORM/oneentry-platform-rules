@@ -68,6 +68,33 @@ Two habits save turns:
 - Start from the schema's `example` when there is one, and change only what you need. The example is real output from a working call far more often than a hand-written schema is correct.
 - Send the minimum the operation requires, then read the entity back and add fields in a second update. A large speculative body fails as one opaque 400; a small one fails informatively.
 
+## curatedBody beats the document example
+
+Some operations come back with a `curatedBody`, plus a line saying where it came from:
+
+```json
+{ "curatedBody": { "position": { "leftObjectId": null, "rightObjectId": null } },
+  "curatedBodySource": "Verified on a live instance. Where this disagrees with \"example\" or with the body schema above, this is the shape the instance and the admin panel read." }
+```
+
+It is a fragment verified by making the call, not generated from the document — and it is printed **beside** the document's own `example` rather than replacing it, because the disagreement between the two is itself the useful information. Where they differ, copy `curatedBody`, and read `note` for what each part of it prevents.
+
+A `curatedBody` is the sign that this operation has already cost somebody a silent failure. Read the `note` in full before building the body.
+
+## Behaviour the schema does not carry
+
+Three fields appear only where practice has something the document does not:
+
+| field | meaning |
+|---|---|
+| `note` | behaviour that is not in the schema: where a parameter lives, which of several accepted shapes is read, what an omitted field clears |
+| `silentNoOp` | the operation answers success without doing the work, and the text names the route that works |
+| `verifyWith` | the read that proves the write landed, with the exact field to look at |
+
+`cms_api_call` echoes `silentNoOp` and `verifyWith` back after a successful mutation, so the reminder arrives at the moment it matters as well as here.
+
+→ `mcp/docs/api/silent-no-ops`
+
 ## Unknown operation ids
 
 ```json
@@ -85,5 +112,6 @@ Check three things in the describe output before moving on:
 1. **`risk` and `alwaysConfirm`** — do you already know this will need a confirm token?
 2. **`permission`** — does `cms_whoami` show the admin holding it? If not, ask for the grant now rather than after a refusal.
 3. **`looseFields`** — is there a field whose example you need to copy rather than invent?
+4. **`curatedBody`, `note`, `silentNoOp`** — has this operation a known way of failing quietly?
 
 Then call with `dryRun: true` if the operation mutates anything.

@@ -43,6 +43,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/server/cms-api-search` | Finding an operation |
 | `mcp/docs/server/cms-api-describe` | Getting an operation's parameters and body shape |
 | `mcp/docs/server/cms-api-call` | Actually calling one |
+| `mcp/docs/server/cms-upload-file` | Putting a file into the instance, from disk or from an address |
 | `mcp/docs/server/response-shaping` | A response came back truncated or with values stripped |
 
 ## When something goes wrong
@@ -59,6 +60,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 |---|---|
 | `mcp/docs/server/agent-workflows` | You want the whole sequence for a common task |
 | `mcp/docs/api/verification-recipes` | You need to prove a change worked |
+| `mcp/docs/api/bulk-content-migration` | The task is hundreds of writes rather than one |
 | `mcp/docs/api/silent-no-ops` | A write answered 200 or 201 and you are about to call it done |
 | `mcp/docs/server/authoring-knowledge` | You are adding to or correcting this documentation |
 
@@ -67,8 +69,10 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | docId | Read it when |
 |---|---|
 | `mcp/docs/api/locales` | Writing localized content, or content is blank in a language |
+| `mcp/docs/api/content-modelling` | Deciding where content goes, before the first write |
 | `mcp/docs/api/attribute-sets` | Building any payload with attribute values |
 | `mcp/docs/api/attribute-types` | A value came back in a shape you did not expect |
+| `mcp/docs/api/list-options-and-extra-values` | A field a visitor picks from, or an option that needs an image or a colour |
 | `mcp/docs/api/general-types` | Creating an entity that needs a type |
 | `mcp/docs/api/pages` | Working with the page tree |
 | `mcp/docs/api/blocks` | Creating or attaching blocks |
@@ -103,6 +107,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | docId | Read it when |
 |---|---|
 | `mcp/docs/api/forms-and-form-data` | Defining a form or reading submissions |
+| `mcp/docs/api/rating-forms-and-reviews` | Reviews, star ratings, or importing either |
 | `mcp/docs/api/users-and-groups` | A Content API route returns a permission error |
 | `mcp/docs/api/admins-and-permissions` | An operation was refused for lack of a permission |
 
@@ -111,6 +116,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | docId | Read it when |
 |---|---|
 | `mcp/docs/api/modules` | Explaining why an admin section is missing |
+| `mcp/docs/api/events` | Sending a mail or a push when something happens |
 | `mcp/docs/api/settings` | Instance-wide settings, limits and quota |
 | `mcp/docs/api/import` | Bulk-loading content from a file |
 | `mcp/docs/api/ai-gateway` | The platform's own model-calling feature |
@@ -131,5 +137,15 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why do my uploaded images have no preview | `mcp/docs/api/files-and-uploads#no-preview-template-no-preview-and-no-error` |
 | Why did my page jump to the root after an update | `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it` |
 | Why does creating a menu with pages answer 500 | `mcp/docs/api/menus#create-the-menu-empty` |
-| How do I upload a file through this server | `mcp/docs/api/files-and-uploads#this-server-cannot-upload-a-file` |
+| How do I upload a file through this server | `mcp/docs/server/cms-upload-file` |
+| Where do the rating and aggregation settings live | `mcp/docs/api/rating-forms-and-reviews#the-rating-settings-live-in-the-module-config` |
+| How do I put an image or a colour on a list option | `mcp/docs/api/list-options-and-extra-values#extra-values-sit-in-extended-with-no-locale-key` |
+| Why does the panel show one selected option out of four | `mcp/docs/api/list-options-and-extra-values#several-selected-options-need-multiselect` |
+| Why did my menu arrive with more items than it has | `mcp/docs/api/menus#parent-references-are-polymorphic` |
+| Why can I not set the order of menu items | `mcp/docs/api/menus#ordering-items-is-not-reproducible-today` |
+| Why does my event never fire | `mcp/docs/api/events#an-event-on-another-module-is-created-and-never-fires` |
+| Why is my coupon working for everybody | `mcp/docs/api/discounts#which-operation-created-a-coupon-decides-its-reuse` |
+| How do I import reviews from another system | `mcp/docs/api/rating-forms-and-reviews#importing-reviews-from-another-system` |
+| Where does alt text for an image live | `mcp/docs/api/files-and-uploads#a-file-record-has-nowhere-to-keep-alt-text` |
+| Why did a page start answering 500 after I added a block | `mcp/docs/api/blocks#attaching-a-block-to-a-page` |
 | How do I delete something safely | `mcp/docs/server/confirm-and-dry-run` |

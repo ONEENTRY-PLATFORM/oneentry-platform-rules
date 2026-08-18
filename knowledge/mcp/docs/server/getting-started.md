@@ -11,7 +11,7 @@ The server exposes the **Admin API only**. The Content and Developer APIs are de
 One MCP server that lets an agent operate a OneEntry instance's Admin API. It has two halves:
 
 - **Knowledge** — this documentation, fetched from a public repository at runtime and searchable through `cms_docs_search` and `cms_docs_read`.
-- **Actuation** — every Admin API operation of the instance you point at, built from that instance's own OpenAPI document, with parameter and body schemas, the permission each one requires, and a risk classification. All of it reachable through one generic invoke tool rather than one tool per endpoint.
+- **Actuation** — every Admin API operation of the instance you point at, built from that instance's own OpenAPI document, with parameter and body schemas, the permission each one requires, and a risk classification. All of it reachable through one generic invoke tool rather than one tool per endpoint, plus two tools for the one thing a JSON body cannot carry: uploading a file.
 
 Nothing is frozen into the package. The catalog always describes the API that is actually running, and the documentation updates without an npm release.
 

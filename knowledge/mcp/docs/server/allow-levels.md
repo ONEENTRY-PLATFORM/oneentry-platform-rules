@@ -34,6 +34,14 @@ The classification is not read from the API document and cannot be influenced by
 
 `cms_api_describe` reports the `risk` of an operation, and `cms_api_search` can filter by `mutating: true` or `false`.
 
+## Uploading a file is a write
+
+The two upload tools — `cms_upload_file` and `cms_import_file_from_url` — sit behind the same gate as `cms_api_call`. At `read` both are refused before anything is read from disk or fetched from the network, and the refusal is recorded like any other.
+
+They also carry bounds the level does not express, because their **source** is a tool argument: a root directory the local one cannot leave, a size cap, a refusal of any address inside the network the server runs in, and in remote mode an operator allowlist before the URL import works at all.
+
+→ `mcp/docs/server/cms-upload-file#what-both-tools-refuse`
+
 ## A level refusal happens before authentication
 
 This ordering is deliberate and worth relying on. When the level forbids an operation, the server refuses **before** it authenticates and before it builds a request. No HTTP call leaves the process:

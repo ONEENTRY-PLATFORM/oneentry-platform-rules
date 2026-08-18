@@ -51,6 +51,27 @@ That advice is safe **for products**, whose update merges what you send. It is n
 
 → `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it` · `mcp/operating-rules#operations-with-a-single-supported-path`
 
+## One article number is one product
+
+Variants that carry their own article number in the source — colours, sizes, finishes — are **separate products**, not one product with a variant field. The article number is what decides it: different numbers in the source, different products in the catalogue.
+
+Two things follow that are easy to get half right:
+
+- **A product holds only its own images.** Copying the whole gallery into every colour is the same mistake one step later. A source site that shows one shared gallery for every colour is not a model to copy.
+- **The link between variants is a relation template**, not an attribute listing the other colours. The attribute the rule compares must be **indexed**, or the rule matches nothing and nothing says so.
+
+Anything with a closed set of values — colour, badge, label, product kind — is a `list`, never free text. A filter can be built from a list and not from a string, and two spellings of one value become two filter entries.
+
+→ `mcp/docs/api/product-relations` · `mcp/docs/api/list-options-and-extra-values`
+
+## There is no stock field
+
+A product carries a status — available, unavailable — and no quantity of its own. A stock number is an ordinary numeric attribute.
+
+Where the source does not publish quantities, agree a placeholder with the human and **record that it is a placeholder** in the handover. Statuses stay real regardless: a product unavailable on the source site is unavailable in the catalogue.
+
+→ `mcp/docs/api/product-statuses` · `mcp/docs/api/bulk-content-migration#report-the-result-as-numbers`
+
 ## Prices and the price attribute
 
 A price is an ordinary numeric attribute that has been marked as the product's price in its attribute set. That marking is what makes it appear as a price in listings, filters and order calculations rather than as a plain number.
@@ -101,6 +122,9 @@ Only attributes that are indexed can be filtered on. A filter over a non-indexed
 - **Bulk `set-status` with a `statusId` field.** It nulls the status and answers success.
 - **Omitting `blocks` on an update, or sending `forms`.** Both are avoidable failures.
 - **A one-level attribute map.** Silently empty. Read back.
+- **Putting every colour in one product.** One article number, one product.
+- **A free-text field where the values are a closed set.** Use a `list`.
+- **Storing a rating or a review count as an attribute.** The platform calculates both.
 - **Treating a `null` price as zero.**
 - **Re-creating a product because the list did not show it yet.** Lists lag by seconds; read by id and never repeat a create.
 

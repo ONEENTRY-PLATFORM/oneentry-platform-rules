@@ -12,7 +12,7 @@ There are nineteen types and no way to add a twentieth. Pick from the list.
 |---|---|
 | `string` | a plain string |
 | `text` | rich text, carrying a markup form alongside a plain form |
-| `textWithHeader` | rich text with a heading |
+| `textWithHeader` | a **list** of heading-and-text pairs |
 | `integer` | a whole number |
 | `real`, `float` | a number |
 | `date` | a date value |
@@ -22,7 +22,7 @@ There are nineteen types and no way to add a twentieth. Pick from the list.
 | `image` | one or more image references |
 | `groupOfImages` | always a list of image references |
 | `radioButton` | the id of a chosen option |
-| `list` | the chosen option ids |
+| `list` | the chosen option ids; `multiselect` decides whether more than one shows |
 | `entity` | references to other entities, by marker |
 | `timeInterval` | a definition of repeating intervals |
 | `button` | a label and a target |
@@ -40,6 +40,21 @@ That distinction matters when you branch on a value: treating `null` as `0` turn
 A `text` or `textWithHeader` value carries both a markup form and a plain form. Write the markup form; read whichever the consumer needs.
 
 Do not put markup into a `string`. It is stored verbatim and rendered as characters wherever the admin panel or a site shows it.
+
+## textWithHeader is a list of pairs
+
+The value of a `textWithHeader` attribute is a list, and holding several heading-and-text pairs in one attribute is what the type exists for:
+
+```json
+[ { "header": "How to use",
+    "htmlValue": "<p>Rinse before first use.</p>",
+    "mdValue": "", "plainValue": "",
+    "params": { "editorMode": "html" } } ]
+```
+
+An accordion of a dozen questions is one attribute with a dozen items — not one item with the questions marked up inside it, and not one attribute per question.
+
+→ `mcp/docs/api/content-modelling#textwithheader-holds-several-heading-and-text-pairs`
 
 ## Files and images depend on the count
 
@@ -66,6 +81,8 @@ An `entity` attribute holds references to other entities, expressed as markers r
 
 Resolve the marker against the instance before writing it; a reference to a marker that does not exist is stored and then fails to resolve when read.
 
+On the public side the value of an `entity` attribute can arrive as a brace-wrapped string of quoted markers rather than as a list. Parse it defensively — accept a list, and accept that form too — instead of assuming one shape.
+
 ## json is not an escape hatch
 
 A `json` attribute holds arbitrary structure, which makes it tempting for anything awkward. The cost is that nothing else understands it: it cannot be filtered on, cannot be indexed for search, and does not render in the admin panel as anything but raw data.
@@ -78,6 +95,17 @@ Use a typed attribute whenever one fits, and reserve `json` for genuinely opaque
 
 `timeInterval` is different again: it describes recurring intervals and is expanded into concrete ranges at read time, so what you write and what a consumer sees are not the same shape.
 
+## Two ways a value disappears from a public read
+
+Both are silent, and both look like a write that did not happen:
+
+- **A very long value.** Past roughly six kilobytes a value stops appearing in public reads, with no error and no marker. Long article bodies belong in the entity's own content rather than in an attribute.
+- **A brace character inside a value.** A `{` or `}` in free text can fail the public read of the whole attribute set with a `5xx`, while the admin panel still shows everything intact. Since editors type whatever they like, this is worth knowing before a customer meets it.
+
+So after writing free text, read the entity **through the public route a site uses**, not only through the admin read. A `5xx` there with an intact admin read points at the content, not at the instance — say which value you suspect when you report it.
+
+→ `mcp/docs/api/verification-recipes#the-general-pattern`
+
 ## When a value looks wrong after writing
 
 1. Was the attribute key built as `<type>_id<id>` from the set, with the right type prefix?
@@ -85,5 +113,8 @@ Use a typed attribute whenever one fits, and reserve `json` for genuinely opaque
 3. For a file or image, did you send the shape matching the number of files?
 4. For a choice type, did you send an option id rather than a label?
 5. Did you read the entity back by id, rather than looking at a list that may lag?
+6. For a choice type with several selections, is `multiselect` set on the attribute?
+
+→ `mcp/docs/api/list-options-and-extra-values`
 
 → `mcp/docs/api/attribute-sets#checklist-before-writing-values`
