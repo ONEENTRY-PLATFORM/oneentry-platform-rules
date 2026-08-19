@@ -142,8 +142,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | How do I put an image or a colour on a list option | `mcp/docs/api/list-options-and-extra-values#extra-values-sit-in-extended-with-no-locale-key` |
 | Why does the panel show one selected option out of four | `mcp/docs/api/list-options-and-extra-values#several-selected-options-need-multiselect` |
 | Why did my menu arrive with more items than it has | `mcp/docs/api/menus#parent-references-are-polymorphic` |
-| Why can I not set the order of menu items | `mcp/docs/api/menus#ordering-items-is-not-reproducible-today` |
-| Why does my event never fire | `mcp/docs/api/events#an-event-on-another-module-is-created-and-never-fires` |
+| How do I set the order of menu items | `mcp/docs/api/menus#ordering-items` |
+| Why is my event refused on this module | `mcp/docs/api/events#an-event-on-another-module-is-refused` |
 | Why is my coupon working for everybody | `mcp/docs/api/discounts#which-operation-created-a-coupon-decides-its-reuse` |
 | How do I import reviews from another system | `mcp/docs/api/rating-forms-and-reviews#importing-reviews-from-another-system` |
 | Where does alt text for an image live | `mcp/docs/api/files-and-uploads#a-file-record-has-nowhere-to-keep-alt-text` |

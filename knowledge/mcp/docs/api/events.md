@@ -2,7 +2,7 @@
 
 An event watches something in one module and sends a message when it happens: a mail, a push, a notification. It is how "tell the customer when the order ships" is configured without any code.
 
-Read this before promising a human that a notification can be built. Which modules an event can watch is a closed list, and an event outside it is created without complaint and never fires.
+Read this before promising a human that a notification can be built. Which modules an event can watch is a closed list, and one outside it is refused.
 
 → `mcp/docs/api/modules` · `mcp/docs/api/forms-and-form-data`
 
@@ -21,13 +21,13 @@ Six: catalogue, forms, orders, users, payments, discounts.
 
 **There is no content module among them.** An event on a page, a block or one of their attributes cannot be built, so "send a mail when this article is published" is not an events task. Say that instead of looking for the right payload — and see the next section for why the API will not say it for you.
 
-## An event on another module is created and never fires
+## An event on another module is refused
 
-A `moduleId` outside those six is accepted. The event is stored, reads back fully populated, appears in listings — and nothing is ever sent, because the module has no event settings at all.
+A `moduleId` outside those six answers `400`, and the message names every module that is accepted. The same check runs on update, so an event cannot be moved onto an unsupported module either.
 
-Nothing in the response distinguishes it from a working event, which makes this the most expensive shape of mistake here: the API reports success and the human reports that the notification is not configured. Choose the module from the six, and if the task needs another one, report it.
+Take the rejection at face value: it means the notification the human asked for cannot be built as an event, not that the body was malformed. Report that, rather than looking for a payload that gets through.
 
-→ `mcp/docs/api/silent-no-ops`
+An event created with no `moduleId` at all is a template — see the notification node of a workflow.
 
 ## The subject and the body live in localizeInfos
 
@@ -62,13 +62,13 @@ There is no operation that lists them, so build one message, send it to yourself
 4. Read it back and confirm `moduleId` and the localized fields.
 5. Trigger the condition once, on a scratch entity, and confirm a message arrives.
 
-Step 5 is the only real check. Everything before it passes for an event on an unsupported module too.
+Step 5 is the only real check of delivery. Step 1 matters: taking the `moduleId` from the listing is what keeps step 3 from being refused.
 
 ## Checking that an event is configured
 
 | check | what it catches |
 |---|---|
-| `moduleId` is one of the six | an event that is stored and inert |
+| the create answered `201`, not `400` | a module that has no event settings |
 | `localizeInfos.<locale>.title` is set | an event a human cannot find in the panel |
 | `subject` and `template` are non-empty per locale | a message written under `mailing` |
 | one real trigger delivered | placeholders that did not resolve |

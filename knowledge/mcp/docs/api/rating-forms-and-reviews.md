@@ -64,7 +64,7 @@ The Admin API route treats one authenticated author as one review per entity: th
 
 What the visitor route needs, beyond the submission body:
 
-- a per-request device metadata header carrying a fingerprint and basic client information. It is required, and the failure it causes does not name it;
+- a per-request `x-device-metadata` header carrying a fingerprint and basic client information, shaped `{"fingerprint":"…","deviceInfo":{"os":"…","browser":"…","location":"…"}}`. It is required for a form that carries a rating, and omitting it answers `400` naming the header;
 - a fingerprint that is **distinct per review and derived from the review** — a random one per run turns the second run into a duplicate set;
 - `formData` values in the field's own shape: a `text` field takes a list of objects carrying the markup value, not a bare string.
 

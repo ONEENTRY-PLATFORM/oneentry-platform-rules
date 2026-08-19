@@ -70,9 +70,11 @@ value is an object → use it directly
 
 ## A file record has nowhere to keep alt text
 
-The stored record carries the file's identity, its name, its links, its size and its content type — and no `alt`, no `title`. There is nowhere in it to put the text a screen reader announces, and no image passes an accessibility review without one.
+The record an upload returns carries the file's identity, its name, its links, its size and its content type — and no `alt`, no `title`. There is nowhere in it to put the text a screen reader announces, and no image passes an accessibility review without one.
 
-The workable convention is a sibling attribute next to each image field, named the same way everywhere — decide the naming once per project and write it into the handover. Otherwise every project invents its own and no site can read alt text generically.
+There is somewhere to put it one level up. When you write the file into an image or file attribute, the slot object keeps the keys you add to it: send `alt` and `title` alongside the upload's own fields and both come back from the public read of that attribute. Use exactly those two names — an agreed pair is what makes alt text readable across projects.
+
+Two limits to state when you use it. The admin panel does not show these keys, so a human re-saving that image in the panel can drop them; and a sibling attribute next to the image field is still the option to choose when the text has to be editable by hand.
 
 ## There is no batch delete
 
@@ -116,7 +118,7 @@ Do not assume a link you obtained on one instance works on another, and do not c
 - **Treating a stripped value as data loss.** The metadata is all there.
 - **Deleting a file without finding its references.** Silent missing images.
 - **Copying a file reference between instances.** Upload again instead.
-- **Expecting an `alt` field on the record.** Use a sibling attribute.
+- **Expecting an `alt` field on the upload record.** Put `alt` and `title` on the attribute slot instead.
 - **Re-uploading a gallery to fix a naming decision.** The old files stay.
 
 → `mcp/docs/api/verification-recipes`

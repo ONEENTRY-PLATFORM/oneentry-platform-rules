@@ -81,7 +81,7 @@ An `entity` attribute holds references to other entities, expressed as markers r
 
 Resolve the marker against the instance before writing it; a reference to a marker that does not exist is stored and then fails to resolve when read.
 
-On the public side the value of an `entity` attribute can arrive as a brace-wrapped string of quoted markers rather than as a list. Parse it defensively — accept a list, and accept that form too — instead of assuming one shape.
+On the public side the value arrives as a list. On an instance carrying older content it can also arrive as a brace-wrapped string of quoted markers, until that entity is written again. Parse defensively — accept both forms — rather than assuming one shape.
 
 ## json is not an escape hatch
 
@@ -95,14 +95,11 @@ Use a typed attribute whenever one fits, and reserve `json` for genuinely opaque
 
 `timeInterval` is different again: it describes recurring intervals and is expanded into concrete ranges at read time, so what you write and what a consumer sees are not the same shape.
 
-## Two ways a value disappears from a public read
+## Read free text through the public route
 
-Both are silent, and both look like a write that did not happen:
+Free text is unrestricted: length and punctuation, braces included, come back from the public read as written. Very long bodies still belong in the entity's own content rather than in an attribute — that is a choice about whoever edits it, not a limit.
 
-- **A very long value.** Past roughly six kilobytes a value stops appearing in public reads, with no error and no marker. Long article bodies belong in the entity's own content rather than in an attribute.
-- **A brace character inside a value.** A `{` or `}` in free text can fail the public read of the whole attribute set with a `5xx`, while the admin panel still shows everything intact. Since editors type whatever they like, this is worth knowing before a customer meets it.
-
-So after writing free text, read the entity **through the public route a site uses**, not only through the admin read. A `5xx` there with an intact admin read points at the content, not at the instance — say which value you suspect when you report it.
+After writing free text, read the entity **through the public route a site uses**, not only through the admin read. The two are different projections, and only the public one tells you what a site will receive.
 
 → `mcp/docs/api/verification-recipes#the-general-pattern`
 

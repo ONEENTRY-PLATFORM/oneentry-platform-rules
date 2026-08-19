@@ -113,7 +113,7 @@ Three things to expect:
 
 - Values follow the field's type — read them as you would an attribute value.
 - Responses are capped by this server; page with the operation's `limit` and `offset`.
-- For **how many** there are, use the count route for the form's marker. Filtering the listing by form identifier does not narrow it and answers empty even where submissions exist, which reads as "the import did nothing".
+- There is no flat listing of every submission: that route answers `405` and names the per-form route to use instead. Always read submissions **by the form's marker**, and use the count route for the form's marker when you only need a total.
 
 → `mcp/docs/server/response-shaping`
 
