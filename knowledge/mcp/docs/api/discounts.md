@@ -74,16 +74,16 @@ A coupon is a discount gated behind a code the customer supplies. The code is th
 
 ## Which operation created a coupon decides its reuse
 
-Two operations create coupons and they produce opposite behaviour:
+Two operations create coupons, and left alone they produce opposite behaviour:
 
-| how the coupon was made | what you get |
+| how the coupon was made | default |
 |---|---|
 | created from a code you supply | reusable — one code, valid for everyone, any number of times |
 | generated from a mask | single-use — each code stops working after the order that used it |
 
-`isReusable` is reported in the response and **not accepted in the create body**, so reuse follows from the operation rather than from a field you can set. There is no way to make a supplied code single-use.
+`isReusable` is accepted in the create body of **both** operations, so the default is a default and not a property of the route. Send it explicitly whenever the distinction matters, and the operation you pick then only decides whether you name the code or have it generated.
 
-On a "15% off your first order" discount that difference is the whole meaning: one route gives fifteen per cent to everyone forever, the other gives each subscriber their own code that burns on use. Read the coupon back and check `isReusable` against what you promised the human.
+On a "15% off your first order" discount that difference is the whole meaning: one setting gives fifteen per cent to everyone forever, the other gives each subscriber their own code that burns on use. Read the coupon back and check `isReusable` against what you promised the human.
 
 ## A discount with no limits is a discount for everyone
 
@@ -103,6 +103,6 @@ One line to check before calling it configured: a discount that is not meant for
 - **Confusing per-item and per-order applicability.** Very different totals.
 - **Conditioning on a non-indexed attribute.** Silently matches nothing.
 - **Creating a discount with no conditions and no coupons.** It applies to everything, for everyone.
-- **Creating a coupon from a supplied code and calling it one-shot.** It is reusable; generate from a mask.
-- **Sending `isReusable` in the create body.** It is not accepted there.
+- **Creating a coupon from a supplied code and calling it one-shot.** It is reusable unless you send `isReusable: false`.
+- **Leaving `isReusable` to the default when the brief says otherwise.** The two operations default in opposite directions.
 - **Expecting a discount to change existing orders.** It does not, by design.

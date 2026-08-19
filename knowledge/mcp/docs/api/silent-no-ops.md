@@ -10,9 +10,7 @@ This document lists the known cases with the route that actually works. Read it 
 
 | operation | what it answers | what does not happen | the route that works |
 |---|---|---|---|
-| bulk product `set-status` with a `statusId` field | `201 true` | the status id goes in `id`; given `statusId` the handler writes `NULL` over the status | include `statusId` in the ordinary product update, then read the product by id |
-| bulk product `set-status`, correctly | `201 true` | it does not re-index, so the listing operation keeps showing the old status | read the product **by id**, not from the listing |
-| attribute set create or update with flat `validators` | `201` / `200` | the rule is stored outside any locale key, so the projection a site reads returns `{}` | key it by locale, then verify through the form or attributes read **by marker** |
+| attribute set schema replace with flat `validators`, `listTitles`, `localizeInfos` or `additionalFields` | `200 true` | the entry is stored outside any locale key, so the projection a site reads returns `{}` | key it by locale. Create and update of the set itself answer `400` for the same body — only the schema-replace operation accepts it |
 | attribute set schema replace wrapped as `{ "schema": … }` | `200 true` | the wrapper is stored as the schema; the previous attributes are gone | send the schema object itself |
 | file upload with no valid `template` | `201` | no `previewLink` is generated | create a template-previews record first and pass its numeric id |
 | page update with no `parentId` | `200` | the page is moved to the root and the old parent's `childrenCount` drops | read the page and send `parentId` back unchanged |
@@ -20,10 +18,6 @@ This document lists the known cases with the route that actually works. Read it 
 | form create with no `type` | `201` | the form is stored with `type: null`; the field is absent from the schema, so nothing reports it | send `type` anyway — it is accepted |
 | form update with no `formModuleConfigs` | `200 true` | every module binding is deleted, and the submissions recorded against them go too | read the form and send its current `formModuleConfigs` back unchanged |
 | entity create with a one-level `attributesSets` map | `201` | the attribute values are stored empty | build it two levels deep: locale, then `<type>_id<id>` |
-| a menu item position operation | `200` | the item is re-parented but sibling order does not change, and public reads ignore stored order | there is none today — build composition and nesting, and report the order as unavailable |
-| an event created on an unsupported module | `201` | it is stored, reads back complete and never fires | pick one of the six supported modules; if the task needs another, say so |
-| a coupon created from a code you supply | `201` | it is reusable, not single-use, and `isReusable` is not accepted in the body | generate from a mask when each code must burn on use |
-| an attribute removed from a set | `200` | the values entities hold under its key stay, and a read-modify-write sends them back | strip the removed key from the entities in the same run |
 | an option extra value written under a locale key | `200` | it is stored and the admin panel shows the field as empty | put `type` and `value` flat in `extended`, with no locale level |
 | a batch write over many entities | `200` per call | one entity can be missed with nothing in the response to say which | re-read every entity you wrote and retry the mismatches |
 | any request once the admin session lapses | `200` with the login page as the body | nothing at all was written | re-authenticate; through this server that retry is automatic, and a second login page is reported |

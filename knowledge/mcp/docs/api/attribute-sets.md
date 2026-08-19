@@ -86,9 +86,13 @@ The locale level is not only for values. Inside a set, an attribute's own locali
 
 → `mcp/docs/api/list-options-and-extra-values`
 
-Written one level flat — `"validators": { "requiredValidator": { "strict": true } }` — the attribute is accepted and the call succeeds, but the rule is stored where nothing reads it. The attribute then behaves as one with no validators: the validator map comes back empty for every locale, and a field you meant to make required is not enforced when the value is submitted.
+Written one level flat — `"validators": { "requiredValidator": { "strict": true } }` — creating or updating the set answers `400`, and the message names the attribute and the field. The same check covers `localizeInfos`, `listTitles` and `additionalFields`.
 
-So after writing an attribute, read the set back and confirm each localized field sits under a locale code — through the right read, which is the next section.
+One route does not run that check: replacing the schema of an existing set. There a flat map is accepted, and the rule is stored where nothing reads it — the attribute then behaves as one with no validators, and a field you meant to make required is not enforced when the value is submitted.
+
+So after replacing a schema, read the set back and confirm each localized field sits under a locale code — through the right read, which is the next section.
+
+→ `mcp/docs/api/silent-no-ops`
 
 ## Two reads two answers
 
@@ -109,14 +113,12 @@ So verify a validator through the read the consumer uses — the form by marker,
 
 ## Values outlive the attribute you removed
 
-Dropping an attribute from a set does not remove the values entities already hold under its key. They stay on every entity that had one, invisible in the admin panel and absent from public reads — and a read-modify-write cycle sends them straight back, so they reproduce themselves on every subsequent update.
+Dropping an attribute from a set clears the values entities held under its key, but not at the instant the call returns: the cleanup runs behind the write. For a short window a read can still show the removed key.
 
-Two consequences worth planning for:
+That window is what to plan for:
 
-- when you remove an attribute, strip its key from the entities in the same run, or say that you did not;
-- when you build an update from a read, compare the keys you are about to send against the current set and drop the ones it no longer defines.
-
-An attribute deleted before it was given a type leaves a key behind too, so the leftovers are not always recognisable as former attributes.
+- do not build an update from a read taken immediately after removing an attribute — a read-modify-write can send the stale key straight back;
+- when you build an update from any read, compare the keys you are about to send against the current set and drop the ones it no longer defines. This is worth doing regardless: it also protects against a set edited by someone else between your read and your write.
 
 → `mcp/docs/api/bulk-content-migration#read-back-every-object-you-wrote`
 

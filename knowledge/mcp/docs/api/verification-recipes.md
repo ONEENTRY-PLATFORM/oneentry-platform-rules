@@ -21,7 +21,7 @@ Skipping step 3 is how a silently-empty attribute map survives verification. Ski
 
 ## Fields that exist for the admin panel
 
-Some structures are there to drive the admin panel: the extra value of a list option, display flags such as `multiselect`, field settings. They are stored as opaque values and any shape is accepted.
+Some structures are there to drive the admin panel: the extra value of a list option, field settings. They are stored as opaque values and any shape is accepted.
 
 For those the chain "wrote it, read it back, it matched" proves **nothing** — the admin read and the public read both hand your own input back, wrong shape included, while the panel shows an empty field or one selection out of four.
 
@@ -34,7 +34,7 @@ So the recipe is different:
 
 Step 4 is the one that matters. A confident report on the strength of a read-back is how a field reaches a customer empty.
 
-The recipe for the commonest case of it — an option's extra value and `multiselect` — is with the field itself.
+The recipe for the commonest case of it — an option's extra value — is with the field itself.
 
 → `mcp/docs/api/list-options-and-extra-values#checking-an-option-you-wrote` · `mcp/docs/api/bulk-content-migration#panel-facing-fields-cannot-be-verified-by-reading`
 

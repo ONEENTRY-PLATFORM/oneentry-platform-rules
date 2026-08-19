@@ -94,7 +94,7 @@ Resolve the parent page before creating a product, and prefer the page URL over 
 
 A product carries a status resolved by marker, which is what a site uses to decide whether it can be bought. Statuses are instance data — read them, do not assume markers like "in stock". **A fresh instance has none**, so the first status is something you create.
 
-Set the status by including `statusId` in the ordinary product update. There is also a bulk `set-status` operation, and it is a trap worth knowing about: the status id goes in a field called **`id`**, not `statusId`. Given `statusId` the handler reads nothing, writes `NULL` over the status, and still answers `201 true`. It does not re-index either, so even a correct bulk write stays invisible to the listing operation until something else triggers a reindex.
+Set the status by including `statusId` in the ordinary product update. There is also a bulk `set-status` operation taking `statusId` and a list of product ids; the older field name `id` is accepted for the same value, and a body with neither answers `400`.
 
 Whichever route you take, read the product back by id and look at `statusId`. The response status is not evidence.
 
@@ -119,7 +119,7 @@ Only attributes that are indexed can be filtered on. A filter over a non-indexed
 - **Looking for `GET /products`.** It does not exist; the list is a `POST`.
 - **Paging in the body of the list call.** It belongs in the query, and the error message blames `langCode` for it.
 - **Swallowing a failed list into an empty result.** The next run creates duplicates of everything.
-- **Bulk `set-status` with a `statusId` field.** It nulls the status and answers success.
+- **Reporting a bulk `set-status` from its response.** Read a product back by id; the status code is not evidence.
 - **Omitting `blocks` on an update, or sending `forms`.** Both are avoidable failures.
 - **A one-level attribute map.** Silently empty. Read back.
 - **Putting every colour in one product.** One article number, one product.

@@ -105,7 +105,7 @@ One route works and the obvious alternative does not.
 - **Replace an attribute set schema** — the schema object itself. Wrapped as `{ "schema": … }` it answers 200 and destroys it.
 - **Update a product** — include `blocks` (`[]` if nothing to set), never `forms`.
 - **Create a menu** — with `pagesIds: []`; non-empty answers 500. Nesting and labels come later.
-- **Set a product status** — `statusId` in the product update, not bulk `set-status`.
+- **Set a product status** — `statusId`, in the product update or in bulk `set-status`.
 - **Upload a file** — `cms_upload_file` or `cms_import_file_from_url`; `cms_api_call` sends JSON only.
 
 ## List products and other calls whose input is split
@@ -119,7 +119,7 @@ A 5xx outside these two lists means stop and report it, with the operation id an
 Two cases where the habit is not enough:
 
 - **A batch write** can miss one entity while every response reports success. Re-read **all** of them — for products, by ids in one call — and retry the mismatches. Calculated values such as ratings arrive after a delay: wait, then check again.
-- **A field that exists for the admin panel** — an option's extra value, a flag like `multiselect` — comes back from every read exactly as sent, while the panel still shows it empty. Get a human to look, or report the check as incomplete and say what is unverified.
+- **A field that exists for the admin panel** — an option's extra value, a field setting — comes back from every read exactly as sent, while the panel still shows it empty. Get a human to look, or report the check as incomplete and say what is unverified.
 
 → `mcp/docs/api/bulk-content-migration#panel-facing-fields-cannot-be-verified-by-reading`
 

@@ -28,11 +28,19 @@ There is a fetch by marker as well as by id, and separate operations for adding 
 
 An item's parent may be another page item or a custom item — the two kinds mix freely in one tree. So a parent reference is meaningful only together with the kind of thing it refers to.
 
+Page items and custom items are numbered separately, so the same number is a valid reference to two different items of one menu. A parent reference therefore carries a kind alongside the id:
+
+- `parentId` — the number, `null` at the top level;
+- `parentType` — `page` or `custom`, `null` at the top level;
+- `itemType` on every item of a public menu tree — `page` or `custom`. This is the value a child of that item must send as its `parentType`.
+
+The position operations accept `newParentType` next to `newParentId`, using the same two values as the `leftObjectType` and `rightObjectType` of the same body.
+
 Practical consequences:
 
 - When you move or update an item, **carry its parent reference through unchanged** unless you are deliberately re-parenting. Dropping it flattens the item to the top level, which looks like the menu reorganising itself.
-- When you read an item to modify it, keep the whole parent information, not just an id.
-- The stored parent is a bare number with no kind attached, while page items and custom items are numbered separately. A custom item and a page item can therefore share a number, and children hung on it are returned under **both** — a menu then arrives with more items than it has. Before nesting anything, read the menu and check that its included pages and its custom items share no id; where they do, the route today is to recreate the custom item until its id differs, and to report the collision.
+- Carry `parentType` with `parentId`. An id on its own is ambiguous whenever a page item and a custom item of that menu share a number.
+- Omitting `newParentType` is accepted: the kind is then worked out from the menu itself, preferring a page item when both match. Send it explicitly when you mean a custom item and the number is also a page item's.
 
 This is the single most common way a menu gets quietly broken.
 
@@ -81,13 +89,15 @@ Two things that bite here:
 
 Trying to create a nested structure in one payload, or bottom-up, produces items whose parents do not exist yet.
 
-## Ordering items is not reproducible today
+## Ordering items
 
-The position operations take a required `position` object even when the order does not matter — `{ "leftObjectId": null, "rightObjectId": null }`. Omitting it answers `5xx`, and an empty object is not enough.
+The position operations take a required `position` object even when the order does not matter — `{ "leftObjectId": null, "rightObjectId": null }`. A body without `position` answers `400` naming the field; an empty object is not enough.
 
-Re-parenting through those operations applies. **Sibling order does not:** the call answers success and the items keep the position they had, and public reads do not take order from stored positions either — page items arrive ordered by page id, custom items after them.
+Both re-parenting and sibling order apply, and a public read returns the items in that order. The order also survives a later update of the menu's `pagesIds`: attaching the same set again does not reshuffle what is already there.
 
-So build the menu correct in composition and nesting, tell the human that item order cannot be set from the API today, and report it. Trying further bodies is what this costs if you do not.
+Neighbours are addressed by the id of the item, not of its position: a page item's neighbour is a page id, a custom item's neighbour is a custom item id. In a mixed row, name each neighbour's kind with `leftObjectType` and `rightObjectType` — without them a neighbour of the other kind is not found, and the moved item lands at the edge of the list instead of between the two.
+
+An update that attaches pages assigns order in the order you list `pagesIds`.
 
 → `mcp/docs/api/silent-no-ops`
 
@@ -108,5 +118,7 @@ Both are confirm-gated where they are destructive. Read the tree before confirmi
 - **Expecting `pagesIds` to carry nesting.** It does not; nest afterwards.
 - **Using a page's title as its menu label.** The label is `menuTitle`.
 - **Listing one page twice in `pagesIds`.** Use a custom item for the second place.
+- **Sending `parentId` without `parentType`.** Ambiguous whenever the two kinds share a number.
+- **Sending a position body without `position`.** It answers 400; the minimal body is `{ "position": { "leftObjectId": null, "rightObjectId": null } }`.
 
 → `mcp/docs/api/verification-recipes#menus`

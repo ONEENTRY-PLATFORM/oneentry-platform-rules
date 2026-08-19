@@ -58,9 +58,9 @@ An attribute whose value may be more than one option needs `multiselect` on the 
 { "type": "list", "identifier": "labels", "multiselect": true, "listTitles": { "en_US": [] } }
 ```
 
-Without it every selected option is stored and returned by both the admin and the public read, and the admin panel displays only the **first** one. No read proves the difference — a human opening the screen sees one selection where there are four.
+Without it every selected option is stored and returned by both the admin and the public read, and the admin panel displays only the **first** one.
 
-So set `multiselect` when you create the attribute, not when someone notices.
+The flag itself is readable: the attribute read by marker returns `multiselect` alongside `type` and `listTitles`, so a check after writing is a real check. Set it when you create the attribute, not when someone notices.
 
 ## additionalFields and image are not extra values
 

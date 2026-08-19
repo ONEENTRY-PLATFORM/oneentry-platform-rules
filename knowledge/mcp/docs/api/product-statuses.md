@@ -44,9 +44,9 @@ Dry run, send, then read the list back and confirm the marker is what you intend
 
 The status is part of the product payload: include `statusId` in the ordinary product update. Read a comparable product first to see the exact field.
 
-There is also a dedicated bulk `set-status` operation, and it needs care. The status id goes in a field named **`id`** — pass `statusId` there and the handler reads nothing, writes `NULL` over the status of every product in the list, and still answers `201 true`. It also does not re-index, so a correct bulk write remains invisible to the product listing until some other change triggers a reindex.
+There is also a dedicated bulk `set-status` operation. It takes the status id as `statusId`, and accepts the older field name `id` for the same value; a body carrying neither answers `400` rather than clearing the status. A successful bulk write re-indexes, so the new status shows up in the product listing on its own.
 
-Prefer the per-product update. Whichever you use, read a product back **by id** and look at `statusId` before reporting anything.
+Whichever you use, read a product back **by id** and look at `statusId` before reporting anything.
 
 Because a status change is what makes a product buyable or unbuyable, treat it as a content change with business meaning: say which products you are about to change and to what, before you do it in bulk.
 
