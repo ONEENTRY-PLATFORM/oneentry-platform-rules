@@ -1,6 +1,6 @@
 # Dynamic block types
 
-Nine block types compute their contents when a site asks, rather than holding a stored list. Each has its own Content API endpoint and its own default template.
+Several block types compute their contents when a site asks, rather than holding a stored list. Each has its own Content API endpoint and its own default template.
 
 They are provisioned with the instance. You configure them; you do not create the types.
 
@@ -19,6 +19,10 @@ They are provisioned with the instance. You configure them; you do not create th
 | Cart complement | Products that go with what is in the cart |
 | Cart similar | Products similar to what is in the cart |
 | Wishlist similar | Products similar to what is on the wishlist |
+
+The similar-products type on a product page belongs with them whenever it is configured to compute its result. It has settings of its own, shared with the two above that work from a cart and a wishlist.
+
+→ `mcp/docs/api/similar-product-blocks`
 
 Each has a general type of its own, so a block of one of these kinds is created like any other block — with that type — and then configured.
 
@@ -44,6 +48,18 @@ How many items, which source, which filters, what to do when there is nothing to
 
 The reliable approach: read a working block of the same type on the same instance and change one field at a time.
 
+## How many items a request may ask for
+
+Each of these types carries its own limit, and the block's setting is the **ceiling**: a request may ask for fewer, never for more. So a request that asks for forty against a block set to twelve gets twelve, with nothing in the response to say it was capped.
+
+Not sending a limit means "use the block's setting" — it is not the same as sending its default. The similar-products type is the exception: it has no limit setting of its own, so it takes the number the request asks for.
+
+## A result can come from the fallback instead
+
+The frequently-ordered type answers with `fallbackUsed`. When it is `true`, nothing was found that was actually bought alongside the product in question, and the block fell back to what sells most.
+
+That is the fastest answer to "why are these suggestions unrelated": the block is working, the order history simply has nothing to say about that product yet. Report it rather than reconfiguring the block.
+
 ## Context dependent output
 
 Several of these types depend on the visitor: recently viewed, repeat purchase, personal recommendations, and the cart and wishlist companions all produce different results for different people, and nothing at all for a visitor with no history.
@@ -65,9 +81,14 @@ cms_api_search { "query": "blocks preview" }
 
 ## Audience filtering
 
-A block can be restricted to visitors matching a rule over user attributes, so the same page shows different blocks to different people. The rule lives in the block's settings.
+A block can be restricted to visitors matching a rule over user attributes, so the same page shows different blocks to different people. The rules live in the block's settings, as a list.
 
-When a block is unexpectedly invisible, check the audience rule before anything else, and use the preview's simulated visitor to test it rather than guessing.
+Two things about that list decide the outcome, and neither is visible in the schema:
+
+- **The first matching rule wins.** The rules are scanned in the order they are stored; the rest are not consulted. They do not combine, so a second rule cannot narrow the first — write one rule per audience, in the order you want them tried.
+- **A rule naming no sections is skipped entirely.** It does not mean "applies everywhere". An empty list is how a rule silently stops doing anything.
+
+When a block is unexpectedly invisible, check the audience rules before anything else, and use the preview's simulated visitor to test them rather than guessing.
 
 ## Common mistakes
 

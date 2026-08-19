@@ -42,12 +42,12 @@ After creating, **read the product back by id**. A one-level attribute map is ac
 
 Two rules that are not visible in the schema:
 
-- **Always include `blocks`.** Send `blocks: []` when you have nothing to set. Omitting it makes the update fail.
 - **Never include `forms`.** The schema accepts the field and the update rejects it on save.
+- **`blocks` and `productPages` are left alone when omitted.** Send them only to change them — and note that `blocks: []` is then a real instruction, meaning "on no blocks", not a filler for a field you had nothing to say about.
 
 Read the product first and send the smallest body that expresses your change. A large speculative body fails as one opaque error; a small one tells you what is wrong.
 
-That advice is safe **for products**, whose update merges what you send. It is not safe everywhere: on pages and blocks an omitted field is applied as "clear it". Check the entity's own document before you shrink a body.
+Shrinking a body is safe here and in most places, because updates merge. It is not safe everywhere: a menu item loses its parent and a form loses its bindings when the field is absent. Check the entity's own document first.
 
 → `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it` · `mcp/operating-rules#operations-with-a-single-supported-path`
 
@@ -120,7 +120,7 @@ Only attributes that are indexed can be filtered on. A filter over a non-indexed
 - **Paging in the body of the list call.** It belongs in the query, and the error message blames `langCode` for it.
 - **Swallowing a failed list into an empty result.** The next run creates duplicates of everything.
 - **Reporting a bulk `set-status` from its response.** Read a product back by id; the status code is not evidence.
-- **Omitting `blocks` on an update, or sending `forms`.** Both are avoidable failures.
+- **Sending `forms` on an update.** The schema accepts it and the save does not.
 - **A one-level attribute map.** Silently empty. Read back.
 - **Putting every colour in one product.** One article number, one product.
 - **A free-text field where the values are a closed set.** Use a `list`.

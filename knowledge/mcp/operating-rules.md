@@ -61,7 +61,7 @@ Several endpoints take the body as one opaque value, so a wrong **shape** is sto
 
 ## An omitted field can mean clear it
 
-Most updates merge. A few apply an omitted field as **"set it to nothing"** and still answer `200`: a page loses `parentId` to the root, a block loses every page attachment, a menu item flattens, a form loses its bindings and their submissions. Products merge, so "PUT always replaces" is the wrong lesson.
+Most updates merge. Two still apply an omitted field as **"set it to nothing"** and answer `200`: a menu item flattens to the top level, a form loses its bindings and their submissions. An explicitly empty value — `[]` or `null` — always means what it says.
 
 Read, change what you meant to, send it back whole — then check the fields that were **not** in your body.
 
@@ -101,10 +101,10 @@ A large response comes back with a `_truncated` envelope saying what was shown a
 
 One route works and the obvious alternative does not.
 
-- **Create a form** — wrapped in `newForm`, with `type`, which the schema omits.
+- **Create a form** — wrapped in `newForm`, with `type`; nothing else reports it missing.
 - **Replace an attribute set schema** — the schema object itself. Wrapped as `{ "schema": … }` it answers 200 and destroys it.
-- **Update a product** — include `blocks` (`[]` if nothing to set), never `forms`.
-- **Create a menu** — with `pagesIds: []`; non-empty answers 500. Nesting and labels come later.
+- **Update a product** — never send `forms`; the schema takes it, the save does not.
+- **Create a menu** — `pagesIds` is a flat set; nesting and labels come later.
 - **Set a product status** — `statusId`, in the product update or in bulk `set-status`.
 - **Upload a file** — `cms_upload_file` or `cms_import_file_from_url`; `cms_api_call` sends JSON only.
 

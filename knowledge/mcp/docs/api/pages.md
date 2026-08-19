@@ -58,11 +58,11 @@ A page created without `localizeInfos` may be accepted and is unusable — it ap
 
 ## Update a page
 
-`parentId` is honoured on create. It is the **update** that is dangerous: an update whose body has no `parentId` is applied as "move this page to the root", and it also decrements the former parent's `childrenCount` and recomputes the position. The call answers `200`, and the page is now somewhere else.
+An update merges: `parentId`, `attributesSets` and `generalTypeId` are all left as they are when the body does not carry them, so an edit to a page's content leaves it where it is in the tree.
 
-Read the page, change what you meant to change, send it back whole, then read it again and check `parentId` — not the fields you set, the ones you did not.
+`parentId: null` is a different instruction. It means "move this page to the root", and it also decrements the former parent's `childrenCount` and recomputes the position — so never send `null` as a stand-in for "no opinion".
 
-`generalTypeId` and `attributesSets` do not behave this way; omitting them leaves them alone. There is no single rule covering both, which is exactly why this needs stating.
+Read the page, change what you meant to change, send it back, then read it again and check `parentId` — not the fields you set, the ones you did not.
 
 → `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it`
 
@@ -93,6 +93,6 @@ The delete operation may accept flags controlling what happens to dependent cont
 - **Assuming a page URL is a route.** It is an identifier for the API, not a path on a website.
 - **Using an id from another instance.** Page ids are local; the page URL is the portable handle.
 - **Reordering by patching position.** Use the position operation.
-- **Updating a page without carrying `parentId` back.** The page silently moves to the root.
+- **Sending `parentId: null` to mean "leave it".** That is the instruction to move the page to the root.
 
 → `mcp/docs/api/verification-recipes#pages`
