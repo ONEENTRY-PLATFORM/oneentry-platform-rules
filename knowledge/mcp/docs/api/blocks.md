@@ -39,17 +39,20 @@ Attachment lives with the page, not with the block, and carries a position withi
 
 Create or locate the block first, then attach it. Attaching a marker that does not exist yet leaves a reference resolving to nothing, and the page renders without it and without an error.
 
-**Then read the page through the public route a site uses.** A page carrying an attached block has been observed to answer `5xx` on public reads while the admin read of both the page and the block stays perfectly healthy — the block itself is unreadable publicly too, and an empty block is enough to produce it. If that happens, detach the block so the site keeps working, keep the content in page attributes for now, and report it with the page URL and the block marker. Do not conclude the block was written wrongly: it was not.
+**Then read the page through the public route a site uses.** The admin read of a page and its block can look healthy while the public projection is not what you meant — that read is the one a visitor gets, so it is the one that proves the attachment.
 
 → `mcp/docs/api/content-modelling#attribute-first-block-second-new-set-last`
 
-## Updating a block does not leave its pages alone
+## What an update does to the pages a block is on
 
-A block update whose body has no `blockPages` is applied as "this block is on no pages" — every attachment it had is removed, nesting included, and the call answers `200`. This is how a block disappears from a site after an edit that had nothing to do with placement.
+`blockPages` distinguishes absent from empty, and the two mean opposite things:
 
-Read the block, keep its current `blockPages`, change what you meant to change, send it back whole. Then read it again and look at `blockPages`.
+- **omitted** — the attachments are left as they are, nesting included. An edit to the block's own content does not move it;
+- **`[]`** — the block is detached from every page it was on, and the call answers `200`.
 
-`attributeSetId` is not affected — omitting it leaves it alone. The danger is specific to the page relationship.
+So an empty array is a deliberate instruction, not a safe default for a field you had nothing to say about. Leave it out unless you mean it.
+
+Read the block, change what you meant to change, send it back, then read it again and look at `blockPages`. That habit is still what catches the difference between the two.
 
 → `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it`
 
@@ -74,7 +77,7 @@ Two consequences when one looks empty:
 - There may be nothing wrong with the block. The rule behind it may simply match nothing for that visitor.
 - Editing the block's own content will not change what it shows. Change the settings or the underlying relation.
 
-→ `mcp/docs/api/block-types` · `mcp/docs/api/product-relations`
+→ `mcp/docs/api/block-types` · `mcp/docs/api/similar-product-blocks` · `mcp/docs/api/product-relations`
 
 ## Delete a block
 

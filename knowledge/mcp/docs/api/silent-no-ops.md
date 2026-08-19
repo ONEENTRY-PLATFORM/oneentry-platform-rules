@@ -13,9 +13,8 @@ This document lists the known cases with the route that actually works. Read it 
 | attribute set schema replace with flat `validators`, `listTitles`, `localizeInfos` or `additionalFields` | `200 true` | the entry is stored outside any locale key, so the projection a site reads returns `{}` | key it by locale. Create and update of the set itself answer `400` for the same body — only the schema-replace operation accepts it |
 | attribute set schema replace wrapped as `{ "schema": … }` | `200 true` | the wrapper is stored as the schema; the previous attributes are gone | send the schema object itself |
 | file upload with no valid `template` | `201` | no `previewLink` is generated | create a template-previews record first and pass its numeric id |
-| page update with no `parentId` | `200` | the page is moved to the root and the old parent's `childrenCount` drops | read the page and send `parentId` back unchanged |
-| block update with no `blockPages` | `200` | every page attachment is removed | read the block and send its page list back unchanged |
-| form create with no `type` | `201` | the form is stored with `type: null`; the field is absent from the schema, so nothing reports it | send `type` anyway — it is accepted |
+| block update with `blockPages: []` | `200` | every page attachment is removed, nesting included | omit the field when placement is not what you are changing; an empty array is an instruction |
+| form create with no `type` | `201` | the form is stored with `type: null`, and nothing in the response says so | send `type` — it is declared and validated, so a wrong value is refused rather than stored |
 | form update with no `formModuleConfigs` | `200 true` | every module binding is deleted, and the submissions recorded against them go too | read the form and send its current `formModuleConfigs` back unchanged |
 | entity create with a one-level `attributesSets` map | `201` | the attribute values are stored empty | build it two levels deep: locale, then `<type>_id<id>` |
 | an option extra value written under a locale key | `200` | it is stored and the admin panel shows the field as empty | put `type` and `value` flat in `extended`, with no locale level |

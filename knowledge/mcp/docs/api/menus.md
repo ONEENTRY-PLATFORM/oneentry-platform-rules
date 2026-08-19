@@ -65,20 +65,20 @@ An item can be marked so that it is added to the menu automatically rather than 
 
 Two implications: do not treat an unexpected item as corruption, and do not remove one without checking whether it will simply come back.
 
-## Create the menu empty
+## Creating a menu with its pages
 
-**Create a menu with `pagesIds: []`, always.** A create carrying a non-empty `pagesIds` answers `500 null value in column "page_id"` — the create path does not build the join rows the pages need, so the insert fails on a not-null column.
+A create may carry `pagesIds`. The ids are checked first: one that does not exist answers `404` naming it, and no menu is created — so a typo costs you nothing to clean up.
 
-Attach the pages with an **update** afterwards. The update path builds those rows correctly, which is why the two calls behave differently on what looks like the same field.
+What the create does **not** do is nest anything. `pagesIds` is a flat set wherever it appears, so the pages arrive as siblings at the top level whatever their relationship in the page tree.
 
-This 500 is known and expected, not an instance fault. The general rule for a 5xx is to stop and report it; this is the documented exception, so route around it instead of escalating.
+Creating empty and attaching with an update afterwards is equally valid and is the better shape when you are building the tree level by level.
 
 ## Building a whole menu
 
 Top-down, one level at a time:
 
-1. Create the menu with an empty `pagesIds`.
-2. Attach the pages with an update. `pagesIds` is a **flat set**: nesting is not taken from the page tree, so even pages whose parents are also in the menu come back at the top level.
+1. Create the menu, with or without `pagesIds`.
+2. Attach any remaining pages with an update. `pagesIds` is a **flat set**: nesting is not taken from the page tree, so even pages whose parents are also in the menu come back at the top level.
 3. Add custom items for everything that is not a page — products, external addresses, column headings. An empty `value` is refused, so a heading with no link needs a placeholder target such as `#`.
 4. Nest each level with the position operations, against the parents you read back.
 
@@ -109,7 +109,6 @@ Both are confirm-gated where they are destructive. Read the tree before confirmi
 
 ## Common mistakes
 
-- **Creating a menu with its pages in one call.** It answers 500; create empty and attach with an update.
 - **Losing the parent reference on an update.** The item jumps to the top level.
 - **Sorting lexorank positions numerically.** The order comes out wrong.
 - **Patching a position field.** Use the position operation.

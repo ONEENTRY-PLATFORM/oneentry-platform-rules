@@ -44,6 +44,18 @@ A result identifies the entity, its kind, and which field the match came from. U
 
 → `mcp/docs/api/index-attributes#what-an-index-attribute-is`
 
+## Semantic search over one kind of entity
+
+Separately from global search, most entity kinds carry a `POST /{kind}/vector/search` route that matches by meaning rather than by word — products, pages, orders, users, discounts, admins and form data each have one. It answers the question global search cannot: "something like this", where the human's wording and the stored wording share no words.
+
+Three things to know before reaching for it:
+
+- It is per kind. There is no cross-entity variant, so pick the kind first.
+- It depends on a capability an instance may not have available. When it is not, the call answers `503`. That is a temporary state, not a malformed request: retry later, or fall back to the entity's own listing with a filter. Do not rewrite the body and try again, and do not report it as a defect without saying it was a 503.
+- On form data the working route is the public one; the admin variant answers `405`.
+
+Match quality follows what has been indexed, so a kind whose content was loaded recently can return less than you expect while the rest of the instance behaves normally.
+
 ## Permissions on the public side
 
 The equivalent Content API route needs its permission granted to the relevant group before a site can call it — and on some instances that grant is not in place by default. A site search that returns a permission error is that, not a missing feature.

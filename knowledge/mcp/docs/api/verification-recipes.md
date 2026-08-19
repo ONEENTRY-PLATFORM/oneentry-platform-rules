@@ -66,13 +66,13 @@ Assert: the product reads back by id with its attributes populated **and `status
 
 Call the listing the way it wants — paging and `langCode` in the query, an array body — and see the `400` once by sending them in the body, so the misleading `langCode` message is familiar rather than surprising.
 
-Update it, including `blocks` and omitting `forms`, and assert the change landed.
+Update it with the smallest body that expresses the change and with no `forms`, and assert the change landed and the page and block relations are still there.
 
 ## Blocks
 
 Create a block, attach it to a scratch page, and set its position.
 
-Assert: the block reads back by marker; the page shows it attached in the expected order; **the page still reads through the public route** — a page carrying a block has been observed to answer `5xx` there while both admin reads stay healthy; for a dynamic block type, the preview operation returns a result and names the rule that applied.
+Assert: the block reads back by marker; the page shows it attached in the expected order; **the page still reads through the public route**, which is the read a visitor gets and the only one that proves the attachment; for a dynamic block type, the preview operation returns a result and names the rule that applied.
 
 An empty dynamic block is not automatically a failure — read the preview's warnings first.
 
@@ -80,11 +80,11 @@ An empty dynamic block is not automatically a failure — read the preview's war
 
 ## Menus
 
-Create the menu with an empty `pagesIds`, then add a page item and a custom item by update, nest one under the other, and reorder.
+Create the menu, add a page item and a custom item, nest one under the other, and reorder.
 
 Assert: the tree reads back with the parent relationships intact — this is the check that catches a parent reference dropped during an update; deleting a parent item removes its branch; the included pages and the custom items **share no id**, which is what catches a branch that would be returned under two parents.
 
-Reordering is the one to try once and stop expecting: the position call answers success, and sibling order comes back as it was.
+Reordering earns three assertions rather than one: the sibling order comes back changed on the admin read, the public read returns the items in that same order, and a later update attaching the same `pagesIds` leaves it alone. Send `parentType` with `parentId` throughout — a tree whose two kinds of item share a number is exactly where the check pays.
 
 → `mcp/docs/api/menus#parent-references-are-polymorphic`
 

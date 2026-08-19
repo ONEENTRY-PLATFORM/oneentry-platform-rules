@@ -123,17 +123,17 @@ The known cases, all of them relationship fields:
 
 | entity | field | what omitting it does |
 |---|---|---|
-| page | `parentId` | moves the page to the root and decrements the old parent's `childrenCount` |
-| block | `blockPages` | detaches the block from every page it was on |
 | menu item | parent reference | flattens the item to the top level |
 | form | `formModuleConfigs` | deletes every binding and the submissions made against them |
 | user | `formData`, `notificationData` | replaces them with empty values |
 
-Products, `generalTypeId` and `attributeSetId` merge — the rule is not "PUT always replaces", and treating it that way makes you resend fields you have not read and get wrong.
+Everything else merges — products, pages, blocks, `generalTypeId`, `attributeSetId`. The rule is not "PUT always replaces", and treating it that way makes you resend fields you have not read and get wrong.
 
-The habit that covers all of it: **read the entity, change what you meant to change, send it back whole**. Then read it again and check the fields that were *not* in your body. Three bugs that look unrelated — a page that jumped to the root, a block that vanished from its page, a menu that reorganised itself — are this one cause.
+Where a field merges, an **explicitly empty** value still means what it says: `blockPages: []` detaches a block from every page, and a `parentId` of `null` moves a page to the root. Absent and empty are two different instructions.
 
-→ `mcp/docs/api/pages` · `mcp/docs/api/blocks` · `mcp/docs/api/silent-no-ops`
+The habit that covers all of it: **read the entity, change what you meant to change, send it back whole**. Then read it again and check the fields that were *not* in your body. A menu that reorganised itself and a form whose submissions disappeared are the same one cause.
+
+→ `mcp/docs/api/menus` · `mcp/docs/api/forms-and-form-data` · `mcp/docs/api/silent-no-ops`
 
 ## Verify with the read your consumer uses
 

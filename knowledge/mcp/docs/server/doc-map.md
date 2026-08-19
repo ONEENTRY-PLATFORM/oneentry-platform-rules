@@ -77,6 +77,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/pages` | Working with the page tree |
 | `mcp/docs/api/blocks` | Creating or attaching blocks |
 | `mcp/docs/api/block-types` | A dynamic block is empty, or you are configuring one |
+| `mcp/docs/api/similar-product-blocks` | Configuring a block that shows products similar to another |
 | `mcp/docs/api/menus` | Building navigation, or a menu reorganised itself |
 | `mcp/docs/api/templates-and-previews` | Changing how something renders |
 | `mcp/docs/api/files-and-uploads` | Uploading files or referencing them from attributes |
@@ -135,8 +136,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why did my write answer 200 and change nothing | `mcp/docs/api/silent-no-ops` |
 | Why are my validators empty when a site reads the form | `mcp/docs/api/attribute-sets#two-reads-two-answers` |
 | Why do my uploaded images have no preview | `mcp/docs/api/files-and-uploads#no-preview-template-no-preview-and-no-error` |
-| Why did my page jump to the root after an update | `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it` |
-| Why does creating a menu with pages answer 500 | `mcp/docs/api/menus#create-the-menu-empty` |
+| Why did my menu item jump to the top level after an update | `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it` |
+| How do I create a menu with its pages | `mcp/docs/api/menus#creating-a-menu-with-its-pages` |
 | How do I upload a file through this server | `mcp/docs/server/cms-upload-file` |
 | Where do the rating and aggregation settings live | `mcp/docs/api/rating-forms-and-reviews#the-rating-settings-live-in-the-module-config` |
 | How do I put an image or a colour on a list option | `mcp/docs/api/list-options-and-extra-values#extra-values-sit-in-extended-with-no-locale-key` |
@@ -147,5 +148,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why is my coupon working for everybody | `mcp/docs/api/discounts#which-operation-created-a-coupon-decides-its-reuse` |
 | How do I import reviews from another system | `mcp/docs/api/rating-forms-and-reviews#importing-reviews-from-another-system` |
 | Where does alt text for an image live | `mcp/docs/api/files-and-uploads#a-file-record-has-nowhere-to-keep-alt-text` |
-| Why did a page start answering 500 after I added a block | `mcp/docs/api/blocks#attaching-a-block-to-a-page` |
+| Why did my block disappear from its pages after an edit | `mcp/docs/api/blocks#what-an-update-does-to-the-pages-a-block-is-on` |
+| Why does my similar-products block answer 400 | `mcp/docs/api/similar-product-blocks#manual-or-automatic-decides-what-a-request-returns` |
+| Why is my similar-products block empty or short | `mcp/docs/api/similar-product-blocks#why-a-block-comes-back-short` |
 | How do I delete something safely | `mcp/docs/server/confirm-and-dry-run` |
