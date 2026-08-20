@@ -76,9 +76,20 @@ So "make the thumbnails bigger" is two steps, not one: change the template, then
 - `404` when no template has that id.
 - `400` when the template carries no usable `proportions`. Give it proportions first; there is nothing to rebuild from without them.
 
-The rebuild is asynchronous. The answer means the work was accepted, not that any image has changed — confirm by re-reading a file's `previewLink` after a pause rather than from the status code.
+The rebuild is asynchronous. The answer means the work was accepted, not that any image has changed — confirm by re-reading a file's `previewLink` after a pause rather than from the status code. How long that pause needs to be scales with how many files reference the template: on a large catalogue it is minutes, not seconds.
 
-`affectedAttributeSets` counts the stored attribute sets referencing this template. **Zero is an answer, not a failure**: nothing already uploaded points at the template, so the change reaches new uploads only. Tell the human that instead of retrying.
+`affectedAttributeSets` counts the stored attribute sets referencing this template, not the number of files. A set that references the template but holds no images still counts. **Zero is an answer, not a failure**: nothing already uploaded points at the template, so the change reaches new uploads only. Tell the human that instead of retrying.
+
+## One unchanged preview does not mean it failed
+
+A rebuild covers each image independently, and one it cannot process is left exactly as it was — its old `previewLink` still points at the old crop. Everything else still updates.
+
+So sampling a single file is not a verdict. If the one you re-read is unchanged, check two or three more before concluding anything:
+
+- some changed, one did not → that file was skipped; the rebuild worked. Name the file to the human and move on.
+- none changed after a wait proportional to the catalogue → then it is worth reporting.
+
+Never re-issue the call because one file looked stale. A second rebuild redoes every image for no gain and takes just as long.
 
 ## Changing a template that is in use
 
