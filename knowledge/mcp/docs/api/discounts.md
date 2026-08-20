@@ -92,7 +92,7 @@ An empty `conditions` with no coupons applies to every order of every customer, 
 State the discount in words first: "fifteen per cent off the first order for someone who subscribed" carries three limits, and none of them is expressed by the amount. Then check each one against the object:
 
 - **a coupon** is the gate — where coupons exist, the conditions apply only when one is used;
-- **single use** comes from mask generation, not from a supplied code;
+- **single use** is `isReusable: false`, which either operation accepts — do not leave it to the default;
 - **conditions** narrow which products, categories or totals are touched.
 
 One line to check before calling it configured: a discount that is not meant for everyone cannot have both `conditions` and its coupon list empty.

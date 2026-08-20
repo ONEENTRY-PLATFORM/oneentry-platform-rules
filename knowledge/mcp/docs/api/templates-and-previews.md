@@ -62,6 +62,24 @@ Then read the list back and keep the numeric id. `template=<id>` on an upload is
 
 → `mcp/docs/api/files-and-uploads#no-preview-template-no-preview-and-no-error` · `mcp/docs/api/baseline-data`
 
+## Changing a preview template does not re-crop old images
+
+A preview is produced when the file is uploaded, from the `proportions` the template held at that moment. Editing those proportions later, or pointing an attribute at a different template, leaves every file already uploaded with the crop it was given. The update answers success and says nothing about the images that already exist.
+
+So "make the thumbnails bigger" is two steps, not one: change the template, then regenerate. Report only the first and the site keeps serving the old crops.
+
+## Regenerate previews for files already uploaded
+
+`POST /template-previews/{id}/regenerate` — `AdminTemplatePreviewsController_regenerate`, permission `settings.templatePreview.update`.
+
+- `200` carrying `enqueued`, `affectedAttributeSets` and `message`.
+- `404` when no template has that id.
+- `400` when the template carries no usable `proportions`. Give it proportions first; there is nothing to rebuild from without them.
+
+The rebuild is asynchronous. The answer means the work was accepted, not that any image has changed — confirm by re-reading a file's `previewLink` after a pause rather than from the status code.
+
+`affectedAttributeSets` counts the stored attribute sets referencing this template. **Zero is an answer, not a failure**: nothing already uploaded points at the template, so the change reaches new uploads only. Tell the human that instead of retrying.
+
 ## Changing a template that is in use
 
 Read which entities reference it first. A template with one consumer is safe to iterate on; one with fifty is a change to fifty things at once.
@@ -80,6 +98,7 @@ Re-point the consumers first, then delete. Deletion is confirm-gated; use the dr
 - **Re-creating a provisioned default.** The identifier is taken.
 - **Renaming an identifier.** References follow the name, not the record.
 - **Deleting before re-pointing.** Consumers are left dangling.
+- **Editing `proportions` and reporting the images updated.** Only new uploads follow the change until you regenerate.
 - **Assuming a preview is what a site will show.** It is a rendering aid; verify on the real surface too.
 
 → `mcp/docs/api/verification-recipes#templates`

@@ -72,5 +72,18 @@ Step 5 is the only real check of delivery. Step 1 matters: taking the `moduleId`
 | `localizeInfos.<locale>.title` is set | an event a human cannot find in the panel |
 | `subject` and `template` are non-empty per locale | a message written under `mailing` |
 | one real trigger delivered | placeholders that did not resolve |
+| the event's mail log carries an entry | a message nobody was resolved to receive |
+
+## Checking whether an event actually sent mail
+
+A configured event tells you nothing about what it sent. `GET /events/{id}/email-logs` — `AdminEventsController_findEmailLogs` — does: it answers a paged list, `limit` and `offset` in the query, newest first, with a total beside the items. One entry per attempted recipient, carrying `email`, `subject`, `status`, `error` and `createdAt`.
+
+`status` is one of three values:
+
+- `sent` — the platform accepted the message for sending. It is **not** a delivery receipt, so do not report a mail as received on the strength of it.
+- `failed` — sending was attempted and did not work; `error` says what happened.
+- `skipped` — it was deliberately not attempted, and the entry says why.
+
+No entries at all after a trigger you know fired means no recipient was resolved. That is a question about the event's module and its condition, not about the message — re-saving `subject` and `template` changes nothing.
 
 → `mcp/docs/api/verification-recipes` · `mcp/docs/api/subscriptions`

@@ -148,6 +148,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why is my coupon working for everybody | `mcp/docs/api/discounts#which-operation-created-a-coupon-decides-its-reuse` |
 | How do I import reviews from another system | `mcp/docs/api/rating-forms-and-reviews#importing-reviews-from-another-system` |
 | Where does alt text for an image live | `mcp/docs/api/files-and-uploads#a-file-record-has-nowhere-to-keep-alt-text` |
+| Why do old images still show the old thumbnail size | `mcp/docs/api/templates-and-previews#changing-a-preview-template-does-not-re-crop-old-images` |
+| Did my event actually send anything | `mcp/docs/api/events#checking-whether-an-event-actually-sent-mail` |
 | Why did my block disappear from its pages after an edit | `mcp/docs/api/blocks#what-an-update-does-to-the-pages-a-block-is-on` |
 | Why does my similar-products block answer 400 | `mcp/docs/api/similar-product-blocks#manual-or-automatic-decides-what-a-request-returns` |
 | Why is my similar-products block empty or short | `mcp/docs/api/similar-product-blocks#why-a-block-comes-back-short` |
