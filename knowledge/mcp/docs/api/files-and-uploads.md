@@ -74,7 +74,7 @@ The record an upload returns carries the file's identity, its name, its links, i
 
 There is somewhere to put it one level up. When you write the file into an image or file attribute, the slot object keeps the keys you add to it: send `alt` and `title` alongside the upload's own fields and both come back from the public read of that attribute. Use exactly those two names — an agreed pair is what makes alt text readable across projects.
 
-Two limits to state when you use it. The admin panel does not show these keys, so a human re-saving that image in the panel can drop them; and a sibling attribute next to the image field is still the option to choose when the text has to be editable by hand.
+Those two names are also the pair the admin panel uses: it offers an `alt` and a `title` field on an image attribute value and writes them back into the same slot object, so text you set through the API is what a human sees and edits, and text a human types is what your next read returns. Where the wording needs a field of its own — reviewed separately, translated on its own schedule — a sibling attribute beside the image is still the better shape.
 
 ## There is no batch delete
 
