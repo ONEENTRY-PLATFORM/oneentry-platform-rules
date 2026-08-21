@@ -81,6 +81,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/menus` | Building navigation, or a menu reorganised itself |
 | `mcp/docs/api/templates-and-previews` | Changing how something renders |
 | `mcp/docs/api/files-and-uploads` | Uploading files or referencing them from attributes |
+| `mcp/docs/api/content-api-reads` | A public read refuses, lags, or serves nothing |
 
 ## Catalogue
 
@@ -110,6 +111,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/forms-and-form-data` | Defining a form or reading submissions |
 | `mcp/docs/api/rating-forms-and-reviews` | Reviews, star ratings, or importing either |
 | `mcp/docs/api/users-and-groups` | A Content API route returns a permission error |
+| `mcp/docs/api/content-api-sign-in-and-cart` | Building the account or cart pages of a site |
 | `mcp/docs/api/admins-and-permissions` | An operation was refused for lack of a permission |
 
 ## Instance configuration
@@ -127,7 +129,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Question | Go to |
 |---|---|
 | Why did my attributes come back empty | `mcp/docs/api/attribute-sets#two-levels-always` |
-| Why is the thing I just created missing from the list | `mcp/docs/api/index-attributes#why-a-value-you-just-wrote-is-missing-from-a-list` |
+| Why is what I just wrote missing from a list or a public read | `mcp/docs/api/index-attributes#when-a-written-value-becomes-searchable` |
 | Why was my call refused with nothing sent | `mcp/docs/server/allow-levels#a-level-refusal-happens-before-authentication` |
 | Why does my filter return nothing | `mcp/docs/api/filters#only-indexed-attributes-can-be-filtered` |
 | Why does creating this fail as a duplicate | `mcp/docs/api/baseline-data#silent-duplicates-versus-hard-failures` |
@@ -135,6 +137,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does the product list complain about `langCode` | `mcp/docs/api/products#listing-products` |
 | Why did my write answer 200 and change nothing | `mcp/docs/api/silent-no-ops` |
 | Why are my validators empty when a site reads the form | `mcp/docs/api/attribute-sets#two-reads-two-answers` |
+| How do I write a text field in a submission | `mcp/docs/api/attribute-types` |
 | Why do my uploaded images have no preview | `mcp/docs/api/files-and-uploads#no-preview-template-no-preview-and-no-error` |
 | Why did my menu item jump to the top level after an update | `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it` |
 | How do I create a menu with its pages | `mcp/docs/api/menus#creating-a-menu-with-its-pages` |
@@ -154,4 +157,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why did my block disappear from its pages after an edit | `mcp/docs/api/blocks#what-an-update-does-to-the-pages-a-block-is-on` |
 | Why does my similar-products block answer 400 | `mcp/docs/api/similar-product-blocks#manual-or-automatic-decides-what-a-request-returns` |
 | Why is my similar-products block empty or short | `mcp/docs/api/similar-product-blocks#why-a-block-comes-back-short` |
+| Why does every public read answer 403 | `mcp/docs/api/content-api-reads#public-reads-use-the-x-app-token-header` |
+| Why is my guest cart empty after adding to it | `mcp/docs/api/content-api-sign-in-and-cart#the-guest-cart-needs-a-uuid-in-x-guest-id` |
+| Why did submissions vanish after a form edit | `mcp/docs/api/forms-and-form-data#an-update-drops-every-config-you-do-not-send-back` |
 | How do I delete something safely | `mcp/docs/server/confirm-and-dry-run` |

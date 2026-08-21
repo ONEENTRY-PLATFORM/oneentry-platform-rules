@@ -44,10 +44,15 @@ Check the restriction before investigating anything else. Removing it is a rules
 
 | Symptom | Usual cause |
 |---|---|
+| **Every** route answers `403 Resource is closed` | The application token was sent as a bearer instead of in `x-app-token` |
 | A permission error naming the route | The route is not granted to the group |
 | Every listing returns the same small count | A read restriction on the group |
 | Works signed in, fails signed out | The rule is on the signed-in group, not on `guest` |
 | Works for one language only | Not permissions — content exists in one locale |
+
+Rule out the first row before changing any rules: it looks exactly like a closed project, and the group's own rules will show the routes as granted the whole time.
+
+→ `mcp/docs/api/content-api-reads#public-reads-use-the-x-app-token-header`
 
 ## Working with users
 
@@ -138,6 +143,7 @@ A returning person is recognised by the account id the network reports rather th
 - **Inventing a `type` for a social network.** It is always `oauth`, plus `oauthProvider`.
 - **Creating a second `guest` group.** Succeeds silently, achieves nothing.
 - **Granting an admin permission to fix a Content API 403.** Different model.
+- **Rewriting group rules over a `403` on every route.** Check the token header first.
 - **Sending only the groups you want to add.** `groupIds` replaces the set.
 - **Updating a user without echoing back its form data.** It is overwritten.
 - **Missing a read restriction** and investigating the data instead.

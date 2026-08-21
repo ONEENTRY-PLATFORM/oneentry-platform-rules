@@ -51,7 +51,7 @@ Ordering is a lexorank **string** on parent-scoped Admin operations and a **numb
 
 ## A read straight after a write can lag
 
-Reading an entity **by id** shows your write immediately; lists and searches may lag by seconds. So re-read by id and **never repeat the write** — that makes a duplicate somebody cleans up by hand. Never swallow a failed read into an empty result either: the next run then recreates everything.
+An **admin** read by id shows your write immediately; admin lists and **every public read**, one entity included, lag by seconds. So re-read after a pause and **never repeat the write** — that makes a duplicate somebody cleans up by hand. Never swallow a failed read into an empty result either: the next run then recreates everything.
 
 ## A 200 means accepted not applied
 
