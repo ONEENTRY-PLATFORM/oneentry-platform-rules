@@ -100,6 +100,23 @@ Whichever route you take, read the product back by id and look at `statusId`. Th
 
 → `mcp/docs/api/product-statuses` · `mcp/docs/api/silent-no-ops`
 
+## Deleting several products at once
+
+The operation on `DELETE /api/admin/products` declares `ids` as a **path** parameter while its path carries no place for it, so the value cannot reach the API. This server refuses that call rather than sending a bare delete of the collection, and `cms_api_describe` marks it `notExecutable`.
+
+Delete a chosen set through the category route instead, with the ids in the **body**:
+
+```text
+DELETE /api/admin/products/category/{pageId}
+{ "ids": [ 104, 105 ] }
+```
+
+The same route with the ids in the query string answers `500` instead of deleting anything. For one product, the single-delete operation needs no category.
+
+Whichever you use, this is a destructive call: dry-run it, show the human the target, and count what is about to go.
+
+→ `mcp/docs/server/confirm-and-dry-run`
+
 ## Relations between products
 
 Related, similar and recommended products come from relation templates and conditions rather than from a list stored on the product.
@@ -127,5 +144,6 @@ Only attributes that are indexed can be filtered on. A filter over a non-indexed
 - **Storing a rating or a review count as an attribute.** The platform calculates both.
 - **Treating a `null` price as zero.**
 - **Re-creating a product because the list did not show it yet.** Lists lag by seconds; read by id and never repeat a create.
+- **Deleting many products through the collection route.** It cannot carry the ids; use the category route with them in the body.
 
 → `mcp/docs/api/verification-recipes#products`

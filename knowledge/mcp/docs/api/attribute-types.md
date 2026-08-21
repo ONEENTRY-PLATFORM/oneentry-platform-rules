@@ -41,6 +41,34 @@ A `text` or `textWithHeader` value carries both a markup form and a plain form. 
 
 Do not put markup into a `string`. It is stored verbatim and rendered as characters wherever the admin panel or a site shows it.
 
+## Text is written one way on an entity and another in a form
+
+Same type, two shapes, and neither is accepted where the other belongs.
+
+On an **entity** — a page, a product — the value carries the forms together, the way the admin panel writes them:
+
+```json
+[ { "htmlValue": "<p>Rinse before first use.</p>",
+    "mdValue": "", "plainValue": "",
+    "params": { "editorMode": "html" } } ]
+```
+
+In a **form submission** it is a list of one object holding **exactly one** of `plainValue`, `htmlValue` or `mdValue`, and nothing else — `[ { "plainValue": "Please call me back." } ]`.
+
+Everything around that is refused, and only the first two answers name the field:
+
+| sent as the value of a form field | answer |
+|---|---|
+| `"Please call me back."` | the marker's value must be an array |
+| `["Please call me back."]` | the value should be of type text |
+| `[{ "value": "…" }]` | value is not allowed |
+| `[{ "htmlValue": "…", "mdValue": "", "plainValue": "" }]` | only one of the three may be provided |
+| the four-key entity shape above | value is not allowed to be empty |
+
+Reaching for the entity shape in a submission is the usual way to arrive at those last two.
+
+→ `mcp/docs/api/forms-and-form-data#fields-are-attributes`
+
 ## textWithHeader is a list of pairs
 
 The value of a `textWithHeader` attribute is a list, and holding several heading-and-text pairs in one attribute is what the type exists for:

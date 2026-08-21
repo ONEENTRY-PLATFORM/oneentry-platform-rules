@@ -44,6 +44,21 @@ Practical consequences:
 
 This is the single most common way a menu gets quietly broken.
 
+## Reading a menu from a site
+
+The public route takes the menu's marker under a `marker` segment:
+
+```text
+GET /api/content/menus/marker/main   → 200
+GET /api/content/menus/main          → 404 Cannot GET
+```
+
+The second is the address people try first, and its `404` is a wrong path rather than a missing menu — nothing about the menu needs fixing when you see it.
+
+One kind of item is only ever seen here: a page whose general type is `external_page` has no public address of its own, and the address it points at arrives in `localizeInfos.<locale>.htmlContent` of its item. That makes such a page the way to put an outside link inside a section of the tree.
+
+→ `mcp/docs/api/content-api-reads#a-page-of-type-external-page-has-no-public-address`
+
 ## Positions are lexorank here and numbers there
 
 On the admin operations, an item's position is a **lexorank string**. On the public side the same ordering is exposed as a **number**.
@@ -119,5 +134,6 @@ Both are confirm-gated where they are destructive. Read the tree before confirmi
 - **Listing one page twice in `pagesIds`.** Use a custom item for the second place.
 - **Sending `parentId` without `parentType`.** Ambiguous whenever the two kinds share a number.
 - **Sending a position body without `position`.** It answers 400; the minimal body is `{ "position": { "leftObjectId": null, "rightObjectId": null } }`.
+- **Reading a menu publicly without the `marker` segment.** That path answers 404.
 
 → `mcp/docs/api/verification-recipes#menus`

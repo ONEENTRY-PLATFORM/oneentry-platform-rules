@@ -24,24 +24,36 @@ When an attribute becomes indexed, existing values have to be picked up before t
 
 ## When a written value becomes searchable
 
-Reading an entity **by id** reflects your write immediately.
+The line is between the **admin side and the public side**, not between one entity and a list.
 
-Lists, filters and search reflect it a short time later — usually seconds.
+An admin read reflects your write immediately — by id, and in an admin listing once the listing catches up, a few seconds later.
+
+Every public Content API read lags by those same seconds, and that includes reading the one entity you just wrote by its address. So the read a site makes is not a way to confirm a write that has just gone in.
 
 ```text
-write a product        → 201, id 512
-list products          → 512 is not there yet
-get product 512        → there it is, with the new value
-list products again    → now it is there
+write a page            → 200
+admin read by id        → the new value, immediately
+public read by url      → the previous value, for a second or three
+public read by url      → the new value
 ```
 
-Both readings are correct. They are answering from different places, and one of them catches up.
+Both answers are correct. They are two projections, and one of them catches up.
+
+Check with a **paused read**, and do not repeat the write — a second write is never what a lagging read needs.
+
+## A new attribute key is absent until it holds a value
+
+An attribute you have just added to a set does not appear in the public answer at all until some entity has a value written into it. The key is missing rather than empty, and waiting does not bring it out.
+
+That reads exactly like "the API does not have this field", and the conclusion people draw from it — that the write has to be repeated, or that the platform needs working around — is wrong both times. Write a value, wait, read again.
+
+→ `mcp/docs/api/content-api-reads#why-a-public-read-still-shows-the-previous-value`
 
 ## Why a value you just wrote is missing from a list
 
 In order of likelihood:
 
-1. **Timing.** You looked too soon. Re-read by id to confirm the write landed, then look again.
+1. **Timing.** You looked too soon. Re-read by id on the admin side to confirm the write landed, then look again.
 2. **The attribute is not indexed.** A filter on it matches nothing, silently.
 3. **The attribute map was one level deep.** The write was accepted and stored nothing. Reading by id shows the attribute empty — this is the check that distinguishes it from timing.
 4. **Wrong locale.** Values are locale-keyed; you may be reading a language you did not write.
@@ -51,7 +63,7 @@ In order of likelihood:
 
 Do **not** repeat the write. A missing entry in a list is not evidence that the write failed, and a repeated create produces a duplicate that consumes the instance's record quota and has to be cleaned up by hand.
 
-Do not conclude the API is broken. Read by id — that answer is authoritative and immediate.
+Do not conclude the field does not exist. The admin read by id is the authoritative and immediate one; a public read that disagrees with it is behind, not right.
 
 Do not add retry loops that re-send writes. Retry the **read**, if anything.
 
@@ -74,6 +86,8 @@ Importing or updating many entities at once means the queryable side lags by mor
 
 - **Filtering on a non-indexed attribute** and reading the empty result as "no matches".
 - **Re-writing after a list looks stale.** Read by id instead.
+- **Re-writing after a public read looks stale.** It lags the admin read; wait and read again.
+- **Reading a new attribute key as unsupported** because the public answer does not carry it. Write a value into it first.
 - **Verifying a bulk import by refreshing a listing.** Sample by id.
 - **Assuming indexing is instant after marking an attribute.** Existing values are picked up progressively.
 
