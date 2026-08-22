@@ -33,12 +33,19 @@ Two operations one path segment apart, with opposite requirements:
 
 | | `sign-up` | `auth` |
 |---|---|---|
-| `formIdentifier` in the body | required | rejected as not allowed |
+| `formIdentifier` in the body | optional | rejected as not allowed |
 | `langCode` in the body | required | rejected as not allowed |
-| `formData` | locale-keyed, `{ "en_US": [ … ] }` | not sent |
+| `formData` | optional, locale-keyed when sent | not sent |
 | `x-device-metadata` header | not needed | required |
 
 So a body that registers a visitor cannot be reused to sign them in, and the error it gets back names the field rather than the difference.
+
+A registration therefore needs no more than the locale and the credentials. Omit `formIdentifier` and the form attached to the auth provider in the URL is used; send it and the value you send is honoured:
+
+```json
+{ "langCode": "en_US",
+  "authData": [ { "marker": "email", "value": "visitor@your-instance.example" } ] }
+```
 
 ## Sign-in needs the x-device-metadata header
 
@@ -52,6 +59,29 @@ So a body that registers a visitor cannot be reused to sign them in, and the err
 Registration does not ask for it. The requirement appears at sign-in, which is why it usually surfaces after the account already exists.
 
 → `mcp/docs/api/rating-forms-and-reviews#importing-reviews-from-another-system`
+
+## Signing in with a one-time code instead of a password
+
+An auth provider created with `isCheckCode` set signs a visitor in by code, and its form does not need a password attribute at all. Two calls, both on the same provider marker:
+
+```text
+POST /api/content/users-auth-providers/marker/email/users/generate-code
+  { "userIdentifier": "visitor@your-instance.example", "eventIdentifier": "auth" }
+POST /api/content/users-auth-providers/marker/email/users/auth
+  { "authData": [ { "marker": "email", "value": "visitor@your-instance.example" } ],
+    "code": "407063" }
+```
+
+The code is delivered to the visitor through the provider's notification channel, never in the response. `auth` answers with the same token pair the password path returns, and a code works once — a second attempt with it answers `401`. A code may also be passed as an `authData` entry whose marker is `code`; on a provider with `isCheckCode` a non-empty entry of that name switches the request to the code path, so do not leave a stale one in the body of a password sign-in.
+
+Registration through such a provider issues the first code by itself, so ask for one only when the visitor needs a new one.
+
+## Two limits guard the code path
+
+Both answer `429`, and both are per visitor rather than per address:
+
+- **Asking for another code too soon.** A code can be reissued about half a minute after the previous one was sent; inside that window the call is refused and the code already sent stays valid. Show the visitor a countdown rather than retrying.
+- **Getting the code wrong five times.** The fifth wrong code destroys the code being guessed, so the correct value stops working too, and the visitor has to request a new one. The count is shared by every call that checks a code — sign-in, code check, activation and password change alike.
 
 ## notificationData carries the email address only
 
@@ -78,6 +108,7 @@ Run the cart half **twice** with the same guest id, in two separate requests. On
 - **Looking for the cart under `users/cart`.** It is `users/me/cart`.
 - **Reusing the registration body for sign-in.** Two of its fields are rejected there.
 - **Omitting `x-device-metadata` at sign-in.** It answers `400` naming the header.
+- **Requesting a fresh code on every click.** Inside the reissue window it answers `429`; the code already sent is the working one.
 - **Putting phone fields into `notificationData`.** Only `email` is accepted.
 
 → `mcp/docs/api/forms-and-form-data` · `mcp/docs/api/content-api-reads`
