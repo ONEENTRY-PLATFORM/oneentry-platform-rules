@@ -119,9 +119,32 @@ Use a typed attribute whenever one fits, and reserve `json` for genuinely opaque
 
 ## Dates and times
 
-`date`, `dateTime` and `time` values are objects with a full timestamp inside rather than bare strings. Read one back from an existing entity and copy the shape rather than sending a string you formatted yourself.
+`date`, `dateTime` and `time` values are objects, never bare strings. A string you formatted yourself — `"2026-01-15"`, `"16:00:00"` — and a numeric timestamp are both refused.
 
-`timeInterval` is different again: it describes recurring intervals and is expanded into concrete ranges at read time, so what you write and what a consumer sees are not the same shape.
+```json
+{ "attributesSets": { "en_US": { "date_id4": {
+    "fullDate": "2026-03-12T00:00:00.000Z",
+    "formattedValue": "12-03-2026",
+    "formatString": "DD-MM-YYYY" } } } }
+```
+
+`fullDate` is the timestamp, in ISO 8601, and is the field the value is actually read from. `formattedValue` and `formatString` describe how a human sees it; both may be omitted, but each must be a string when present. The usual `formatString` is `DD-MM-YYYY` for `date`, `DD-MM-YYYY HH:mm` for `dateTime` and `HH:mm` for `time`.
+
+Sending a scalar answers `400`, and the message names the attribute key, the expected object and an example. `""`, `null` and `{}` are accepted and mean the field is empty — that is how a value is cleared. A `fullDate` that is present but empty is refused.
+
+## Where the date check applies
+
+The check runs on every write that carries `attributesSets` — creating and updating a product, updating a page, creating and updating a form — and on the system operation that updates attribute values in place. On those routes a bad shape is refused before anything is written.
+
+Writes that do not carry `attributesSets` do not run it, so an ill-formed date can still be stored elsewhere without an error. After writing a date through any other route, read the value back rather than trusting the status code.
+
+Form submissions are stricter than entities. `POST /api/content/form-data` requires all three fields and does not accept `""` for these types, so `{ "fullDate": "…" }` alone, and a cleared value, pass on an entity and are refused on a submission.
+
+→ `mcp/docs/api/forms-and-form-data#fields-are-attributes`
+
+## timeInterval is expanded when it is read
+
+`timeInterval` describes recurring intervals and is expanded into concrete ranges at read time, so what you write and what a consumer sees are not the same shape.
 
 ## Read free text through the public route
 

@@ -62,6 +62,22 @@ Then read the list back and keep the numeric id. `template=<id>` on an upload is
 
 → `mcp/docs/api/files-and-uploads#no-preview-template-no-preview-and-no-error` · `mcp/docs/api/baseline-data`
 
+## The width of a proportion is width not weight
+
+Each rectangular variant carries an alignment and its size. The horizontal and vertical variants take `width` and `height`; the square one takes `side`.
+
+```json
+{ "proportions": { "preview": {
+    "default": true,
+    "horizontal": { "alignmentType": "middleMiddle", "width": 300, "height": 200 },
+    "vertical":   { "alignmentType": "middleMiddle", "width": 200, "height": 300 },
+    "square":     { "alignmentType": "middleMiddle", "side": 250 } } } }
+```
+
+`weight` is accepted as a deprecated alias for `width` and stored as `width`, so a body written either way is kept the same. **Every read answers with both keys**, `width` and `weight` carrying the same number, which is why a template you did not write yourself still shows a `weight` you never sent. Write `width`.
+
+Sending both with **different** values answers `400` naming the variant and the two numbers. A variant whose size is missing, or not a number, answers `400` as well — `"300"` in quotes is refused. An empty set such as `{ "default": {} }` is still accepted.
+
 ## Changing a preview template does not re-crop old images
 
 A preview is produced when the file is uploaded, from the `proportions` the template held at that moment. Editing those proportions later, or pointing an attribute at a different template, leaves every file already uploaded with the crop it was given. The update answers success and says nothing about the images that already exist.

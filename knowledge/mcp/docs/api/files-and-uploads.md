@@ -68,6 +68,10 @@ value is a list   → take the first element
 value is an object → use it directly
 ```
 
+On the way in, a single file is accepted **either way** — as the bare record or as a list holding it. The admin read then answers with whichever form you sent, so the shape you write is the shape you get back.
+
+Write the list. It is the form that survives a second file being added, and it makes read-modify-write leave the value's shape alone.
+
 ## A file record has nowhere to keep alt text
 
 The record an upload returns carries the file's identity, its name, its links, its size and its content type — and no `alt`, no `title`. There is nowhere in it to put the text a screen reader announces, and no image passes an accessibility review without one.
