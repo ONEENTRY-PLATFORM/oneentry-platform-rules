@@ -94,6 +94,27 @@ So after replacing a schema, read the set back and confirm each localized field 
 
 → `mcp/docs/api/silent-no-ops`
 
+## The validator name comes from a fixed list
+
+A validator name is not free text. Creating a set, updating it, or replacing its schema with a name outside the list answers `400`, and the message names the attribute, the locale and the name it did not recognise, then lists the ones it accepts. That response is where to read the list — no read operation returns it.
+
+```text
+requiredValidator         trimValidator             stringInspectionValidator
+urlInspectionValidator    emailInspectionValidator  checkForNumberValidator
+roundingNumberValidator   booleanValidator          comparisonValidator
+regExpValidator           fieldMaskValidator        checkForAGivenList
+defaultValueValidator     sizeInPixelsValidator     checkingFilesValidator
+minMaxDateValidator       valueValidator            checkForLettersValidator
+```
+
+Two are easy to get wrong by analogy: it is `emailInspectionValidator`, not `emailValidator`, and `checkForAGivenList` carries no `Validator` suffix.
+
+Accepted is not the same as enforced. `sizeInPixelsValidator`, `checkingFilesValidator`, `minMaxDateValidator`, `valueValidator` and `checkForLettersValidator` are stored for the admin panel to read, and no submission is rejected because of them. The rest are checked when a value is submitted. So setting one of those five and reporting the field as validated is wrong — confirm by submitting a value that should fail.
+
+The name check follows the locale key. A `validators` map written flat, with no locale level, is not name-checked at all, so on the schema-replace route — which accepts a flat map — an unrecognised name is stored there and no `400` is raised. Key the map by locale and both checks apply.
+
+A set that already holds an unrecognised name keeps it, and nothing re-checks it until the set is written again. That write is where it surfaces: it answers `400` until the name is corrected, and the field is enforced by nothing up to that point.
+
 ## Two reads two answers
 
 An attribute set can be read two ways, and they do not show the same thing:
