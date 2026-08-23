@@ -62,6 +62,23 @@ Treat user data as personal data. Do not copy it into conversations, reports or 
 
 → `mcp/docs/api/block-types#audience-filtering`
 
+## The isLogin field is what a user signs in with
+
+One attribute of a sign-in form carries the flag isLogin. Its value is not an ordinary profile field: it is the credential the person signs in with. Writing it in the user card moves the credential too, so the displayed value and the working one never drift apart. You do not name a form when you do it — the form of the user's own sign-in provider is used.
+
+A value counts as a change only when it differs from what the profile already holds under that marker. The card sends `formData` back whole on every save, so an edit that leaves the field alone is never refused, whatever state the account is in.
+
+A real change answers `400` and writes nothing when:
+
+- the value is blank;
+- it is already taken by another user, **including removed ones**;
+- the body carries the marker under several locales with different values;
+- the account came from a social network, where the credential belongs to the network.
+
+Nothing is written on refusal — neither the profile nor group membership changes, even when the same call also sends `groupIds`. Retry with a corrected value rather than splitting the call in two.
+
+The value is stored exactly as sent. Alone among the form's fields it is not escaped, so `&` and `<` survive and the person signs in with the characters you wrote.
+
 ## Create a group
 
 Legitimate, and worth doing deliberately. A new group starts with no permissions, so nothing works for its members until you grant the routes they need — one existing permission record at a time.
@@ -145,7 +162,7 @@ A returning person is recognised by the account id the network reports rather th
 - **Granting an admin permission to fix a Content API 403.** Different model.
 - **Rewriting group rules over a `403` on every route.** Check the token header first.
 - **Sending only the groups you want to add.** `groupIds` replaces the set.
-- **Updating a user without echoing back its form data.** It is overwritten.
+- **Updating a user without echoing back its form data.** It is overwritten, and that includes the sign-in field.
 - **Missing a read restriction** and investigating the data instead.
 - **Putting user details into a report.** Personal data stays in the instance.
 

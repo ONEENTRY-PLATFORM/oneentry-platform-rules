@@ -47,6 +47,14 @@ A registration therefore needs no more than the locale and the credentials. Omit
   "authData": [ { "marker": "email", "value": "visitor@your-instance.example" } ] }
 ```
 
+## Changing the address a visitor signs in with
+
+The profile update takes the sign-in field — the one flagged isLogin — like any other field of the form, and writing it moves the credential: from then on the visitor signs in with the new value and the old one stops working. Send it in `formData` under its own marker, exactly as you would any other field.
+
+The value is stored as sent rather than escaped, and the refusals are the same ones an operator meets in the admin panel. Read them before you build the account page, so the site can tell the visitor which of them it hit.
+
+→ `mcp/docs/api/users-and-groups#the-islogin-field-is-what-a-user-signs-in-with`
+
 ## Sign-in needs the x-device-metadata header
 
 `auth` without it answers `400` naming the header and nothing else. The value is a JSON object, the same shape the visitor form route takes:
