@@ -108,7 +108,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 
 | docId | Read it when |
 |---|---|
-| `mcp/docs/api/forms-and-form-data` | Defining a form or reading submissions |
+| `mcp/docs/api/forms-and-form-data` | Defining a form, or binding it so it accepts anything |
+| `mcp/docs/api/form-submissions` | Listing, filtering or reading what visitors submitted |
 | `mcp/docs/api/rating-forms-and-reviews` | Reviews, star ratings, or importing either |
 | `mcp/docs/api/users-and-groups` | A Content API route returns a permission error |
 | `mcp/docs/api/content-api-sign-in-and-cart` | Building the account or cart pages of a site |

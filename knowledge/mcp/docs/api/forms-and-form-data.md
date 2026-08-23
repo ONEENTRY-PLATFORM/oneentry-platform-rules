@@ -128,19 +128,15 @@ Two consequences worth planning around:
 
 ## Reading submissions
 
-Form data operations list what was submitted, filter it, and fetch one submission. A submission carries the field values plus metadata about who submitted it and when.
+Submissions are read by the form's marker, with a `POST` whose filter travels in the body. Which filter narrows to one page and which one narrows to a module binding is the part worth reading before you call it.
 
-Three things to expect:
-
-- Values follow the field's type — read them as you would an attribute value.
-- Responses are capped by this server; page with the operation's `limit` and `offset`.
-- There is no flat listing of every submission: that route answers `405` and names the per-form route to use instead. Always read submissions **by the form's marker**, and use the count route for the form's marker when you only need a total.
-
-→ `mcp/docs/server/response-shaping`
+→ `mcp/docs/api/form-submissions`
 
 ## Submission status
 
-Some submissions carry a status an operator moves through as they process it, with an operation of its own. Do not edit a submission's values to record that it was handled — and after an import, check the statuses: unapproved records do not count towards a rating.
+A submission can carry a status an operator moves through as they process it.
+
+→ `mcp/docs/api/form-submissions#submission-status`
 
 ## Delete a form
 
@@ -155,8 +151,7 @@ Deleting a form removes its submissions with it — definition and data are one 
 - **Updating a form without echoing `formModuleConfigs`.** Bindings and submissions are deleted, answering `200`.
 - **Echoing them back without their `id`.** Same loss, and the form still looks bound.
 - **A `text` value with more than one of the three keys**, or with `params` beside them.
-- **Filtering the submission listing by form identifier.** It comes back empty; use the count route.
 - **Deleting a form to "clean up".** The submissions go too.
 - **Building a review form by hand.** Read `mcp/docs/api/rating-forms-and-reviews` first.
 
-→ `mcp/docs/api/verification-recipes#forms`
+→ `mcp/docs/api/form-submissions` · `mcp/docs/api/verification-recipes#forms`
