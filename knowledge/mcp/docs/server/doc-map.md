@@ -149,6 +149,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why did my menu arrive with more items than it has | `mcp/docs/api/menus#parent-references-are-polymorphic` |
 | How do I set the order of menu items | `mcp/docs/api/menus#ordering-items` |
 | Why is my event refused on this module | `mcp/docs/api/events#an-event-on-another-module-is-refused` |
+| Why does my form event send no mail | `mcp/docs/api/events#an-event-with-no-recipient-looks-configured` |
+| How do I write a list or radioButton value | `mcp/docs/api/attribute-types#the-value-form-of-a-list-and-a-radiobutton` |
 | Why is my coupon working for everybody | `mcp/docs/api/discounts#which-operation-created-a-coupon-decides-its-reuse` |
 | How do I import reviews from another system | `mcp/docs/api/rating-forms-and-reviews#importing-reviews-from-another-system` |
 | Where does alt text for an image live | `mcp/docs/api/files-and-uploads#a-file-record-has-nowhere-to-keep-alt-text` |

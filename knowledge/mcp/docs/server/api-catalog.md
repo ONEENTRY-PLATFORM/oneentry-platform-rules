@@ -18,6 +18,8 @@ The two are merged into one catalog: every operation, with its risk classificati
 
 Anything not under `/api/admin` is removed from the catalog and reported as a warning. This server exposes the Admin API only, and that is enforced when the catalog is built rather than left to the caller.
 
+So a Content API route is never a search result, however real it is. `cms_api_search` returning nothing for one is not evidence it does not exist — the public routes a storefront uses are documented under `mcp/docs/api/content-api-reads`, `mcp/docs/api/content-api-sign-in-and-cart` and `mcp/docs/api/files-and-uploads` instead.
+
 ## The catalog is cached per base URL
 
 The fetched API document is cached on disk under the cache directory, keyed by the base URL, so two instances never share a catalog. On a later start the cache is used if the instance cannot be reached, and `cms_whoami` reports that:

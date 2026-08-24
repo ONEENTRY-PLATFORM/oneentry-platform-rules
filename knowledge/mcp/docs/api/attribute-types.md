@@ -21,8 +21,8 @@ There are nineteen types and no way to add a twentieth. Pick from the list.
 | `file` | one or more file references |
 | `image` | one or more image references |
 | `groupOfImages` | always a list of image references |
-| `radioButton` | the id of a chosen option |
-| `list` | the chosen option ids; `multiselect` decides whether more than one shows |
+| `radioButton` | the id of a chosen option, as a bare string |
+| `list` | a **list of option objects**; `multiselect` decides whether more than one shows |
 | `entity` | references to other entities, by marker |
 | `timeInterval` | a definition of repeating intervals |
 | `button` | a label and a target |
@@ -97,11 +97,43 @@ value is an object → use it directly
 
 An attribute that holds one image today can hold two tomorrow, because a content manager added one. Code that assumes the singular shape breaks at exactly that moment.
 
-## Choice types store ids not labels
+## The value form of a list and a radioButton
 
-`radioButton` stores the id of the chosen option; `list` stores the chosen option ids. The human-readable labels live in the attribute definition, per locale.
+Both store the option's id rather than its label, and the labels live in the attribute definition, per locale — but the two types wrap that id differently, and only one of them is a bare string.
 
-So to set a choice you need the option id from the attribute set, and to display one you need to resolve the id back to a label in the locale you are rendering. Writing the label as the value does not work.
+`radioButton` is the id on its own:
+
+```json
+{ "attributesSets": { "en_US": { "radioButton_id8": "yes" } } }
+```
+
+`list` is a **list of option objects**, each carrying the id under `value` and the label under `title`:
+
+```json
+{ "attributesSets": { "en_US": { "list_id7": [
+    { "value": "rfq", "title": "Request for quote" } ] } } }
+```
+
+`[]` and `""` both clear the value. A bare string, or a list of bare strings, is refused with `400`; the message names the locale and the attribute key, states the expected form and shows an example.
+
+Writing the label where the id belongs does not work, in either type.
+
+## The shape checks only see canonically named keys
+
+The refusals that guard value shape — the `list` one above, and the `date`, `dateTime` and `time` one below — are keyed off the **attribute key**, not off the type recorded in the attribute set. Each runs only where the key is built the canonical way, `<type>_id<id>`.
+
+```text
+"list_id7":     ["rfq"]        → 400, the shape is refused
+"my_labels":    ["rfq"]        → 200, stored exactly as sent
+"date_id3":     "2026-01-15"   → 400, the shape is refused
+"when_custom":  "2026-01-15"   → 200, stored exactly as sent
+```
+
+An attribute addressed by any other key — a hand-written marker, one copied from another set — is not shape-checked at all. The malformed value is accepted, the call answers `200`, and the admin read echoes it back to you unchanged, so nothing in the exchange says anything is wrong.
+
+The key convention is therefore not cosmetic. It is what turns a value a site cannot render into a refusal you see at once. Build the key from the set, and where you cannot, read the value back **through the public route** rather than trusting the status code.
+
+→ `mcp/docs/api/verification-recipes#the-general-pattern`
 
 ## entity references use markers
 
@@ -138,6 +170,8 @@ The check runs on every write that carries `attributesSets` — creating and upd
 
 Writes that do not carry `attributesSets` do not run it, so an ill-formed date can still be stored elsewhere without an error. After writing a date through any other route, read the value back rather than trusting the status code.
 
+It is also skipped for any attribute key not named `date_id<id>`, `dateTime_id<id>` or `time_id<id>` — see the section above.
+
 Form submissions are stricter than entities. `POST /api/content/form-data` requires all three fields and does not accept `""` for these types, so `{ "fullDate": "…" }` alone, and a cleared value, pass on an entity and are refused on a submission.
 
 → `mcp/docs/api/forms-and-form-data#fields-are-attributes`
@@ -148,9 +182,9 @@ Form submissions are stricter than entities. `POST /api/content/form-data` requi
 
 ## Read free text through the public route
 
-Free text is unrestricted: length and punctuation, braces included, come back from the public read as written. Very long bodies still belong in the entity's own content rather than in an attribute — that is a choice about whoever edits it, not a limit.
+Free text is unrestricted: length and punctuation, braces included, come back from the public read as written. Very long bodies still belong in the entity's own content rather than in an attribute — a choice about whoever edits it, not a limit.
 
-After writing free text, read the entity **through the public route a site uses**, not only through the admin read. The two are different projections, and only the public one tells you what a site will receive.
+The general rule the sections above keep pointing at: the admin read and the public read are different projections, and only the public one tells you what a site receives.
 
 → `mcp/docs/api/verification-recipes#the-general-pattern`
 
@@ -159,7 +193,7 @@ After writing free text, read the entity **through the public route a site uses*
 1. Was the attribute key built as `<type>_id<id>` from the set, with the right type prefix?
 2. Was it nested under a locale key?
 3. For a file or image, did you send the shape matching the number of files?
-4. For a choice type, did you send an option id rather than a label?
+4. For a choice type, did you send an option id rather than a label — wrapped in an option object for a `list`, bare for a `radioButton`?
 5. Did you read the entity back by id, rather than looking at a list that may lag?
 6. For a choice type with several selections, is `multiselect` set on the attribute?
 

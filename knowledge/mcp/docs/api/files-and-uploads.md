@@ -26,6 +26,19 @@ An upload returns a record describing the stored file: its identity, its name, a
 
 Uploads consume instance storage quota, so an upload made by mistake is not free. Do not re-upload a file to "make sure it worked"; read the record back instead.
 
+## A visitor uploads through the public files route
+
+A storefront does not need an admin session to attach a file. There is a public files route, reached with the site's app token, and it returns the same record the admin one does — a list, one entry per file part sent.
+
+`type`, `entity` and `id` are **folder names and nothing else**. No entity is checked to exist: nonsense values are accepted and simply produce a path nobody will look under. They are for tidiness, not for binding a file to anything.
+
+Two consequences worth saying out loud when advising on this:
+
+- Anyone holding the site's public token can store a file on the instance, because the permission that governs the route is granted to the guest group by default. Storage quota is the exposed resource.
+- The catalog this server searches is the Admin API only, so `cms_api_search` will never return this route. That is not evidence it does not exist.
+
+→ `mcp/docs/server/api-catalog#paths-outside-the-admin-api-are-dropped`
+
 ## No preview template no preview and no error
 
 `template` is **the numeric id of a `/template-previews` record**. It is not a flag, and `template=1` is not an incantation — it means "preview template number one", which on a fresh instance does not exist.
@@ -41,7 +54,7 @@ So, once per instance, before the first image:
 
 Previews are generated for `png`, `jpeg` and `jpg` only. Documents get no preview by design, which is why an upload of a PDF never carries one.
 
-The preview is not only a thumbnail: the inline placeholder a site shows while the full image loads comes from the preview record, so an image without one cannot be rendered progressively. That is what makes the template id worth settling before the first upload rather than after the last.
+A preview is not only a thumbnail — the inline placeholder a site shows while the full image loads comes from it too, so an image without one cannot be rendered progressively. Settle the template id before the first upload, not after the last.
 
 → `mcp/docs/api/templates-and-previews` · `mcp/docs/api/baseline-data`
 
@@ -92,7 +105,7 @@ The record an upload returns carries the file's identity, its name, its links, i
 
 There is somewhere to put it one level up. When you write the file into an image or file attribute, the slot object keeps the keys you add to it: send `alt` and `title` alongside the upload's own fields and both come back from the public read of that attribute. Use exactly those two names — an agreed pair is what makes alt text readable across projects.
 
-Those two names are also the pair the admin panel uses: it offers an `alt` and a `title` field on an image attribute value and writes them back into the same slot object, so text you set through the API is what a human sees and edits, and text a human types is what your next read returns. Where the wording needs a field of its own — reviewed separately, translated on its own schedule — a sibling attribute beside the image is still the better shape.
+Those two names are also the pair the admin panel uses, on the same slot object — so text you set through the API is what a human sees and edits, and what a human types is what your next read returns. Where the wording needs reviewing or translating on its own schedule, a sibling attribute beside the image is still the better shape.
 
 ## Attaching a file to a form submission
 

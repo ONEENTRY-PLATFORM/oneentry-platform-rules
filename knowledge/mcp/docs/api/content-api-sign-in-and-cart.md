@@ -66,7 +66,35 @@ The value is stored as sent rather than escaped, and the refusals are the same o
 
 Registration does not ask for it. The requirement appears at sign-in, which is why it usually surfaces after the account already exists.
 
+Two different `400`s come out of it, and they mean different things: `Missing x-device-metadata header` when it is absent, `Invalid x-device-metadata format` when the value is not JSON, `fingerprint` is not a string, or `deviceInfo` is not an object.
+
 → `mcp/docs/api/rating-forms-and-reviews#importing-reviews-from-another-system`
+
+## Where the session routes live
+
+There is no `auth` prefix. Signing out and renewing a token live under the **auth provider's marker**, next to sign-in, which is why looking for `/api/content/auth/logout` returns `404` and reads as "sign-out is not supported":
+
+```text
+POST .../users-auth-providers/marker/email/users/auth        sign in, returns a token pair
+POST .../users-auth-providers/marker/email/users/refresh     exchange a refresh token for a new pair
+POST .../users-auth-providers/marker/email/users/logout      sign out on this device
+POST .../users-auth-providers/marker/email/users/logout-all  sign out everywhere
+GET  .../users-auth-providers/marker/email/users/sessions    list the active devices
+```
+
+`email` is the marker of the default password provider; substitute the one you are using.
+
+**Only some of them want `x-device-metadata`.** `auth`, `refresh`, `logout` and OAuth sign-in require it. `logout-all` and `sessions` identify the caller from the bearer token alone and answer normally without it — so a client that sends the header everywhere is not wrong, but one that cannot build it can still sign out of everything.
+
+## What a fingerprint decides
+
+The fingerprint in `x-device-metadata` is the identity of the *device*, and three behaviours follow from it:
+
+- Signing in again with the **same** fingerprint replaces that device's session and leaves other devices alone. Repeat sign-in is therefore always safe and always returns a fresh pair — it does not accumulate sessions.
+- Signing in with a **different** fingerprint adds a session beside the first. `sessions` lists them, one entry per device.
+- `refresh` must carry the fingerprint the refresh token was issued to.
+
+Closing a session ends its access token **immediately**, before the token's own expiry — a read with it answers `401`. So sign-out is real server-side state, not a client discarding a cookie.
 
 ## Signing in with a one-time code instead of a password
 
@@ -79,6 +107,12 @@ POST /api/content/users-auth-providers/marker/email/users/auth
   { "authData": [ { "marker": "email", "value": "visitor@your-instance.example" } ],
     "code": "407063" }
 ```
+
+`eventIdentifier` is not a free label: it must name an **existing send-code event** of the forms module. No such event, or an event carrying that identifier with a different form type, answers `404 Event "<identifier>" with formType "send_code" not found`, and no code is created or destroyed. An empty or absent value is refused earlier, with `400 eventIdentifier should not be empty`.
+
+A success there means the event was found — not that anything reached the visitor. Delivery still depends on the account having the notification contact filled in.
+
+→ `mcp/docs/api/events#configuring-a-form-submitted-email-event`
 
 The code is delivered to the visitor through the provider's notification channel, never in the response. `auth` answers with the same token pair the password path returns, and a code works once — a second attempt with it answers `401`. A code may also be passed as an `authData` entry whose marker is `code`; on a provider with `isCheckCode` a non-empty entry of that name switches the request to the code path, so do not leave a stale one in the body of a password sign-in.
 
