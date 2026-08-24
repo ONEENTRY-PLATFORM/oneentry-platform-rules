@@ -58,9 +58,42 @@ Separate list fields are what makes them filterable and what lets a human edit o
 
 → `mcp/docs/api/list-options-and-extra-values`
 
+## What the rating aggregate carries
+
+The entity's `rating` object holds more than the star. In the numeric modes — `average`, `weighted`, `median` — it carries four fields:
+
+| field | what it is |
+|---|---|
+| `value` | the star, following `allowHalfRatings` |
+| `averageValue` | the exact mean to two decimals, on the same scale, **not** rounded to a star |
+| `distribution` | `{"1":n, …, "N":n}` — reviews per star, `N` being the scale |
+| `votes` | how many submissions carried a score |
+
+`averageValue` is the number a shop prints as "4.4 based on 38 reviews". Reading `value` for that shows 4, and the difference is a whole half-star of accuracy thrown away.
+
+`method` says which mode produced it. Under `like_dislike` the object carries `like` and `dislike` instead, and neither `averageValue` nor `distribution` exists — branch on `method` rather than assuming the numeric shape.
+
+## Only a submission with a score counts as a rating
+
+The one-rating-per-visitor rule weighs **scored** submissions alone, and that is what makes follow-ups possible:
+
+```text
+score 5, new fingerprint, unrated entity   → 201
+score 3, new fingerprint, same entity      → 400 "You have already rated this entity"
+no score, new fingerprint, same entity     → 201
+```
+
+So a shop reply, a helpfulness note, or any submission that carries no score is accepted against an entity that is already rated. Name the review in `replayTo` and it is stored as that review's child — the extended read returns it with `parentId` set and `depth: 1`, which is what a threaded review list is built from.
+
+## A rating submission can be edited
+
+Updating one is accepted and rewrites only its content. The original author and the fingerprint the rerating rule keys on are both preserved, so an edit neither reassigns the review nor frees the visitor to score again.
+
+That matters for moderation: correcting a typo in a review does not quietly turn it into the moderator's own review, and does not open a second vote.
+
 ## Importing reviews from another system
 
-The Admin API route treats one authenticated author as one review per entity: the second submission for the same product is refused as already rated. So a bulk import of visitor reviews cannot go through it, and this server cannot make the visitor request for you.
+The refusal above still shapes a bulk import: one scored submission per entity per fingerprint is all the route takes, so imported reviews need a fingerprint each and this server cannot make the visitor request for you.
 
 What the visitor route needs, beyond the submission body:
 
