@@ -6,5 +6,9 @@
       "Read(//media/andrvm/SAMSUNG/PROJECTS/FL2/oneentry-platform-mcp/**)",
       "Bash(grep -rniE 'dnk-|cms-sb|webdnk|gitlab\\\\.com|\\\\b\\(CMS|DNK\\)-[0-9]{2,4}\\\\b|src/[A-Za-z0-9_./-]+\\\\.\\(ts|sql\\)|#L[0-9]+|postgres|typeorm|nestjs|elastic|redis|bull|pgvector|CREATE \\(TABLE|VIEW|INDEX\\)|k3s|kubectl|\\\\bstand\\\\b' knowledge/ README.md CLAUDE.md)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "oneentry-mcp-platform"
+  ],
+  "enableAllProjectMcpServers": true
 }
