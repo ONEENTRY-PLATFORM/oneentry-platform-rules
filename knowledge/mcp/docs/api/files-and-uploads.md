@@ -45,6 +45,20 @@ The preview is not only a thumbnail: the inline placeholder a site shows while t
 
 → `mcp/docs/api/templates-and-previews` · `mcp/docs/api/baseline-data`
 
+## What the two preview keys in a record hold
+
+`previewLink` is not a single link. It is keyed by the **proportion markers** of the preview template the upload named, and each value is a pair: the inline placeholder as a `data:` URI first, the preview's own address second.
+
+```json
+{ "previewLink": { "main": [ "data:image/webp;base64,UklGRs4A",
+                             "https://your-instance.example/photo.preview.main.png" ] },
+  "defaultPreview": "main" }
+```
+
+`defaultPreview` names **which marker to use** by default. It is a key of `previewLink`, not an address — in an `<img src>` it renders nothing.
+
+Both keys are absent when the upload named no valid `template`, so read them defensively.
+
 ## Referencing a file from an attribute
 
 A `file` or `image` attribute holds references to uploaded files. Write the reference in the shape the attribute already uses — read an existing entity with a populated file attribute and copy it.
@@ -79,6 +93,23 @@ The record an upload returns carries the file's identity, its name, its links, i
 There is somewhere to put it one level up. When you write the file into an image or file attribute, the slot object keeps the keys you add to it: send `alt` and `title` alongside the upload's own fields and both come back from the public read of that attribute. Use exactly those two names — an agreed pair is what makes alt text readable across projects.
 
 Those two names are also the pair the admin panel uses: it offers an `alt` and a `title` field on an image attribute value and writes them back into the same slot object, so text you set through the API is what a human sees and edits, and text a human types is what your next read returns. Where the wording needs a field of its own — reviewed separately, translated on its own schedule — a sibling attribute beside the image is still the better shape.
+
+## Attaching a file to a form submission
+
+A form's file field takes the **upload record itself**. Send the object the upload returned, inside a list, as the field's value: its content type, its keyed `previewLink` and its marker `defaultPreview` are all accepted as they arrived, so there is nothing to repack.
+
+```json
+{ "formData": { "en_US": [ { "marker": "photo", "type": "image",
+                             "value": [ { "filename": "files/form/photo.png",
+                                          "downloadLink": "https://your-instance.example/photo.png",
+                                          "size": 3008 } ] } ] } }
+```
+
+`filename`, `downloadLink` and `size` are the trio a value must carry; leave one out and the answer is `400` naming the missing key. `image` and `file` take one entry, `groupOfImages` several.
+
+A visitor uploads through the public files route with the site's app token and gets the same record, so a storefront attaches a photo to a review with no admin session.
+
+→ `mcp/docs/api/forms-and-form-data#fields-are-attributes`
 
 ## There is no batch delete
 
@@ -123,6 +154,8 @@ Do not assume a link you obtained on one instance works on another, and do not c
 - **Deleting a file without finding its references.** Silent missing images.
 - **Copying a file reference between instances.** Upload again instead.
 - **Expecting an `alt` field on the upload record.** Put `alt` and `title` on the attribute slot instead.
+- **Reading `defaultPreview` as an address.** It names a key of `previewLink`.
+- **Repacking an upload record for a form submission.** It is taken as it is.
 - **Re-uploading a gallery to fix a naming decision.** The old files stay.
 
 → `mcp/docs/api/verification-recipes`
