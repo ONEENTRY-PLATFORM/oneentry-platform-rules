@@ -4,7 +4,7 @@ An option of a `list` or `radioButton` attribute is more than a label: each opti
 
 Read this before building any attribute a visitor picks from. Three details here each make a correctly stored value invisible in the admin panel, and none of them shows up in a read-back.
 
-→ `mcp/docs/api/attribute-types#choice-types-store-ids-not-labels` · `mcp/docs/api/attribute-sets#an-attribute-definition-is-locale-keyed-too`
+→ `mcp/docs/api/attribute-types#the-value-form-of-a-list-and-a-radiobutton` · `mcp/docs/api/attribute-sets#an-attribute-definition-is-locale-keyed-too`
 
 ## What an option is made of
 
@@ -60,7 +60,9 @@ An attribute whose value may be more than one option needs `multiselect` on the 
 
 Without it every selected option is stored and returned by both the admin and the public read, and the admin panel displays only the **first** one.
 
-The flag itself is readable: the attribute read by marker returns `multiselect` alongside `type` and `listTitles`, so a check after writing is a real check. Set it when you create the attribute, not when someone notices.
+The flag itself is readable, from both reads that matter. The attribute read by marker returns `multiselect` alongside `type` and `listTitles`, and so does **the form read by marker a site uses** — beside `listTitles`, `validators` and `settings`. So a check after writing is a real check, and a site can tell a multi-select field from a single-select one without a second call.
+
+It is a plain boolean, not locale-scoped, and `false` when the attribute never set it. On anything that is not a `list` it is `false` and means nothing. Set it when you create the attribute, not when someone notices.
 
 ## additionalFields and image are not extra values
 

@@ -48,6 +48,41 @@ An event created with no `moduleId` at all is a template — see the notificatio
 
 Send both, then read the event back and check `title` is present for every active locale.
 
+## Configuring a form submitted email event
+
+An event on the forms module is configured by three fields the create and update schemas do carry but that nothing else points you at. Together they decide whether a submitted form sends anything.
+
+```json
+{ "name": "Enquiry received", "moduleId": 2,
+  "formType": "submit_data",
+  "formIdentifier": "contact-us",
+  "actions": { "isEmail": true },
+  "forms": { "mode": "any_data",
+             "emails": [ { "attr": "email" },
+                         { "plain": "sales@your-instance.example" } ] },
+  "localizeInfos": { "en_US": {
+    "title": "Enquiry received",
+    "subject": "A new enquiry",
+    "template": "<p>Someone filled in the contact form.</p>",
+    "push": "A new enquiry" } } }
+```
+
+- **`formType`** is a closed set: `registration`, `send_code`, `change_password`, `submit_data`. A value outside it answers `400 formType must be a valid enum value` — the message does **not** list what is allowed, so read the four from here or from the operation schema.
+- **`forms.emails` is what decides where the mail goes.** Each entry is either `{"attr":"<field marker>"}`, taking the address from the submitted field, or `{"plain":"<address>"}`, a fixed recipient. Objects, not strings, even though the schema types the list loosely.
+- **`forms.mode`** is `any_data`, `reply` or `status`; **`forms.status`** applies when the mode is `status`.
+- **`formIdentifier`** binds the event to a form. `formEmailFieldIdentifier` is legacy and is not read — the recipient comes from `forms.emails`.
+- Subject, body and push text live in `localizeInfos`, exactly as for any other event.
+
+**Every event bound to a form fires.** Two events naming the same `formIdentifier` both send on one submission, so a duplicate left over from an experiment doubles the mail rather than being ignored.
+
+## An event with no recipient looks configured
+
+While `forms.emails` is empty the event is complete in every visible way — it has a subject, a body, `isEmail` set — and sends to nobody.
+
+That is now visible rather than silent: the submission writes a `skipped` row into the event's email log, reading `no-recipient-configured`. Read the log after the first real trigger rather than trusting the `201`.
+
+→ `mcp/docs/api/forms-and-form-data#a-form-must-be-bound-before-it-accepts-submissions`
+
 ## Which placeholders are available
 
 Placeholders depend on the module the event watches. For the catalogue, the entity's own fields — its title and any attribute marker. For recipients, the user's fields by marker.
@@ -71,6 +106,7 @@ Step 5 is the only real check of delivery. Step 1 matters: taking the `moduleId`
 | the create answered `201`, not `400` | a module that has no event settings |
 | `localizeInfos.<locale>.title` is set | an event a human cannot find in the panel |
 | `subject` and `template` are non-empty per locale | a message written under `mailing` |
+| on a form event, `forms.emails` is non-empty | an event that is complete and sends to nobody |
 | one real trigger delivered | placeholders that did not resolve |
 | the event's mail log carries an entry | a message nobody was resolved to receive |
 
@@ -84,6 +120,6 @@ A configured event tells you nothing about what it sent. `GET /events/{id}/email
 - `failed` — sending was attempted and did not work; `error` says what happened.
 - `skipped` — it was deliberately not attempted, and the entry says why.
 
-No entries at all after a trigger you know fired means no recipient was resolved. That is a question about the event's module and its condition, not about the message — re-saving `subject` and `template` changes nothing.
+An event that asked for mail and resolved nobody now leaves a `skipped` row saying so, so **no entries at all** after a trigger you believe fired means the trigger did not reach the event — a question about its module and its condition, not about the message. Re-saving `subject` and `template` changes nothing either way.
 
 → `mcp/docs/api/verification-recipes` · `mcp/docs/api/subscriptions`
