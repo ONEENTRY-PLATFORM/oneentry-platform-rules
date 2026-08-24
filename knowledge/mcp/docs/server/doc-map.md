@@ -153,6 +153,9 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | How do I write a list or radioButton value | `mcp/docs/api/attribute-types#the-value-form-of-a-list-and-a-radiobutton` |
 | Why is my coupon working for everybody | `mcp/docs/api/discounts#which-operation-created-a-coupon-decides-its-reuse` |
 | How do I import reviews from another system | `mcp/docs/api/rating-forms-and-reviews#importing-reviews-from-another-system` |
+| What is averageValue next to the star rating | `mcp/docs/api/rating-forms-and-reviews#what-the-rating-aggregate-carries` |
+| Why was my second review refused as already rated | `mcp/docs/api/rating-forms-and-reviews#only-a-submission-with-a-score-counts-as-a-rating` |
+| How does a visitor sign out | `mcp/docs/api/content-api-sign-in-and-cart#where-the-session-routes-live` |
 | Where does alt text for an image live | `mcp/docs/api/files-and-uploads#a-file-record-has-nowhere-to-keep-alt-text` |
 | Why do old images still show the old thumbnail size | `mcp/docs/api/templates-and-previews#changing-a-preview-template-does-not-re-crop-old-images` |
 | I regenerated previews and one image is unchanged | `mcp/docs/api/templates-and-previews#one-unchanged-preview-does-not-mean-it-failed` |
