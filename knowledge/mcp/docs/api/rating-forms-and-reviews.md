@@ -103,15 +103,21 @@ What the visitor route needs, beyond the submission body:
 
 Tell the human that this part runs outside MCP, so the confirmations and the audit line do not cover it.
 
-## An unapproved review does not count
+## Which review statuses the aggregate counts
 
-Submissions carry a status, and the aggregate is built from approved ones. After an import, read the statuses: a whole import sitting unapproved reads exactly like a rating that failed to calculate.
+The aggregate counts the submissions a visitor can see, and no others. A submission held for moderation, one blocked by a moderator, and one deleted are all left out; a submission that is simply sent, or one already approved, is counted.
+
+Whether a new review waits for approval is the binding's own setting, `isModerate`. With it off there is no approval step at all, so a review counts from the moment it is accepted — waiting for an "approved" status that never arrives is the usual reason an import looks like it failed to calculate. With it on, a review counts only once a moderator approves it, so after an import read the statuses before concluding anything.
+
+Because the rule is "visible or not", the aggregate also moves **downwards** with no new review: blocking or deleting one takes it out of the average and out of the counts. An entity left with no visible reviews reads as zero — zero votes and a zero score, not the number it carried before.
 
 Delete the submissions you made while working out the shape. Test reviews count towards the average as readily as real ones, and they are invisible on a page while distorting the number next to it.
 
 ## The aggregate is calculated after a delay
 
 Immediately after the last submission the aggregate can still be empty, or counted for a fraction of the entities. That is normal and not evidence of a failure.
+
+A change of status carries the same delay: approving, blocking or deleting a review moves the average no faster than writing a new one does. A read taken straight after approving looks exactly like an approval that did nothing.
 
 Check again after a wait before reporting anything. A first check taken as the truth turns a working platform into a defect report — and a report an agent has to withdraw costs more than the wait.
 
