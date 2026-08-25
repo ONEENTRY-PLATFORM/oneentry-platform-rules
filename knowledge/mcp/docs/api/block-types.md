@@ -52,7 +52,7 @@ The reliable approach: read a working block of the same type on the same instanc
 
 Each of these types carries its own limit, and the block's setting is the **ceiling**: a request may ask for fewer, never for more. So a request that asks for forty against a block set to twelve gets twelve, with nothing in the response to say it was capped.
 
-Not sending a limit means "use the block's setting" — it is not the same as sending its default. The similar-products type is the exception: it has no limit setting of its own, so it takes the number the request asks for.
+Not sending a limit means "use the block's setting" — it is not the same as sending its default. The similar-products type inverts the rule whenever it computes its result rather than serving a hand-picked shelf: there the block's item count is the **default**, and a request may ask for more than it. Send nothing and you get the block's own number; a block that has none falls back to an internal one. The inversion is deliberate — one such block serves several layouts at once, so its item count describes the usual shelf rather than a bound on matching.
 
 ## A result can come from the fallback instead
 
@@ -70,10 +70,13 @@ So "the block is empty" from an admin's own browser is usually correct behaviour
 
 There is a preview operation that returns what a block would produce, and it accepts a simulated context — a target product, a simulated visitor, cart or wishlist contents, and audience overrides.
 
-Two things to know:
+Three things to know:
 
 - It requires a specific admin permission. Without it the preview answers 403 while the rest of the block operations work.
 - Its response reports which audience rule was applied, whether a fallback was used, and any warnings. Those warnings are the fastest route to why a block is empty.
+- It also reports, card by card, which selection signals put each product there — matched attributes and how many, closeness to the source, whether the product sits in the source's own section, how many orders it shared with the source, which cart item produced it. Read that before changing settings: it distinguishes a block filled by the rule you wrote from one filled by a substitution.
+
+A block whose contents are computed per source product needs that source passed in, otherwise the preview answers empty and says so in the warnings rather than failing. A block whose contents are hand-picked ignores the source and previews the shelf.
 
 ```text
 cms_api_search { "query": "blocks preview" }
@@ -83,10 +86,16 @@ cms_api_search { "query": "blocks preview" }
 
 A block can be restricted to visitors matching a rule over user attributes, so the same page shows different blocks to different people. The rules live in the block's settings, as a list.
 
-Two things about that list decide the outcome, and neither is visible in the schema:
+Four things about that list decide the outcome, and none is visible in the schema:
 
 - **The first matching rule wins.** The rules are scanned in the order they are stored; the rest are not consulted. They do not combine, so a second rule cannot narrow the first — write one rule per audience, in the order you want them tried.
 - **A rule naming no sections is skipped entirely.** It does not mean "applies everywhere". An empty list is how a rule silently stops doing anything.
+- **The sections a rule names are exact**, and do not include what sits under them. Naming a branch keeps only the products attached to that branch page itself, which for a grouping page is usually none — the block then answers empty for exactly the audience the rule was written for. List the sections the products actually sit in.
+- **A rule applies whether the block's contents are hand-picked or computed.** A shelf you assembled by hand is filtered for the visitor the same way a computed one is, so a rule you added for one block type behaves the same on the others.
+
+When a rule matches, the visitor sees the block narrowed to that rule's sections. When none matches, the block answers unfiltered — and so does a visitor whose attribute holds no value, unless a rule tests for presence or absence, which such a visitor can still match.
+
+Comparison is against the value the visitor's attribute holds. For an attribute that offers a list of options, that is the value of the option selected, not the label shown next to it — write the rule against the option value, and read it back from a user record if you are unsure which is which.
 
 When a block is unexpectedly invisible, check the audience rules before anything else, and use the preview's simulated visitor to test them rather than guessing.
 
