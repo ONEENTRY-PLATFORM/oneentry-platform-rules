@@ -49,6 +49,9 @@ Check the restriction before investigating anything else. Removing it is a rules
 | Every listing returns the same small count | A read restriction on the group |
 | Works signed in, fails signed out | The rule is on the signed-in group, not on `guest` |
 | Works for one language only | Not permissions — content exists in one locale |
+| A listing read with `POST` is refused | The **add** rule opens it, not a read rule |
+
+The rule follows the HTTP method, not the meaning: a listing whose filter travels in the body is a `POST`, so the add rule opens it. The refusal names the rule and its permission — `requires the "addRule" rule of the group permission (permissionId: 36)`.
 
 Rule out the first row before changing any rules: it looks exactly like a closed project, and the group's own rules will show the routes as granted the whole time.
 
