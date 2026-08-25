@@ -59,7 +59,9 @@ Submitter metadata is for operators: the address and device fingerprint of the v
 
 ## Submission status
 
-Some submissions carry a status an operator moves through as they process it, with an operation of its own. Do not edit a submission's values to record that it was handled — and after an import, check the statuses: unapproved records do not count towards a rating.
+Some submissions carry a status an operator moves through as they process it, with an operation of its own. Do not edit a submission's values to record that it was handled. Status decides whether a review counts towards a rating, and which statuses count is set out in one place.
+
+→ `mcp/docs/api/rating-forms-and-reviews#which-review-statuses-the-aggregate-counts`
 
 ## Common mistakes
 
