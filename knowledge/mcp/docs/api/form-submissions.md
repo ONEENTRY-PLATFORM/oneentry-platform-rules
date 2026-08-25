@@ -23,10 +23,25 @@ Values follow each field's type, so read them as you would any attribute value. 
 An integer value is matched against the entity's internal id as well as against that text, so an id copied out of a listing keeps working. A value too long to be an id — a phone number used as a login, say — is compared as text only, which is the correct reading of it.
 
 ```json
-{ "entityIdentifier": "contacts-page", "status": ["SENT"] }
+{ "entityIdentifier": "contacts-page", "status": ["sent"] }
 ```
 
-The rest of the filter body is `parentId` (`null` for root-level entries only), `dateFrom` and `dateTo` over the submission time, `status`, `userIdentifier` and `isAdmin`. A `parentId` that is not an integer answers `400`.
+## Which keys the filter body accepts
+
+The body accepts these keys and no others:
+
+| Key | What it does |
+|---|---|
+| `entityIdentifier` | narrows to one entity, as above |
+| `parentId` | `0` returns root-level entries only; an id returns that entry's replies |
+| `dateFrom`, `dateTo` | range over the submission time |
+| `status` | array of statuses, lowercase: `sent`, `moderation`, `approved`, `banned`, `deleted` |
+| `userIdentifier` | the submitter's login |
+| `isSentByAdmin` | `true` keeps only what an operator submitted |
+
+Any other key answers `400 property <name> should not exist`, so a misspelled key is refused rather than dropped: a `400` here is telling you the key is wrong, not the value. Pagination is not part of the body — `limit` and `offset` are query parameters and are refused in the body like any other unknown key.
+
+A `parentId` that is not an integer answers `400`. A status outside the list answers `400` and the message names the five that are accepted, so send them lowercase.
 
 ## What formModuleConfigId narrows and what it cannot
 
@@ -40,6 +55,8 @@ Both modes return the same identity keys: `id`, `formIdentifier`, `time`, `formD
 
 The extended mode adds the comment fields — `depth`, `path`, `parentId` — and the submitter metadata. Ask for it when you are building a thread, not by default.
 
+Submitter metadata is for operators: the address and device fingerprint of the visitor come back in the operator listing only. The public read of the same marker returns the submission without them, so a storefront cannot show them and does not leak them either.
+
 ## Submission status
 
 Some submissions carry a status an operator moves through as they process it, with an operation of its own. Do not edit a submission's values to record that it was handled — and after an import, check the statuses: unapproved records do not count towards a rating.
@@ -51,5 +68,7 @@ Some submissions carry a status an operator moves through as they process it, wi
 - **Reading an empty answer as "no submissions".** A foreign config id returns nothing.
 - **Filtering the listing by form identifier.** It comes back empty; use the count route.
 - **Asking for the extended mode by habit.** The plain one already names the entity.
+- **Paging from the body.** `limit` and `offset` are query parameters; in the body they answer `400`.
+- **Sending a status in upper case.** The five values are lowercase.
 
 → `mcp/docs/api/forms-and-form-data#a-form-must-be-bound-before-it-accepts-submissions` · `mcp/docs/api/verification-recipes#forms`
