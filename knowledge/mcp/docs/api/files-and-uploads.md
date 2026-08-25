@@ -150,6 +150,8 @@ Deleting removes the stored file, not the references to it. Attributes pointing 
 
 Find the references first. If you cannot establish what uses a file, say so before confirming the delete.
 
+The delete call names the file, **not** its stored path. It takes `type`, `entity` and `id` as its own parameters — the same folder values the upload used — and the file's own name separately. The name a record carries is the full path those folders produced, so passing that record's name back is the common mistake: the answer is `404`, which reads like "already gone" and is not. Send the last segment of the path alone.
+
 ## Development mode differences
 
 An instance can be configured to keep uploads locally rather than in its usual storage. Where that is on, links and behaviour differ from production.
