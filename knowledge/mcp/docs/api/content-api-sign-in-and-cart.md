@@ -118,6 +118,10 @@ The code is delivered to the visitor through the provider's notification channel
 
 Registration through such a provider issues the first code by itself, so ask for one only when the visitor needs a new one.
 
+The same code, asked for the same way, is what a forgotten-password reset takes — on every provider, whatever its activation setting says.
+
+→ `mcp/docs/api/password-reset`
+
 ## Two limits guard the code path
 
 Both answer `429`, and both are per visitor rather than per address:

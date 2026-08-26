@@ -113,6 +113,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/rating-forms-and-reviews` | Reviews, star ratings, or importing either |
 | `mcp/docs/api/users-and-groups` | A Content API route returns a permission error |
 | `mcp/docs/api/content-api-sign-in-and-cart` | Building the account or cart pages of a site |
+| `mcp/docs/api/password-reset` | A visitor cannot sign in and needs a new password |
 | `mcp/docs/api/admins-and-permissions` | An operation was refused for lack of a permission |
 
 ## Instance configuration
@@ -156,6 +157,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | What is averageValue next to the star rating | `mcp/docs/api/rating-forms-and-reviews#what-the-rating-aggregate-carries` |
 | Why was my second review refused as already rated | `mcp/docs/api/rating-forms-and-reviews#only-a-submission-with-a-score-counts-as-a-rating` |
 | How does a visitor sign out | `mcp/docs/api/content-api-sign-in-and-cart#where-the-session-routes-live` |
+| How does a visitor reset a forgotten password | `mcp/docs/api/password-reset#two-calls-in-order` |
+| Why is the password change asking for a code | `mcp/docs/api/password-reset#the-code-is-required-on-every-provider` |
 | Where does alt text for an image live | `mcp/docs/api/files-and-uploads#a-file-record-has-nowhere-to-keep-alt-text` |
 | Why do old images still show the old thumbnail size | `mcp/docs/api/templates-and-previews#changing-a-preview-template-does-not-re-crop-old-images` |
 | I regenerated previews and one image is unchanged | `mcp/docs/api/templates-and-previews#one-unchanged-preview-does-not-mean-it-failed` |
