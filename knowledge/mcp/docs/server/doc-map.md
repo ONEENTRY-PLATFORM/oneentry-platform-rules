@@ -110,6 +110,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 |---|---|
 | `mcp/docs/api/forms-and-form-data` | Defining a form, or binding it so it accepts anything |
 | `mcp/docs/api/form-submissions` | Listing, filtering or reading what visitors submitted |
+| `mcp/docs/api/captcha-fields` | A form has a captcha field and submissions are refused |
 | `mcp/docs/api/rating-forms-and-reviews` | Reviews, star ratings, or importing either |
 | `mcp/docs/api/users-and-groups` | A Content API route returns a permission error |
 | `mcp/docs/api/content-api-sign-in-and-cart` | Building the account or cart pages of a site |
@@ -140,6 +141,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why did my write answer 200 and change nothing | `mcp/docs/api/silent-no-ops` |
 | Why are my validators empty when a site reads the form | `mcp/docs/api/attribute-sets#two-reads-two-answers` |
 | How do I write a text field in a submission | `mcp/docs/api/attribute-types` |
+| What do I send as the value of a captcha field | `mcp/docs/api/captcha-fields#what-a-captcha-field-must-carry` |
 | Why do my uploaded images have no preview | `mcp/docs/api/files-and-uploads#no-preview-template-no-preview-and-no-error` |
 | Why did my menu item jump to the top level after an update | `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it` |
 | How do I create a menu with its pages | `mcp/docs/api/menus#creating-a-menu-with-its-pages` |
