@@ -26,7 +26,7 @@ There are nineteen types and no way to add a twentieth. Pick from the list.
 | `entity` | references to other entities, by marker |
 | `timeInterval` | a definition of repeating intervals |
 | `button` | a label and a target |
-| `spam` | a captcha field; it holds no author-supplied value |
+| `spam` | a captcha field; its value is a verification token — `mcp/docs/api/captcha-fields` |
 | `json` | an arbitrary JSON value |
 
 ## Numbers are numbers and null is null

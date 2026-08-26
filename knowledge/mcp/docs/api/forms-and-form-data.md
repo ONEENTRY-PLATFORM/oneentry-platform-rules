@@ -47,7 +47,7 @@ Copy the values exactly. Where `sign_in_up` is rejected as unknown, the instance
 
 ## Fields are attributes
 
-A form's fields are attributes, with the same nineteen types and value shapes as elsewhere, so everything in `mcp/docs/api/attribute-types` applies to submissions: numbers may be `null`, choice fields store option ids, file fields change shape with the count. A captcha field holds no author-supplied value; it exists so a site renders a widget there.
+A form's fields are attributes, with the same nineteen types and value shapes as elsewhere, so everything in `mcp/docs/api/attribute-types` applies to submissions: numbers may be `null`, choice fields store option ids, file fields change shape with the count. A captcha field does carry a value, and a submission that omits it is refused — see `mcp/docs/api/captcha-fields`.
 
 The one type written differently here than on an entity is `text`: a submitted value is a list of **one object carrying exactly one** of `plainValue`, `htmlValue` or `mdValue`, with no other key beside it. A bare string, a list of strings, `[{ "value": … }]`, two of the three keys together and the four-key shape an entity attribute uses are each refused.
 
