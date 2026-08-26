@@ -78,9 +78,22 @@ Each rectangular variant carries an alignment and its size. The horizontal and v
 
 Sending both with **different** values answers `400` naming the variant and the two numbers. A variant whose size is missing, or not a number, answers `400` as well — `"300"` in quotes is refused. An empty set such as `{ "default": {} }` is still accepted.
 
+## Previews for images sent through a site form
+
+An image a visitor sends through a form does not have to name a preview template. The upload answers without `previewLink` — the file is stored, nothing is wrong — and the previews are produced when the submission is created, from the preview template assigned to the form field's own attribute.
+
+So for form files the order is: upload with no `template`, put the returned record into the field's value, then read `previewLink` and `defaultPreview` off the **submission**, not off the upload answer.
+
+Two things worth telling a human:
+
+- A field whose attribute has no preview template assigned stores the value exactly as sent, with no preview and no error. Assign one and submissions created afterwards carry previews; the ones already stored keep what they have.
+- A value that already carries `previewLink` is stored untouched, so re-sending a record uploaded with `template=` costs nothing and changes nothing.
+
+→ `mcp/docs/api/files-and-uploads#attaching-a-file-to-a-form-submission`
+
 ## Changing a preview template does not re-crop old images
 
-A preview is produced when the file is uploaded, from the `proportions` the template held at that moment. Editing those proportions later, or pointing an attribute at a different template, leaves every file already uploaded with the crop it was given. The update answers success and says nothing about the images that already exist.
+A preview is produced when the file is uploaded — or, for a form file, when the submission is stored — from the `proportions` the template held at that moment. Editing those proportions later, or pointing an attribute at a different template, leaves every file already uploaded with the crop it was given. The update answers success and says nothing about the images that already exist.
 
 So "make the thumbnails bigger" is two steps, not one: change the template, then regenerate. Report only the first and the site keeps serving the old crops.
 
