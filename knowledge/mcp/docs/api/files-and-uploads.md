@@ -39,6 +39,20 @@ Two consequences worth saying out loud when advising on this:
 
 → `mcp/docs/server/api-catalog#paths-outside-the-admin-api-are-dropped`
 
+## No file type is refused
+
+There is no allowlist of extensions and no setting that introduces one. Every part sent is stored whatever its name says it is — a document, a page, a vector image, a name carrying no extension at all — and it is served back under a content type read off that name, so a file a browser treats as a document opens as a page on the instance's own address.
+
+Three limits apply on the way in, and they are the whole list:
+
+- the maximum upload size configured on the instance, applied per file. Over it the answer is `400` and the message names the setting;
+- the instance's storage allowance. Over it the answer is `400` as well, and nothing is kept;
+- the permission that governs the route.
+
+What a particular field accepts is decided on the attribute instead. A file attribute carries validators holding the extensions and the size bounds a person picking a file is held to — those are stored for the editing panel and are not applied to a submitted value, so a file sent through the API is never measured against them. Read them as the project's own rule and check the file yourself before sending it.
+
+→ `mcp/docs/api/attribute-sets#the-validator-name-comes-from-a-fixed-list`
+
 ## No preview template no preview and no error
 
 `template` is **the numeric id of a `/template-previews` record**. It is not a flag, and `template=1` is not an incantation — it means "preview template number one", which on a fresh instance does not exist.
@@ -150,6 +164,8 @@ Deleting removes the stored file, not the references to it. Attributes pointing 
 
 Find the references first. If you cannot establish what uses a file, say so before confirming the delete.
 
+Nothing about the file limits the delete. Its type, its age and who put it there do not matter: a file a visitor stored through the public route is removed by the same call as one an administrator uploaded. The limit is the permission on the route — the public one grants storing and not removing by default, so removing is an administrator's call unless a group is given that permission too.
+
 The delete call names the file, **not** its stored path. It takes `type`, `entity` and `id` as its own parameters — the same folder values the upload used — and the file's own name separately. The name a record carries is the full path those folders produced, so passing that record's name back is the common mistake: the answer is `404`, which reads like "already gone" and is not. Send the last segment of the path alone.
 
 ## Development mode differences
@@ -166,6 +182,7 @@ Do not assume a link you obtained on one instance works on another, and do not c
 - **Assuming the singular value shape.** It changes with the count.
 - **Re-uploading to check the first upload worked.** Read the record; uploads cost quota.
 - **Treating a stripped value as data loss.** The metadata is all there.
+- **Expecting the instance to refuse a file type.** It refuses none; the attribute's validators are the project's rule.
 - **Deleting a file without finding its references.** Silent missing images.
 - **Copying a file reference between instances.** Upload again instead.
 - **Expecting an `alt` field on the upload record.** Put `alt` and `title` on the attribute slot instead.
