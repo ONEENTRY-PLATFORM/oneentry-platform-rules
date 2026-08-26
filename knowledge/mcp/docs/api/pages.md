@@ -74,6 +74,23 @@ Create or find the block first, then attach it by its marker. Attaching a block 
 
 → `mcp/docs/api/blocks`
 
+## Why a page returns fewer blocks than you attached
+
+A public read of a page's blocks is governed by the reading group's rules, and a read restriction caps the answer at a fixed number of records. That ceiling applies to the blocks of a single page exactly as it applies to a listing, so a page carrying more blocks than the ceiling comes back trimmed.
+
+Nothing in the answer says so. These reads take no `limit` or `offset` and carry no total, so a trimmed response is indistinguishable from a page that genuinely has that many blocks, and the blocks past the ceiling cannot be reached from the site at all.
+
+The comparison is the tell: read the same page's blocks through the Admin API, which the restriction does not touch. Two different counts mean the restriction, not a lost attachment.
+
+Two ways to open it, both on the instance rather than in the request:
+
+- raise `restrictedDataLength` under `user` in the general settings;
+- grant the group unrestricted read on the page routes.
+
+Either takes a few minutes to take effect.
+
+→ `mcp/docs/api/users-and-groups#read-limits-are-a-rule-not-a-missing-permission`
+
 ## Delete a page
 
 Deletion is confirm-gated by this server because it is irreversible, and a page rarely stands alone: it may have children, attached blocks, forms, or products pointing at it as their catalogue parent.
@@ -93,6 +110,7 @@ The delete operation may accept flags controlling what happens to dependent cont
 - **Assuming a page URL is a route.** It is an identifier for the API, not a path on a website.
 - **Using an id from another instance.** Page ids are local; the page URL is the portable handle.
 - **Reordering by patching position.** Use the position operation.
+- **Reading a trimmed block list as the whole set.** A read restriction caps it, and the response gives no sign.
 - **Sending `parentId: null` to mean "leave it".** That is the instruction to move the page to the root.
 
 → `mcp/docs/api/verification-recipes#pages`
