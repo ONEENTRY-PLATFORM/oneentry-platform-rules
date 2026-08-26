@@ -166,7 +166,7 @@ Sending a scalar answers `400`, and the message names the attribute key, the exp
 
 ## Where the date check applies
 
-The check runs on every write that carries `attributesSets` — creating and updating a product, updating a page, creating and updating a form — and on the system operation that updates attribute values in place. On those routes a bad shape is refused before anything is written.
+The check runs on every entity write that carries `attributesSets`, **creating and updating alike** — products, pages, blocks, forms, templates, slides, discounts, user groups and events — and on the system operation that updates attribute values in place. On those routes a bad shape is refused before anything is written. The same holds for the `list` check above and for the locale level itself: a one-level map is refused on create as it is on update.
 
 Writes that do not carry `attributesSets` do not run it, so an ill-formed date can still be stored elsewhere without an error. After writing a date through any other route, read the value back rather than trusting the status code.
 
