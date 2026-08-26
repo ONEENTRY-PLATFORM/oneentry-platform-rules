@@ -55,22 +55,24 @@ What a particular field accepts is decided on the attribute instead. A file attr
 
 ## No preview template no preview and no error
 
-`template` is **the numeric id of a `/template-previews` record**. It is not a flag, and `template=1` is not an incantation — it means "preview template number one", which on a fresh instance does not exist.
+`template` names a `/template-previews` record — either its numeric **id** or its string **identifier**. It is not a flag, and `template=1` is not an incantation: it means "preview template number one", which on a fresh instance does not exist.
 
 A fresh instance has **no template-previews records at all**. Upload an image without a valid template id and the file is stored correctly, `previewLink` is simply absent, and nothing reports a problem. Thirty images later that is thirty images a site cannot render as thumbnails.
 
 So, once per instance, before the first image:
 
 1. `GET /template-previews`. If it is empty, create one — title, identifier, and the proportions you want generated.
-2. Note the **numeric id** from the response. A marker is not accepted here; a non-numeric `template` fails on the database type.
-3. Upload with `template=<that id>`.
+2. Note its `id` or its `identifier` from the response. `template` accepts either form; naming a template that does not exist answers `400`, and no other parameter name is read.
+3. Upload with `template=<that id or identifier>`.
 4. Read the returned record and confirm `previewLink` is present. If it is not, the template id is wrong — do not vary `type` and `entity` hoping for a different outcome, they have nothing to do with it.
 
 Previews are generated for `png`, `jpeg` and `jpg` only. Documents get no preview by design, which is why an upload of a PDF never carries one.
 
 A preview is not only a thumbnail — the inline placeholder a site shows while the full image loads comes from it too, so an image without one cannot be rendered progressively. Settle the template id before the first upload, not after the last.
 
-→ `mcp/docs/api/templates-and-previews` · `mcp/docs/api/baseline-data`
+A file headed for a form submission is the exception: leave `template` out and the previews are filled in when the submission is created.
+
+→ `mcp/docs/api/templates-and-previews#previews-for-images-sent-through-a-site-form` · `mcp/docs/api/baseline-data`
 
 ## What the two preview keys in a record hold
 
@@ -135,6 +137,8 @@ A form's file field takes the **upload record itself**. Send the object the uplo
 `filename`, `downloadLink` and `size` are the trio a value must carry; leave one out and the answer is `400` naming the missing key. `image` and `file` take one entry, `groupOfImages` several.
 
 A visitor uploads through the public files route with the site's app token and gets the same record, so a storefront attaches a photo to a review with no admin session.
+
+If the field's attribute has a preview template assigned, the stored value comes back carrying `previewLink` and `defaultPreview` even though the upload answer had neither.
 
 → `mcp/docs/api/forms-and-form-data#fields-are-attributes`
 
