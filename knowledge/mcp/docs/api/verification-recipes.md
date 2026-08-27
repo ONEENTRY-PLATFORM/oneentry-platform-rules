@@ -84,7 +84,7 @@ Create the menu, add a page item and a custom item, nest one under the other, an
 
 Assert: the tree reads back with the parent relationships intact — this is the check that catches a parent reference dropped during an update; deleting a parent item removes its branch; the included pages and the custom items **share no id**, which is what catches a branch that would be returned under two parents.
 
-Reordering earns three assertions rather than one: the sibling order comes back changed on the admin read, the public read returns the items in that same order, and a later update attaching the same `pagesIds` leaves it alone. Send `parentType` with `parentId` throughout — a tree whose two kinds of item share a number is exactly where the check pays.
+Reordering earns four assertions rather than one: the sibling order comes back changed on the admin read, the public read returns the items in that same order, a later update attaching the same `pagesIds` leaves it alone, and — moving an item across the two kinds, on a fresh menu — its lexorank falls between its neighbours', which the order alone does not prove. Send `parentType` with `parentId` throughout — a tree whose two kinds of item share a number is exactly where the check pays.
 
 → `mcp/docs/api/menus#parent-references-are-polymorphic`
 
