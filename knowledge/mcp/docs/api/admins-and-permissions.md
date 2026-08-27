@@ -12,6 +12,16 @@ Keys look like `menu.update`, `orders.get`, `blocks.preview`, `settings.attribut
 
 Each operation declares the key it requires. `cms_api_describe` shows it as `permission`, and `cms_whoami` shows what the current admin holds.
 
+## An unrecognised key is refused by the instance
+
+A write that carries a key outside the vocabulary is refused with `400`, and **nothing** is stored — not the unrecognised key, and not the valid keys sent beside it. It applies to creating an admin, updating one, and updating a permission map on its own.
+
+The response names every offending key in one go, so a single call finds all the mistakes in a payload rather than one per attempt. A recognised key carrying a value that is neither `true` nor `false` is refused the same way — with one exception: `admins.modules`, which scopes the areas an admin sees, takes a list of area identifiers instead of a boolean.
+
+Take the vocabulary from `AdminsController_getAllAvailablePermissionsKeys` and send only keys it returns. A key that reads like the neighbour of a real one is not thereby real: `admins.get` exists, `pages.scope` does not.
+
+This matters most when you edit a map you just read. Change the value you meant to change and send the rest back untouched — a key you invented or mistyped on the way through takes the whole write down with it.
+
 ## The local check and what it means
 
 Before sending, this server compares the operation's required key against the admin's map. If it is missing, the call is refused locally:
@@ -95,7 +105,7 @@ Admin permissions govern the Admin API. Content API access is governed by user g
 ## Common mistakes
 
 - **Retrying a permission refusal.** It cannot succeed.
-- **Inventing a permission key.** The vocabulary is fixed.
+- **Inventing a permission key.** The vocabulary is fixed, and a write carrying an unknown key is refused whole.
 - **Replacing a permission map wholesale.** Rights disappear silently.
 - **Asking for a grant of an ungrantable export permission.**
 - **Expecting a grant to apply mid-session.** Reconnect.
