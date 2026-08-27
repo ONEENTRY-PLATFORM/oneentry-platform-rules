@@ -34,7 +34,7 @@ Page items and custom items are numbered separately, so the same number is a val
 - `parentType` — `page` or `custom`, `null` at the top level;
 - `itemType` on every item of a public menu tree — `page` or `custom`. This is the value a child of that item must send as its `parentType`.
 
-The position operations accept `newParentType` next to `newParentId`, using the same two values as the `leftObjectType` and `rightObjectType` of the same body.
+The position operations accept `newParentType` next to `newParentId`, with those same two values. Do not carry them over to `leftObjectType` and `rightObjectType` of the same body: a neighbour's kind uses the other vocabulary, `menu-page` or `menu-custom-item`. Two dictionaries in one body — ordering, below, spells it out.
 
 Practical consequences:
 
@@ -110,9 +110,27 @@ The position operations take a required `position` object even when the order do
 
 Both re-parenting and sibling order apply, and a public read returns the items in that order. The order also survives a later update of the menu's `pagesIds`: attaching the same set again does not reshuffle what is already there.
 
-Neighbours are addressed by the id of the item, not of its position: a page item's neighbour is a page id, a custom item's neighbour is a custom item id. In a mixed row, name each neighbour's kind with `leftObjectType` and `rightObjectType` — without them a neighbour of the other kind is not found, and the moved item lands at the edge of the list instead of between the two.
+Neighbours are addressed by the id of the item, not of its position: a page item's neighbour is a page id, a custom item's neighbour is a custom item id. In a row of one kind that is all it takes — an unnamed neighbour is read as the same kind as the item being moved.
 
-An update that attaches pages assigns order in the order you list `pagesIds`.
+In a **mixed** row, name each neighbour's kind with `leftObjectType` and `rightObjectType`, and name it in the vocabulary those two fields use:
+
+| field | values | means |
+|---|---|---|
+| `newParentType` | `page`, `custom` | the kind of the new parent |
+| `leftObjectType`, `rightObjectType` | `menu-page`, `menu-custom-item` | the kind of a neighbour |
+
+Both directions work once the kind is spelled this way — a custom item in between two pages, a page in beside a custom item.
+
+```text
+PUT /api/admin/menus/8/custom-items/459/position     custom item 459 between pages 3 and 4
+  { "newParentId": null,
+    "position": { "leftObjectId": 3, "leftObjectType": "menu-page",
+                  "rightObjectId": 4, "rightObjectType": "menu-page" } }
+```
+
+**A kind the instance does not know is not refused.** `page`, `custom` and near-misses such as `menu_page` all answer `200`; the neighbour is not resolved and the moved item's rank is reset to the middle of the range. The order that comes out can still look like the one you asked for. So check the rank, not the order: the moved item's lexorank has to fall **between** its two neighbours'. A value of `0|hzzzzz:` right after a move is that reset, not a placement.
+
+An update that attaches pages assigns order in the order you list `pagesIds`. Omitting `position` while changing the parent leaves the order alone.
 
 → `mcp/docs/api/silent-no-ops`
 
@@ -133,6 +151,8 @@ Both are confirm-gated where they are destructive. Read the tree before confirmi
 - **Using a page's title as its menu label.** The label is `menuTitle`.
 - **Listing one page twice in `pagesIds`.** Use a custom item for the second place.
 - **Sending `parentId` without `parentType`.** Ambiguous whenever the two kinds share a number.
+- **Writing `page` or `custom` as a neighbour's kind.** That is the `newParentType` vocabulary. A neighbour is `menu-page` or `menu-custom-item`; the wrong word answers 200 and resets the rank.
+- **Judging a reorder by the order alone.** Read the lexorank: an unresolved neighbour can leave a plausible order behind.
 - **Sending a position body without `position`.** It answers 400; the minimal body is `{ "position": { "leftObjectId": null, "rightObjectId": null } }`.
 - **Reading a menu publicly without the `marker` segment.** That path answers 404.
 
