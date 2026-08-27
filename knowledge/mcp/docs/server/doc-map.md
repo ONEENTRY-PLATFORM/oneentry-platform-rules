@@ -122,6 +122,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | docId | Read it when |
 |---|---|
 | `mcp/docs/api/modules` | Explaining why an admin section is missing |
+| `mcp/docs/api/journal` | Finding who changed something, or clearing the instance's own record of it |
 | `mcp/docs/api/events` | Sending a mail or a push when something happens |
 | `mcp/docs/api/settings` | Instance-wide settings, limits and quota |
 | `mcp/docs/api/import` | Bulk-loading content from a file |
@@ -172,3 +173,6 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why is my guest cart empty after adding to it | `mcp/docs/api/content-api-sign-in-and-cart#the-guest-cart-needs-a-uuid-in-x-guest-id` |
 | Why did submissions vanish after a form edit | `mcp/docs/api/forms-and-form-data#an-update-drops-every-config-you-do-not-send-back` |
 | How do I delete something safely | `mcp/docs/server/confirm-and-dry-run` |
+| Why can I not list the submissions of a form | `mcp/docs/api/form-submissions#both-read-routes-need-the-forms-data-read-permission` |
+| Why does clearing the journal answer 400 | `mcp/docs/api/journal#clearing-the-journal-needs-an-explicit-window` |
+| Why did an operation that worked start answering 403 | `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it` |

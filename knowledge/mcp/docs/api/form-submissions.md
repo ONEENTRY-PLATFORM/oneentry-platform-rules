@@ -2,9 +2,29 @@
 
 What visitors submitted against a form: how the listing is called, how to narrow it to one page or one product, and what comes back. The listing has one supported method and two filters that are easy to confuse with each other.
 
-Read this when a listing returns everything, nothing, or a shape you did not expect.
+Read this when a listing returns everything, nothing, or a shape you did not expect. Both read routes are permission-gated, so start with the next section if what you have is a `403`.
 
 → `mcp/docs/api/forms-and-form-data` · `mcp/docs/api/rating-forms-and-reviews`
+
+## Both read routes need the forms data read permission
+
+Reading submissions requires `forms.data.read`. Two operations are behind it:
+
+| Operation | Route |
+|---|---|
+| `AdminFormDataController_findByFormMarker` | `POST /form-data/marker/{marker}` |
+| `AdminFormDataController_countSent` | `GET /form-data/count/{marker}` |
+
+Without the grant both answer `403 Forbidden resource`. The message does **not** name the key, so a `403` on either route means this one and nothing else — there is no second permission to look for.
+
+Two things make it easy to misread:
+
+- **Holding the other form keys is not enough.** `forms.create`, `forms.update`, `forms.data.update` and `forms.data.delete` are separate grants. An admin can edit and delete submissions it is not allowed to list.
+- **A read can be refused.** Elsewhere a permission stops a write; here it stops a `GET`. An empty-looking failure on the count route is a refusal, not a form with no submissions.
+
+The counting route is also narrower than the listing: it counts only submissions in a visible status — `sent`, `approved`, or none at all — so `deleted`, `banned` and `moderation` entries are absent from the total while the listing still returns them when you ask for those statuses.
+
+→ `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it`
 
 ## The listing is a POST with the filter in the body
 
@@ -72,5 +92,7 @@ Some submissions carry a status an operator moves through as they process it, wi
 - **Asking for the extended mode by habit.** The plain one already names the entity.
 - **Paging from the body.** `limit` and `offset` are query parameters; in the body they answer `400`.
 - **Sending a status in upper case.** The five values are lowercase.
+- **Reading a `403` as a missing form.** Both read routes need `forms.data.read`.
+- **Comparing the count against the listing.** The count skips `deleted`, `banned` and `moderation`.
 
 → `mcp/docs/api/forms-and-form-data#a-form-must-be-bound-before-it-accepts-submissions` · `mcp/docs/api/verification-recipes#forms`

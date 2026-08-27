@@ -33,6 +33,33 @@ Then stop. Granting is their action.
 
 A grant made while your session is open is not picked up until the session reconnects — the permission list is read once.
 
+## A key can exist without any admin holding it
+
+The vocabulary is fixed at any moment but it is not frozen: keys are added to the platform over time, and an admin provisioned before a key existed does not hold it. Nobody is granted it retroactively.
+
+So an operation that worked for months can begin answering `403` while every neighbouring operation still succeeds — the account did not lose anything, the operation gained a requirement. `forms.data.read` and `journal.delete` are two keys where this is the usual explanation.
+
+`AdminsController_getAllAvailablePermissionsKeys` returns every key the instance recognises. Compare it against the admin's own map before concluding anything: a key in that list and absent from the map is a grant to ask for, and a key in neither is one you have misremembered.
+
+→ `mcp/docs/api/form-submissions#both-read-routes-need-the-forms-data-read-permission`
+
+## Signing every admin out has its own permission
+
+`AuthController_logoutAllUsers` — `POST /auth/logout/all-users` — is gated by `admins.totalLogout`. Called with no token it answers `401`; called by an admin without the grant it answers `403 Forbidden resource`, and nothing is signed out.
+
+The operation carries **no permission in the catalog**, so the local pre-check has nothing to compare and cannot stop the call. Unlike the refusals above, this one arrives from the instance after the request was sent.
+
+Do not confuse it with the visitor route. Signing out one *customer* everywhere is a Content API concern on a different path, and the two are never substitutes for each other.
+
+| To sign out | Use |
+|---|---|
+| admins, across the instance | `POST /auth/logout/all-users` |
+| one visitor, on every device | `POST .../users-auth-providers/marker/{marker}/users/logout-all` |
+
+Treat it as destructive whichever way it is pointed: it ends sessions belonging to people who did not ask for it. Show the human what you are about to do and wait.
+
+→ `mcp/docs/api/content-api-sign-in-and-cart#where-the-session-routes-live`
+
 ## Some permissions cannot be granted
 
 `orders.export`, `payments.export` and `users.export` are not grantable on current instances. Operations requiring them answer 403 permanently, no matter who is asking.
@@ -73,3 +100,5 @@ Admin permissions govern the Admin API. Content API access is governed by user g
 - **Asking for a grant of an ungrantable export permission.**
 - **Expecting a grant to apply mid-session.** Reconnect.
 - **Creating an admin to work around a refusal.** Gated, and not the answer.
+- **Reading a new `403` as lost rights.** The operation more often gained a requirement.
+- **Calling the total logout to fix a stuck session.** It ends everyone else's too.
