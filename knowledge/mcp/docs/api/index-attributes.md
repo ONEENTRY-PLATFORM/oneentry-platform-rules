@@ -76,6 +76,26 @@ There is an operation returning the distinct values an indexed attribute current
 - checking a filter value exists before sending a filter that would otherwise return nothing;
 - seeing what a facet on a site will actually offer.
 
+## Why a search by meaning finds nothing for a kind
+
+Global search and the per-kind `POST /{kind}/vector/search` routes match by meaning, and a kind whose records carry no vector answers them with nothing at all. An empty answer reads exactly like "no match", so check the coverage before concluding either.
+
+`IndexAttributeController_getHealth` — `GET /index-attributes/health` — reports it per kind under `sinks.vectors.byTable`, with an entry each for pages, discounts, users, admins and orders:
+
+```json
+{ "sinks": { "vectors": { "byTable": {
+    "pages": { "total": 14, "eligible": 14, "vectorized": 0,
+               "missingSample": [1, 38, 39] } } } } }
+```
+
+`total` counts the records. `eligible` counts those carrying enough text to produce a vector — a record with no title and no usable attribute cannot. `vectorized` counts those that have one, and `missingSample` lists up to fifty ids that ought to and do not.
+
+`eligible` above `vectorized`, or a non-empty `missingSample`, means the coverage is behind. Say so, name the kind, and stop there: rewriting the entities does not provoke it, and a second search does not either.
+
+The `vectorized` and `total` sitting beside `byTable` count products alone. Read the per-kind entries instead — the two outer numbers can look complete while a whole kind is uncovered.
+
+→ `mcp/docs/api/global-search`
+
 ## Bulk changes take proportionally longer
 
 Importing or updating many entities at once means the queryable side lags by more than seconds. Verify a bulk change by sampling — read a handful of entities by id, then check the listing once, rather than polling the listing repeatedly.
@@ -90,5 +110,6 @@ Importing or updating many entities at once means the queryable side lags by mor
 - **Reading a new attribute key as unsupported** because the public answer does not carry it. Write a value into it first.
 - **Verifying a bulk import by refreshing a listing.** Sample by id.
 - **Assuming indexing is instant after marking an attribute.** Existing values are picked up progressively.
+- **Reading an empty search by meaning as no match.** Check the coverage for that kind first.
 
 → `mcp/docs/api/verification-recipes`

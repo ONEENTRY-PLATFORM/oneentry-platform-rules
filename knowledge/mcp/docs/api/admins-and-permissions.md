@@ -8,9 +8,19 @@ Admin mutations are permanently confirm-gated, so nothing in this area happens w
 
 ## Permissions are dotted keys
 
-Keys look like `menu.update`, `orders.get`, `blocks.preview`, `settings.attributes.create`. The vocabulary is fixed by the platform: a key outside it cannot be held by anyone, and inventing one achieves nothing.
+Keys look like `menu.update`, `orders.get`, `blocks.preview`, `settings.attributes.create`. The vocabulary is fixed by the platform: a key outside it cannot be held by anyone, and a write that carries one is refused outright.
 
 Each operation declares the key it requires. `cms_api_describe` shows it as `permission`, and `cms_whoami` shows what the current admin holds.
+
+## An unrecognised permission key is refused with 400
+
+A write that carries a key outside the vocabulary is refused with `400`, and **nothing** is stored — not the unrecognised key, and not the valid keys sent beside it. It applies to every write carrying a `permissions` map: creating an admin, and updating one.
+
+The response names every offending key in one go, so a single call finds all the mistakes in a payload rather than one per attempt. A recognised key carrying a value that is neither `true` nor `false` is refused the same way — with one exception: `admins.modules`, which scopes the areas an admin sees, takes a list of area identifiers instead of a boolean.
+
+Take the vocabulary from `AdminsController_getAllAvailablePermissionsKeys` and send only keys it returns. A key that reads like the neighbour of a real one is not thereby real: `admins.get` exists, `pages.scope` does not.
+
+This matters most when you edit a map you just read. Change the value you meant to change and send the rest back untouched — a key you invented or mistyped on the way through takes the whole write down with it.
 
 ## The local check and what it means
 
@@ -37,11 +47,11 @@ A grant made while your session is open is not picked up until the session recon
 
 The vocabulary is fixed at any moment but it is not frozen: keys are added to the platform over time, and an admin provisioned before a key existed does not hold it. Nobody is granted it retroactively.
 
-So an operation that worked for months can begin answering `403` while every neighbouring operation still succeeds — the account did not lose anything, the operation gained a requirement. `forms.data.read` and `journal.delete` are two keys where this is the usual explanation.
+So an operation that worked for months can begin answering `403` while every neighbouring operation still succeeds — the account did not lose anything, the operation gained a requirement. `forms.data.read`, `journal.delete`, `files.create` and `files.delete` are keys where this is the usual explanation.
 
 `AdminsController_getAllAvailablePermissionsKeys` returns every key the instance recognises. Compare it against the admin's own map before concluding anything: a key in that list and absent from the map is a grant to ask for, and a key in neither is one you have misremembered.
 
-→ `mcp/docs/api/form-submissions#both-read-routes-need-the-forms-data-read-permission`
+→ `mcp/docs/api/form-submissions#both-read-routes-need-the-forms-data-read-permission` · `mcp/docs/api/files-and-uploads#admin-uploads-and-deletes-need-file-permissions`
 
 ## Signing every admin out has its own permission
 
@@ -99,7 +109,7 @@ Admin permissions govern the Admin API. Content API access is governed by user g
 ## Common mistakes
 
 - **Retrying a permission refusal.** It cannot succeed.
-- **Inventing a permission key.** The vocabulary is fixed.
+- **Inventing a permission key.** The vocabulary is fixed, and a write carrying an unknown key is refused whole.
 - **Replacing a permission map wholesale.** Rights disappear silently.
 - **Reporting an export refusal as a platform limitation.** Those keys grant like any other.
 - **Expecting a grant to apply mid-session.** Reconnect.

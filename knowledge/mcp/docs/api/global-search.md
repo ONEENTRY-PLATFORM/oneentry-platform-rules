@@ -54,7 +54,9 @@ Three things to know before reaching for it:
 - It depends on a capability an instance may not have available. When it is not, the call answers `503`. That is a temporary state, not a malformed request: retry later, or fall back to the entity's own listing with a filter. Do not rewrite the body and try again, and do not report it as a defect without saying it was a 503.
 - On form data the working route is the public one; the admin variant answers `405`.
 
-Match quality follows what has been indexed, so a kind whose content was loaded recently can return less than you expect while the rest of the instance behaves normally.
+Match quality follows what has been indexed, so a kind whose content was loaded recently can return less than you expect while the rest of the instance behaves normally. An answer that is empty rather than short is worth checking against the coverage the instance reports per kind, before you read it as "nothing matches".
+
+→ `mcp/docs/api/index-attributes#why-a-search-by-meaning-finds-nothing-for-a-kind`
 
 ## Permissions on the public side
 
