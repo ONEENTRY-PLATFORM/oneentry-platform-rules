@@ -177,4 +177,5 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does clearing the journal answer 400 | `mcp/docs/api/journal#clearing-the-journal-needs-an-explicit-window` |
 | Why did an operation that worked start answering 403 | `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it` |
 | Why is my upload or file delete refused with 403 | `mcp/docs/api/files-and-uploads#admin-uploads-and-deletes-need-file-permissions` |
-| Why was my admin permission write refused with 400 | `mcp/docs/api/admins-and-permissions#an-unrecognised-key-is-refused-by-the-instance` |
+| Why was my admin permission write refused with 400 | `mcp/docs/api/admins-and-permissions#an-unrecognised-permission-key-is-refused-with-400` |
+| Why does a search by meaning return nothing for a kind | `mcp/docs/api/index-attributes#why-a-search-by-meaning-finds-nothing-for-a-kind` |
