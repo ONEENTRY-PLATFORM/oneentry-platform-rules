@@ -47,11 +47,11 @@ A grant made while your session is open is not picked up until the session recon
 
 The vocabulary is fixed at any moment but it is not frozen: keys are added to the platform over time, and an admin provisioned before a key existed does not hold it. Nobody is granted it retroactively.
 
-So an operation that worked for months can begin answering `403` while every neighbouring operation still succeeds — the account did not lose anything, the operation gained a requirement. `forms.data.read` and `journal.delete` are two keys where this is the usual explanation.
+So an operation that worked for months can begin answering `403` while every neighbouring operation still succeeds — the account did not lose anything, the operation gained a requirement. `forms.data.read`, `journal.delete`, `files.create` and `files.delete` are keys where this is the usual explanation.
 
 `AdminsController_getAllAvailablePermissionsKeys` returns every key the instance recognises. Compare it against the admin's own map before concluding anything: a key in that list and absent from the map is a grant to ask for, and a key in neither is one you have misremembered.
 
-→ `mcp/docs/api/form-submissions#both-read-routes-need-the-forms-data-read-permission`
+→ `mcp/docs/api/form-submissions#both-read-routes-need-the-forms-data-read-permission` · `mcp/docs/api/files-and-uploads#admin-uploads-and-deletes-need-file-permissions`
 
 ## Signing every admin out has its own permission
 
