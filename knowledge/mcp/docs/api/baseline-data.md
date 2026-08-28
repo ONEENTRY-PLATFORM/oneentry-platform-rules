@@ -50,7 +50,7 @@ If a Content API call returns `403 Permission data not found`, the fix is granti
 
 ## Admin permission keys
 
-An admin's rights are a map of dotted keys such as `orders.get`, `blocks.preview` or `settings.attributes.create`. The vocabulary is fixed by the platform; a key outside it can never be held by anyone.
+An admin's rights are a map of dotted keys such as `orders.get`, `blocks.preview` or `settings.attributes.create`. The vocabulary is fixed by the platform; a key outside it can never be held by anyone, and a write carrying one is refused with `400` and stores nothing at all.
 
 - Read the admin's own map — `cms_whoami` reports it — rather than guessing.
 - Grant or revoke individual keys. Never replace the whole map: removing rights the human still needs is easy, reconstructing them is not.
