@@ -143,6 +143,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why are my validators empty when a site reads the form | `mcp/docs/api/attribute-sets#two-reads-two-answers` |
 | How do I write a text field in a submission | `mcp/docs/api/attribute-types` |
 | What do I send as the value of a captcha field | `mcp/docs/api/captcha-fields#what-a-captcha-field-must-carry` |
+| Why is my captcha field accepting any token | `mcp/docs/api/captcha-fields#hiding-the-captcha-field-switches-the-check-off` |
 | Why do my uploaded images have no preview | `mcp/docs/api/files-and-uploads#no-preview-template-no-preview-and-no-error` |
 | Why did my menu item jump to the top level after an update | `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it` |
 | How do I create a menu with its pages | `mcp/docs/api/menus#creating-a-menu-with-its-pages` |
