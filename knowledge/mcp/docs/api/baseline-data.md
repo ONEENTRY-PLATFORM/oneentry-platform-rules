@@ -54,7 +54,7 @@ An admin's rights are a map of dotted keys such as `orders.get`, `blocks.preview
 
 - Read the admin's own map — `cms_whoami` reports it — rather than guessing.
 - Grant or revoke individual keys. Never replace the whole map: removing rights the human still needs is easy, reconstructing them is not.
-- `orders.export`, `payments.export` and `users.export` are **not grantable** on current instances, so those operations answer 403 permanently. Report that instead of retrying.
+- The export keys read entity-first — `users.export`, `orders.export`, `payments.export`. A seeded admin holds all three, and they grant like any other key.
 
 → `mcp/docs/api/admins-and-permissions`
 

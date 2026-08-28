@@ -176,3 +176,4 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why can I not list the submissions of a form | `mcp/docs/api/form-submissions#both-read-routes-need-the-forms-data-read-permission` |
 | Why does clearing the journal answer 400 | `mcp/docs/api/journal#clearing-the-journal-needs-an-explicit-window` |
 | Why did an operation that worked start answering 403 | `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it` |
+| Can an export permission be granted | `mcp/docs/api/admins-and-permissions#exporting-data-has-its-own-permissions` |

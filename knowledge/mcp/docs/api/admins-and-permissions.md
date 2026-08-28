@@ -60,11 +60,15 @@ Treat it as destructive whichever way it is pointed: it ends sessions belonging 
 
 → `mcp/docs/api/content-api-sign-in-and-cart#where-the-session-routes-live`
 
-## Some permissions cannot be granted
+## Exporting data has its own permissions
 
-`orders.export`, `payments.export` and `users.export` are not grantable on current instances. Operations requiring them answer 403 permanently, no matter who is asking.
+`users.export`, `orders.export` and `payments.export` govern the operations under `/export` — everything of a kind, or one auth provider, order storage or payment account at a time.
 
-Report that as a platform limitation rather than a configuration problem, and do not ask a human to grant them — they cannot.
+They are ordinary keys. Each appears in the vocabulary the instance returns, an admin provisioned with the instance holds all three, and an export asked for by a holder runs rather than refusing — the order export answers `200` with a file. So handle a refusal the way you would any other: name the key and ask for the grant. It is not a limitation to report and route around.
+
+Read the key names in that order — the entity first, `export` second. `export.users` is the shape people reach for and it is not in the vocabulary, so a grant asked for under that name cannot be given.
+
+`format` is required and takes `csv` or `xml`. Anything else answers `400` before the export begins, which is the cheapest way to find out you sent `xlsx`.
 
 ## Never replace an admins permission map
 
@@ -97,7 +101,7 @@ Admin permissions govern the Admin API. Content API access is governed by user g
 - **Retrying a permission refusal.** It cannot succeed.
 - **Inventing a permission key.** The vocabulary is fixed.
 - **Replacing a permission map wholesale.** Rights disappear silently.
-- **Asking for a grant of an ungrantable export permission.**
+- **Reporting an export refusal as a platform limitation.** Those keys grant like any other.
 - **Expecting a grant to apply mid-session.** Reconnect.
 - **Creating an admin to work around a refusal.** Gated, and not the answer.
 - **Reading a new `403` as lost rights.** The operation more often gained a requirement.
