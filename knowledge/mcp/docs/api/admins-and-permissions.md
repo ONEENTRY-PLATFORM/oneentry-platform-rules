@@ -8,11 +8,11 @@ Admin mutations are permanently confirm-gated, so nothing in this area happens w
 
 ## Permissions are dotted keys
 
-Keys look like `menu.update`, `orders.get`, `blocks.preview`, `settings.attributes.create`. The vocabulary is fixed by the platform: a key outside it cannot be held by anyone, and inventing one achieves nothing.
+Keys look like `menu.update`, `orders.get`, `blocks.preview`, `settings.attributes.create`. The vocabulary is fixed by the platform: a key outside it cannot be held by anyone, and a write that carries one is refused outright.
 
 Each operation declares the key it requires. `cms_api_describe` shows it as `permission`, and `cms_whoami` shows what the current admin holds.
 
-## An unrecognised key is refused by the instance
+## An unrecognised permission key is refused with 400
 
 A write that carries a key outside the vocabulary is refused with `400`, and **nothing** is stored — not the unrecognised key, and not the valid keys sent beside it. It applies to every write carrying a `permissions` map: creating an admin, and updating one.
 
