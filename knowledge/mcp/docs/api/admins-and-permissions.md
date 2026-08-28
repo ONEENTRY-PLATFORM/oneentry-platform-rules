@@ -64,7 +64,7 @@ Treat it as destructive whichever way it is pointed: it ends sessions belonging 
 
 `users.export`, `orders.export` and `payments.export` govern the operations under `/export` — everything of a kind, or one auth provider, order storage or payment account at a time.
 
-They are ordinary keys. Each appears in the vocabulary the instance returns, an admin provisioned with the instance holds all three, and an export asked for by a holder runs rather than refusing — the order export answers `200` with a file. So handle a refusal the way you would any other: name the key and ask for the grant. It is not a limitation to report and route around.
+They are ordinary keys. Each appears in the vocabulary the instance returns, an admin provisioned with the instance holds all three, and an export asked for by a holder runs — the order export answers `200` with a file. Take the key away and the same call answers `403 Forbidden resource` with nothing exported. So handle a refusal here the way you would any other: name the key and ask for the grant. It is not a limitation to report and route around.
 
 Read the key names in that order — the entity first, `export` second. `export.users` is the shape people reach for and it is not in the vocabulary, so a grant asked for under that name cannot be given.
 
