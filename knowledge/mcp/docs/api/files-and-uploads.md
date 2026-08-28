@@ -39,6 +39,18 @@ Two consequences worth saying out loud when advising on this:
 
 → `mcp/docs/server/api-catalog#paths-outside-the-admin-api-are-dropped`
 
+## Admin uploads and deletes need file permissions
+
+Two keys govern the admin file routes: `files.create` for the upload, `files.delete` for the delete. An admin holding neither still authenticates, still reads, and still downloads — only the two writes are refused, with `403 Forbidden resource`, and nothing is stored or removed. With no token at all the answer is `401` instead.
+
+The editor route is gated action by action rather than as a whole: creating a folder needs `files.create`, removing a file or a folder needs `files.delete`, and its remaining actions are not gated. That operation declares no permission in the catalog, so the local pre-check has nothing to compare and cannot stop the call — the refusal arrives from the instance after the request went out.
+
+Both keys are recent, so an admin provisioned before they existed does not hold them and an upload that worked for months begins answering `403`. Read the admin's map before concluding anything about the file: the account did not lose a right, the route gained a requirement.
+
+The public files route is unaffected. It is governed by the user group's own file permission, and a `403` there is never fixed by granting an admin key.
+
+→ `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it`
+
 ## No file type is refused
 
 There is no allowlist of extensions and no setting that introduces one. Every part sent is stored whatever its name says it is — a document, a page, a vector image, a name carrying no extension at all — and it is served back under a content type read off that name, so a file a browser treats as a document opens as a page on the instance's own address.
@@ -47,7 +59,7 @@ Three limits apply on the way in, and they are the whole list:
 
 - the maximum upload size configured on the instance, applied per file. Over it the answer is `400` and the message names the setting;
 - the instance's storage allowance. Over it the answer is `400` as well, and nothing is kept;
-- the permission that governs the route.
+- the permission that governs the route — `files.create` on the admin one.
 
 What a particular field accepts is decided on the attribute instead. A file attribute carries validators holding the extensions and the size bounds a person picking a file is held to — those are stored for the editing panel and are not applied to a submitted value, so a file sent through the API is never measured against them. Read them as the project's own rule and check the file yourself before sending it.
 
@@ -168,7 +180,7 @@ Deleting removes the stored file, not the references to it. Attributes pointing 
 
 Find the references first. If you cannot establish what uses a file, say so before confirming the delete.
 
-Nothing about the file limits the delete. Its type, its age and who put it there do not matter: a file a visitor stored through the public route is removed by the same call as one an administrator uploaded. The limit is the permission on the route — the public one grants storing and not removing by default, so removing is an administrator's call unless a group is given that permission too.
+Nothing about the file limits the delete. Its type, its age and who put it there do not matter: a file a visitor stored through the public route is removed by the same call as one an administrator uploaded. The limit is the permission on the route — `files.delete` on the admin one; the public one grants storing and not removing by default, so removing is an administrator's call unless a group is given that permission too.
 
 The delete call names the file, **not** its stored path. It takes `type`, `entity` and `id` as its own parameters — the same folder values the upload used — and the file's own name separately. The name a record carries is the full path those folders produced, so passing that record's name back is the common mistake: the answer is `404`, which reads like "already gone" and is not. Send the last segment of the path alone.
 
@@ -187,6 +199,7 @@ Do not assume a link you obtained on one instance works on another, and do not c
 - **Re-uploading to check the first upload worked.** Read the record; uploads cost quota.
 - **Treating a stripped value as data loss.** The metadata is all there.
 - **Expecting the instance to refuse a file type.** It refuses none; the attribute's validators are the project's rule.
+- **Reading a `403` on upload or delete as a problem with the file.** The admin routes need `files.create` and `files.delete`.
 - **Deleting a file without finding its references.** Silent missing images.
 - **Copying a file reference between instances.** Upload again instead.
 - **Expecting an `alt` field on the upload record.** Put `alt` and `title` on the attribute slot instead.
