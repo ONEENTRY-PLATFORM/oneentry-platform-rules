@@ -84,16 +84,16 @@ Two implications: do not treat an unexpected item as corruption, and do not remo
 
 A create may carry `pagesIds`. The ids are checked first: one that does not exist answers `404` naming it, and no menu is created — so a typo costs you nothing to clean up.
 
-What the create does **not** do is nest anything. `pagesIds` is a flat set wherever it appears, so the pages arrive as siblings at the top level whatever their relationship in the page tree.
+What `pagesIds` does **not** do is nest anything. It is a flat set wherever it appears, so pages arrive as siblings at the top level whatever their relationship in the page tree. Creating empty and attaching with an update afterwards is equally valid, and the better shape when you build the tree level by level.
 
-Creating empty and attaching with an update afterwards is equally valid and is the better shape when you are building the tree level by level.
+A menu read gives `pagesIds` back — the same flat set an update accepts. To add one page, read the menu, append the id, and write `pagesIds` back. An update **without** `pagesIds` leaves the page set untouched, so you can change a title alone; send `pagesIds: []` only when you mean to empty the menu.
 
 ## Building a whole menu
 
 Top-down, one level at a time:
 
 1. Create the menu, with or without `pagesIds`.
-2. Attach any remaining pages with an update. `pagesIds` is a **flat set**: nesting is not taken from the page tree, so even pages whose parents are also in the menu come back at the top level.
+2. Attach any remaining pages with an update. `pagesIds` is a **flat set** — nesting is not taken from the page tree.
 3. Add custom items for everything that is not a page — products, external addresses, column headings. An empty `value` is refused, so a heading with no link needs a placeholder target such as `#`.
 4. Nest each level with the position operations, against the parents you read back.
 
