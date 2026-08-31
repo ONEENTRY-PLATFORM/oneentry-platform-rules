@@ -128,11 +128,11 @@ PUT /api/admin/menus/8/custom-items/459/position     custom item 459 between pag
                   "rightObjectId": 4, "rightObjectType": "menu-page" } }
 ```
 
-**A kind the instance does not know is not refused.** `page`, `custom` and near-misses such as `menu_page` all answer `200`; the neighbour is not resolved and the moved item's rank is reset to the middle of the range. The order that comes out can still look like the one you asked for. So check the rank, not the order: the moved item's lexorank has to fall **between** its two neighbours'. A value of `0|hzzzzz:` right after a move is that reset, not a placement.
+The parent words `page` and `custom` are understood here too and mean the same two kinds.
+
+**A kind the instance does not know is refused.** A near-miss such as `menu_page`, or any other value, answers `400` naming the side, the neighbour id and the kind that was looked for, and the moved item keeps the rank it had. The same `400` comes back when the kind is right but that neighbour is not in this menu. A neighbour id left out — omitted or `null` — still means "no neighbour on that side" and is accepted: that is how an item goes to either end of a row.
 
 An update that attaches pages assigns order in the order you list `pagesIds`. Omitting `position` while changing the parent leaves the order alone.
-
-→ `mcp/docs/api/silent-no-ops`
 
 ## Delete a menu or an item
 
