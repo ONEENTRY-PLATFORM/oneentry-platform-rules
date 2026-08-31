@@ -26,9 +26,9 @@ The flag follows the HTTP method, not the meaning of the call: a search whose qu
 
 `readAllRule: 0` with `readRestrictionRule: 1` is a read that succeeds and is trimmed. The public answer stops at the restricted length — ten records unless the instance says otherwise — and nothing in the response says it was cut. With `readAllRule: 1` the same call returns everything.
 
-It applies to every public list on that path, and to a page's blocks exactly as it applies to a listing.
+**Which reads it actually trims varies by route.** A page's blocks comes back cut. The product listings, asked for fifty, answer with fifty. So the rule tells you a read *may* be trimmed, never that it is, and a full-length answer is not evidence that the restriction is off.
 
-A list that returns the same small count for every query, on a project that plainly has more content, is this. Confirm it by reading the same data through the Admin API, which the restriction does not touch: two different counts settle it.
+That makes this a thing to measure rather than assume, in both directions. A list that returns the same small count for every query, on a project that plainly has more content, is the restriction; confirm it by reading the same data through the Admin API, which it does not touch, and let the two counts settle it.
 
 → `mcp/docs/api/pages#why-a-page-returns-fewer-blocks-than-you-attached`
 
@@ -46,18 +46,20 @@ To read the value in force without guessing, `AdminUserPermissionsController_get
 
 ## Paging cannot reach past the cap
 
-A capped read still honours `limit` and `offset`, but only inside the window:
+Where a read is trimmed, it still honours `limit` and `offset`, but only inside the window:
 
 - `offset` at or past the cap returns an empty array, not the next page;
 - `limit` is trimmed to what is left of the cap, so `offset: 5, limit: 50` on a cap of ten yields five records.
 
-A site paging a capped listing therefore sees the first ten records and then nothing at all, whatever the total. Raising the setting or granting unrestricted read is the only way through — no request shape gets past it.
+A site paging such a listing therefore sees the first ten records and then nothing at all, whatever the total. Raising the setting or granting unrestricted read is the only way through — no request shape gets past it.
+
+That is also the cheapest way to tell a trimmed read from an untrimmed one: ask for `offset: 5, limit: 50`. Fifty records back means this route is not being trimmed at all.
 
 ## What a new instance grants the guest group
 
 Every content permission record provisioned with the instance is linked to the guest group, so the routes are open to anyone holding the application token from the start. Two things follow that are worth checking rather than assuming.
 
-**Nearly every read route is provisioned as a restricted read.** So the ten-record ceiling is the default state of almost every public listing on a new project, and a fresh site hits it as soon as any list grows past it. A couple of routes ship with read-all instead — the active subscriptions list and the refund read — and the write-only routes carry no read rule at all, so treat "restricted" as the default to check rather than a guarantee.
+**Nearly every read route is provisioned as a restricted read**, so that is the rule a new project starts from almost everywhere — with the caveat above that what it trims in practice varies by route. A couple ship with read-all instead — the active subscriptions list and the refund read — and the write-only routes carry no read rule at all, so treat "restricted" as the default to check rather than a guarantee.
 
 **Many of them are provisioned with `addRule` on**, because the visitor-facing writes need it: sign-up and the other sign-in provider calls, form submissions, order creation, payment sessions, event subscription, the searches by meaning — and `/api/content/files`.
 
