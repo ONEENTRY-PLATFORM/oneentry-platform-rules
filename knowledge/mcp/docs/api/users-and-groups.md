@@ -24,7 +24,7 @@ A second group for signed-in customers, with identifier `user`, exists on fully 
 
 ## Permissions are per route and already exist
 
-Around 110 permission records are provisioned, one per Content API path, each with a section and a set of rules. They cover everything the Content API exposes.
+A permission record is provisioned for every Content API path, each with a section and a set of rules. They cover everything the Content API exposes.
 
 So the workflow when a route is refused is:
 
@@ -36,9 +36,7 @@ A permission path is unique per group, so creating one that exists fails — and
 
 ## Read limits are a rule not a missing permission
 
-A group's rules can allow reading with a restriction, which caps how many records a listing returns — and that is how every content route is provisioned. A site showing the same small number of items for every listing is hitting the cap, not running out of content.
-
-Check it before investigating anything else. Lifting it is a rules change on the existing record, never a new one.
+A site showing the same small number of items for every listing is hitting a read restriction on the group, not running out of content — and that restriction is how every content route is provisioned. Check it before investigating anything else; lifting it is a rules change on the existing record, never a new one.
 
 → `mcp/docs/api/content-api-permission-rules#a-restricted-read-caps-the-list-at-ten`
 
