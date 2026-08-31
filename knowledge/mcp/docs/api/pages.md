@@ -37,6 +37,8 @@ Two habits keep tree work correct:
 
 Ordering among siblings uses a **lexorank string** on the parent-scoped operations, not a number. Never sort those values numerically, and never reorder by patching the field.
 
+A children read returns siblings ordered by that string, highest first. The Content API returns the same children in the same order, but numbers them instead: the first child carries the **highest** number and the numbers count down to `1` for the last one. Sort that number descending to reproduce the order the panel shows — sorting it ascending reverses the list.
+
 Find the dedicated position operation and use it — it is what renumbers the surrounding siblings correctly:
 
 ```text
