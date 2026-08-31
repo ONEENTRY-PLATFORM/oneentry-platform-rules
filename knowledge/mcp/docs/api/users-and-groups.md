@@ -36,9 +36,11 @@ A permission path is unique per group, so creating one that exists fails — and
 
 ## Read limits are a rule not a missing permission
 
-A group's rules can allow reading with a restriction, which caps how many records a listing returns. A site that shows exactly the same small number of items for every listing is usually hitting that, not running out of content.
+A group's rules can allow reading with a restriction, which caps how many records a listing returns — and that is how every content route is provisioned. A site showing the same small number of items for every listing is hitting the cap, not running out of content.
 
-Check the restriction before investigating anything else. Removing it is a rules change on the existing permission.
+Check it before investigating anything else. Lifting it is a rules change on the existing record, never a new one.
+
+→ `mcp/docs/api/content-api-permission-rules#a-restricted-read-caps-the-list-at-ten`
 
 ## Diagnosing a Content API refusal
 
@@ -51,7 +53,7 @@ Check the restriction before investigating anything else. Removing it is a rules
 | Works for one language only | Not permissions — content exists in one locale |
 | A listing read with `POST` is refused | The **add** rule opens it, not a read rule |
 
-The rule follows the HTTP method, not the meaning: a listing whose filter travels in the body is a `POST`, so the add rule opens it. The refusal names the rule and its permission — `requires the "addRule" rule of the group permission (permissionId: 36)`.
+The refusal names the rule and the record to fix — `requires the "addRule" rule of the group permission (permissionId: 36)`. Which flag opens which method is in `mcp/docs/api/content-api-permission-rules#the-five-rules-and-what-each-one-opens`.
 
 Rule out the first row before changing any rules: it looks exactly like a closed project, and the group's own rules will show the routes as granted the whole time.
 
@@ -169,4 +171,4 @@ A returning person is recognised by the account id the network reports rather th
 - **Missing a read restriction** and investigating the data instead.
 - **Putting user details into a report.** Personal data stays in the instance.
 
-→ `mcp/docs/api/verification-recipes#permissions`
+→ `mcp/docs/api/content-api-permission-rules` · `mcp/docs/api/verification-recipes#permissions`

@@ -89,7 +89,7 @@ Two ways to open it, both on the instance rather than in the request:
 
 Either takes a few minutes to take effect.
 
-→ `mcp/docs/api/users-and-groups#read-limits-are-a-rule-not-a-missing-permission`
+→ `mcp/docs/api/content-api-permission-rules#a-restricted-read-caps-the-list-at-ten`
 
 ## Delete a page
 

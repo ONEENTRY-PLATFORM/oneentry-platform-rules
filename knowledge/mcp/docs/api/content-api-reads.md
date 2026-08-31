@@ -40,6 +40,14 @@ So verify with a **paused read**, and never repeat the write.
 
 → `mcp/docs/api/index-attributes#when-a-written-value-becomes-searchable`
 
+## Why a public list stops at the same number
+
+The rules of the reading group decide how much of a list the public sees, not just whether the call succeeds. Every content route is provisioned as a restricted read, which trims the answer to a fixed count — ten unless the instance says otherwise — and marks it in no way at all.
+
+So a list that comes back the same short length whatever you ask for is a rule, and `limit` and `offset` cannot page past it. Read the record for the path before you treat the missing records as missing content.
+
+→ `mcp/docs/api/content-api-permission-rules#a-restricted-read-caps-the-list-at-ten`
+
 ## A page of type external page has no public address
 
 `GET /api/content/pages/url/<url>` answers `404 Page not found` for a page whose general type is `external_page`, however correctly the page is set up. Nothing is wrong with it: that type has no public page of its own.
@@ -63,6 +71,7 @@ So check the work through the public route the site itself will call, with the l
 - **Sending the application token as a bearer.** Every route answers `403 Resource is closed`.
 - **Reading that `403` as a closed project** and rewriting the group permissions.
 - **Repeating a write because the public read still shows the old value.** Wait and read again.
+- **Treating a trimmed list as the whole list.** The restricted read says nothing about being cut.
 - **Looking for a public address for an external page.** It arrives in the menu.
 - **Verifying only through the admin read.** It is not what the site receives.
 
