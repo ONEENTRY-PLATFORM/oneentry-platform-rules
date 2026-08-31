@@ -92,7 +92,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/product-relations` | Related, similar or recommended products |
 | `mcp/docs/api/filters` | Narrowing a listing, or configuring facets |
 | `mcp/docs/api/index-attributes` | A filter finds nothing, or a new value is missing from a list |
-| `mcp/docs/api/global-search` | Locating an entity by a word a human used |
+| `mcp/docs/api/global-search` | Locating an entity by a word a human used, or building a site search on the public one |
 
 ## Commerce
 
@@ -185,3 +185,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does every public list stop at ten | `mcp/docs/api/content-api-permission-rules#a-restricted-read-caps-the-list-at-ten` |
 | Why can a public token upload a file | `mcp/docs/api/content-api-permission-rules#why-a-public-token-can-upload-a-file` |
 | Where is the restricted read length set | `mcp/docs/api/content-api-permission-rules#where-the-restricted-length-is-set-and-read` |
+| Why does the site search return only five results | `mcp/docs/api/global-search#results-come-back-grouped-in-fives` |
+| Why is limit refused on the search | `mcp/docs/api/global-search#paging-one-kind-needs-limit-and-exactly-one-type` |
+| Why does the search never find my documents | `mcp/docs/api/global-search#what-global-search-never-finds` |
+| Where is the public search by meaning | `mcp/docs/api/global-search#semantic-search-over-one-kind-of-entity` |
