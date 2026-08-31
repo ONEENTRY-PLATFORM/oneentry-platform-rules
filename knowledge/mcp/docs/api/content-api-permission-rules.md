@@ -34,7 +34,7 @@ A list that returns the same small count for every query, on a project that plai
 
 ## Where the restricted length is set and read
 
-The number lives under `user` in the general settings, as `restrictedDataLength`, and it is instance-wide rather than per path.
+The number lives under `user` in the general settings, as `restrictedDataLength`, and it is instance-wide rather than per path. On a fresh instance the key is not there at all and the fallback applies, so finding no such setting tells you nothing about what public reads are being cut to.
 
 To read the value in force without guessing, `AdminUserPermissionsController_getHealth` — `GET /api/admin/user-permissions/health` — reports it in `config`:
 
@@ -57,9 +57,9 @@ A site paging a capped listing therefore sees the first ten records and then not
 
 Every content permission record provisioned with the instance is linked to the guest group, so the routes are open to anyone holding the application token from the start. Two things follow that are worth checking rather than assuming.
 
-**Every one of them is provisioned as a restricted read**, never as read-all. So the ten-record ceiling is the default state of every public listing on a new project, and a fresh site hits it as soon as any list grows past it.
+**Nearly every read route is provisioned as a restricted read.** So the ten-record ceiling is the default state of almost every public listing on a new project, and a fresh site hits it as soon as any list grows past it. A couple of routes ship with read-all instead — the active subscriptions list and the refund read — and the write-only routes carry no read rule at all, so treat "restricted" as the default to check rather than a guarantee.
 
-**About twenty of them are provisioned with `addRule` on**, because the visitor-facing writes need it: sign-up and the other sign-in provider calls, form submissions, order creation, payment sessions, event subscription — and `/api/content/files`.
+**Many of them are provisioned with `addRule` on**, because the visitor-facing writes need it: sign-up and the other sign-in provider calls, form submissions, order creation, payment sessions, event subscription, the searches by meaning — and `/api/content/files`.
 
 ## Why a public token can upload a file
 

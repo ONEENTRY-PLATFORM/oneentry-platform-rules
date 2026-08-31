@@ -82,9 +82,9 @@ It is the cheap answer to "find the page called roughly this" and it does not ca
 
 ## Semantic search over one kind of entity
 
-Separately, most kinds carry a `POST /{kind}/vector/search` route that matches by meaning rather than by word — products, pages, orders, users, discounts, admins and form data each have one. It answers the question the word search cannot: "something like this", where the human's wording and the stored wording share no words.
+Separately, seven kinds carry a `POST /{kind}/vector/search` route that matches by meaning rather than by word — products, pages, orders, users, discounts, admins and form data. It answers the question the word search cannot: "something like this", where the human's wording and the stored wording share no words.
 
-The public form works and is granted to the guest group by default:
+**It exists on the Content API only.** Every admin variant of the address answers `405`, for all seven kinds, so this server cannot run a search by meaning at all. The call goes to the public address with an application token, exactly as the site would make it — and it is granted to the guest group by default:
 
 ```bash
 curl -X POST "https://your-instance.example/api/content/pages/vector/search?langCode=en_US" \
@@ -104,7 +104,7 @@ The answer is `{ "items": [...], "total": n }`, and a `POST` that worked answers
 - The search covers **the whole instance**. There is no site, branch or parent parameter, so a project holding several sites gets all of them back and must narrow the results itself.
 - Pages come back whether or not they are visible. Each item carries `isVisible`; a site that shows results unfiltered will publish pages that were deliberately hidden.
 
-Two more things to know. It depends on a capability an instance may not have available, and when it is missing the call answers `503` — a temporary state, not a malformed request, so retry later or fall back to a filtered listing rather than rewriting the body. And on form data the working route is the public one; the admin variant answers `405`.
+One more thing to know: it depends on a capability an instance may not have available, and when it is missing the call answers `503` — a temporary state, not a malformed request, so retry later or fall back to a filtered listing rather than rewriting the body. A `405` is the other answer entirely, and means you sent it to the admin address.
 
 Match quality follows what has been indexed, so a kind whose content was loaded recently can return less than you expect while the rest of the instance behaves normally.
 
@@ -125,5 +125,6 @@ Match quality follows what has been indexed, so a kind whose content was loaded 
 - **Sending `limit` without a single `types` value.** That is the drilldown `400`.
 - **Expecting documents in the results.** File-bearing attribute values are never matched.
 - **Typing `/vector-search`** and concluding from the `404` that search by meaning does not exist.
+- **Sending a search by meaning to the admin address.** Every kind answers `405` there.
 - **Publishing semantic results unfiltered.** Hidden pages are among them.
 - **Treating either search as a complete set.** Both are capped by design.
