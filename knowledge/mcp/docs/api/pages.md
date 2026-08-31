@@ -76,7 +76,7 @@ Create or find the block first, then attach it by its marker. Attaching a block 
 
 ## Why a page returns fewer blocks than you attached
 
-A public read of a page's blocks is governed by the reading group's rules, and a read restriction caps the answer at a fixed number of records. That ceiling applies to the blocks of a single page exactly as it applies to a listing, so a page carrying more blocks than the ceiling comes back trimmed.
+A public read of a page's blocks is governed by the reading group's rules, and a read restriction caps the answer at a fixed number of records. This read is one the ceiling is applied to, so a page carrying more blocks than the ceiling comes back trimmed — even though other public listings on the same instance answer in full.
 
 Nothing in the answer says so. These reads take no `limit` or `offset` and carry no total, so a trimmed response is indistinguishable from a page that genuinely has that many blocks, and the blocks past the ceiling cannot be reached from the site at all.
 

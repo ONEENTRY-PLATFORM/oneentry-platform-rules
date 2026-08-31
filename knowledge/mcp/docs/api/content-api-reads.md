@@ -42,9 +42,9 @@ So verify with a **paused read**, and never repeat the write.
 
 ## Why a public list stops at the same number
 
-The rules of the reading group decide how much of a list the public sees, not just whether the call succeeds. Every content route is provisioned as a restricted read, which trims the answer to a fixed count — ten unless the instance says otherwise — and marks it in no way at all.
+The rules of the reading group decide how much of a list the public sees, not just whether the call succeeds. Nearly every content route is provisioned as a restricted read, and where that is applied it trims the answer to a fixed count — ten unless the instance says otherwise — and marks it in no way at all.
 
-So a list that comes back the same short length whatever you ask for is a rule, and `limit` and `offset` cannot page past it. Read the record for the path before you treat the missing records as missing content.
+So a list that comes back the same short length whatever you ask for is a rule, and `limit` and `offset` cannot page past it. Read the record for the path before you treat the missing records as missing content. Which routes are trimmed varies, so measure the one you care about rather than assuming either way.
 
 → `mcp/docs/api/content-api-permission-rules#a-restricted-read-caps-the-list-at-ten`
 
