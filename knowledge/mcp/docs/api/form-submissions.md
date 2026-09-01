@@ -22,7 +22,7 @@ Two things make it easy to misread:
 - **Holding the other form keys is not enough.** `forms.create`, `forms.update`, `forms.data.update` and `forms.data.delete` are separate grants. An admin can edit and delete submissions it is not allowed to list.
 - **A read can be refused.** Elsewhere a permission stops a write; here it stops a `GET`. An empty-looking failure on the count route is a refusal, not a form with no submissions.
 
-The counting route is also narrower than the listing: it counts only submissions in a visible status — `sent`, `approved`, or none at all — so `deleted`, `banned` and `moderation` entries are absent from the total while the listing still returns them when you ask for those statuses.
+The counting route also answers a narrower question than the listing, so the two numbers rarely match by accident.
 
 → `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it`
 
@@ -30,11 +30,24 @@ The counting route is also narrower than the listing: it counts only submissions
 
 Submissions are always read **by the form's marker**, and that route is a `POST` because the filter travels in the body rather than in the query string. There is no `GET` form of it. The flat listing of every submission answers `405` and names the per-form route instead — take the name and change the method too, not just the path.
 
-When you only need a total, use the count route for the same marker rather than paging a listing to the end.
+When you only need a total, use the count route for the same marker rather than paging a listing to the end — but read the next section before you compare it with anything.
 
 Values follow each field's type, so read them as you would any attribute value. Responses are capped by this server; page with the operation's `limit` and `offset`.
 
 → `mcp/docs/server/response-shaping`
+
+## Why the count and the listing disagree
+
+The count route counts only submissions that carry values, and only those in a visible status: `sent`, `approved`, or none at all. `deleted`, `banned` and `moderation` entries stay out of the total while the listing still returns them when you ask for those statuses, so the count can be **lower** than what you see.
+
+Values are locale-keyed, and a listing returns only the submissions that carry values for the `langCode` you asked for. The count takes an optional `langCode` of its own. Without it, submissions in every locale are counted, so on a multilingual instance the count can be **higher** than a listing. Pass the same `langCode` to both and the two agree:
+
+```text
+GET  /form-data/count/{marker}?langCode=en_US
+POST /form-data/marker/{marker}?langCode=en_US
+```
+
+If a total will not fall to zero after you delete every submission you can see, the remainder is in a status or a locale your listing did not ask for — not data you lost.
 
 ## Reading the submissions of one page or product
 
@@ -93,6 +106,6 @@ Some submissions carry a status an operator moves through as they process it, wi
 - **Paging from the body.** `limit` and `offset` are query parameters; in the body they answer `400`.
 - **Sending a status in upper case.** The five values are lowercase.
 - **Reading a `403` as a missing form.** Both read routes need `forms.data.read`.
-- **Comparing the count against the listing.** The count skips `deleted`, `banned` and `moderation`.
+- **Comparing the count against a listing.** They have different scopes; pass the same `langCode` to both.
 
 → `mcp/docs/api/forms-and-form-data#a-form-must-be-bound-before-it-accepts-submissions` · `mcp/docs/api/verification-recipes#forms`
