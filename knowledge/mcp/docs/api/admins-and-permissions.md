@@ -31,9 +31,13 @@ Admin #12 lacks the "menu.delete" permission required by AdminMenusController_re
 No request was sent — ask for the grant instead of retrying.
 ```
 
-Nothing was sent, so nothing changed. The refusal is final: retrying, changing the body, or reaching for a neighbouring operation with the same requirement all fail identically.
+Your operation was never sent, so nothing changed. The refusal is final: retrying, changing the body, or reaching for a neighbouring operation with the same requirement all fail identically.
 
-There is one nuance. If the server could not read the admin's permissions at all, the list is empty, the local check is **skipped**, and refusals arrive as 403 from the instance instead. An empty `permissions` in `cms_whoami` means "unknown", not "none".
+Two things it does not tell you. If the server could not read the admin's permissions at all, the list is empty, the local check is **skipped**, and refusals arrive as 403 from the instance instead — an empty `permissions` in `cms_whoami` means "unknown", not "none". And the check does not know a requirement for every operation: the ones that manage admin accounts are refused by the instance rather than locally, so a call that mutates an admin can pass the local check and still answer 403.
+
+Treat a call that was not refused locally as unverified, not as permitted.
+
+→ `mcp/docs/server/allow-levels#the-local-permission-pre-check`
 
 ## Asking for a grant
 
@@ -66,7 +70,7 @@ Helpers stay open, because a write grant has to be usable on its own. Checking w
 
 The vocabulary is fixed at any moment but it is not frozen: keys are added to the platform over time, and an admin provisioned before a key existed does not hold it. Nobody is granted it retroactively.
 
-So an operation that worked for months can begin answering `403` while every neighbouring operation still succeeds — the account did not lose anything, the operation gained a requirement. `forms.data.read`, `pages.get`, `menu.get`, `journal.get`, `settings.general.get`, `settings.attributesSets.get`, `journal.delete`, `files.create` and `files.delete` are keys where this is the usual explanation.
+So an operation that worked for months can begin answering `403` while every neighbouring operation still succeeds — the account did not lose anything, the operation gained a requirement. `forms.data.read`, `pages.get`, `menu.get`, `journal.get`, `settings.general.get`, `settings.attributesSets.get`, `menu.delete`, `journal.delete`, `files.create` and `files.delete` are keys where this is the usual explanation.
 
 `AdminsController_getAllAvailablePermissionsKeys` returns every key the instance recognises. Compare it against the admin's own map before concluding anything: a key in that list and absent from the map is a grant to ask for, and a key in neither is one you have misremembered.
 

@@ -2,7 +2,7 @@
 
 Every error this server can hand you, what caused it, and the one next action for each. Written to be found by pasting the message you got.
 
-The most important distinction: a **refusal** happens locally and nothing was sent; an **error** came back from the instance and something was attempted.
+The most important distinction: a **refusal** happens locally and the operation was never sent; an **error** came back from the instance and something was attempted.
 
 → `mcp/docs/server/errors-startup` · `mcp/docs/server/allow-levels`
 
@@ -14,7 +14,7 @@ Errors arrive as JSON with an `error` field and, usually, context:
 { "error": "…", "opId": "…", "status": 403, "hint": "…" }
 ```
 
-- No `status` at all means the server decided locally. Nothing was sent, nothing changed.
+- No `status` at all means the server decided locally: your operation was not sent and nothing changed.
 - `status: 0` means the request was attempted and the instance could not be reached.
 - Any other `status` came from the instance.
 - `hint` is the next action. Read it before doing anything else.
