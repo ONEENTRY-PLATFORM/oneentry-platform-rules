@@ -17,6 +17,7 @@ This document lists the known cases with the route that actually works. Read it 
 | form create with no `type` | `201` | the form is stored with `type: null`, and nothing in the response says so | send `type` — it is declared and validated, so a wrong value is refused rather than stored |
 | form update with no `formModuleConfigs` | `200 true` | every module binding is deleted, and the submissions recorded against them go too | read the form and send its current `formModuleConfigs` back unchanged |
 | an option extra value written under a locale key | `200` | it is stored and the admin panel shows the field as empty | put `type` and `value` flat in `extended`, with no locale level |
+| product create or update with a top-level `sku` | `201` / `200` | the article number is not stored, and every later read shows the one the product's attribute values give it | write the value on the attribute the set uses for it, inside `attributesSets` |
 | a batch write over many entities | `200` per call | one entity can be missed with nothing in the response to say which | re-read every entity you wrote and retry the mismatches |
 | any request once the admin session lapses | `200` with the login page as the body | nothing at all was written | re-authenticate; through this server that retry is automatic, and a second login page is reported |
 

@@ -36,6 +36,14 @@ The minimum is a general type, an attribute set, localized content and attribute
 
 Both `localizeInfos` and `attributesSets` are usually loose fields, so copy the shape from the example in `cms_api_describe` rather than inferring it.
 
+`productPages` — the sections the product sits in — is a list of **objects**, not of ids:
+
+```json
+{ "productPages": [{ "pageId": 674 }] }
+```
+
+A bare id answers `400` naming the field, the shape it expects and the value it received. An empty list is accepted and means no section yet. An update wants the same shape.
+
 After creating, **read the product back by id**. A one-level attribute map is accepted, answers 201, and stores nothing.
 
 ## Update a product
@@ -61,6 +69,8 @@ Two things follow that are easy to get half right:
 - **The link between variants is a relation template**, not an attribute listing the other colours. The attribute the rule compares must be **indexed**, or the rule matches nothing and nothing says so.
 
 Anything with a closed set of values — colour, badge, label, product kind — is a `list`, never free text. A filter can be built from a list and not from a string, and two spellings of one value become two filter entries.
+
+The number itself is a **read** field. `sku` comes back on product reads and belongs to no create or update body: it mirrors the value of one attribute in the product's own set, so that attribute is where you write it. Sent at the top level it is accepted, stored nowhere, and absent from the response. To find which attribute a set uses for it, read a product that already has one and match its `sku` against its `attributesSets` values.
 
 → `mcp/docs/api/product-relations` · `mcp/docs/api/list-options-and-extra-values`
 
