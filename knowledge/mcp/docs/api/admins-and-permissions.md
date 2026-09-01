@@ -43,11 +43,30 @@ Then stop. Granting is their action.
 
 A grant made while your session is open is not picked up until the session reconnects — the permission list is read once.
 
+## Reading admin data needs a permission too
+
+Reads are gated the same way writes are. An account that holds no keys reads nothing, and a missing key answers `403 Forbidden resource` on the read itself.
+
+| What you are reading | Key |
+|---|---|
+| Pages | `pages.get` |
+| Admin accounts | `admins.get` |
+| General settings | `settings.general.get` |
+| Menus | `menu.get` |
+| Users | `users.get` |
+| Journal entries and session traffic | `journal.get` |
+| Attribute sets and their attributes | `settings.attributesSets.get` |
+| Form submissions and their counts | `forms.data.read` |
+
+One key covers every read of that data rather than a single route: the listing, reading one by id, and the search and pagination forms beside them all require it. So a `403` on one of them will not be worked around by reaching for a neighbour.
+
+Helpers stay open, because a write grant has to be usable on its own. Checking whether a login, an email, a marker or a page URL is already taken, reading the list of recognised permission keys, and reading the catalogue of attribute-set types all work without a read key.
+
 ## A key can exist without any admin holding it
 
 The vocabulary is fixed at any moment but it is not frozen: keys are added to the platform over time, and an admin provisioned before a key existed does not hold it. Nobody is granted it retroactively.
 
-So an operation that worked for months can begin answering `403` while every neighbouring operation still succeeds — the account did not lose anything, the operation gained a requirement. `forms.data.read`, `journal.delete`, `files.create` and `files.delete` are keys where this is the usual explanation.
+So an operation that worked for months can begin answering `403` while every neighbouring operation still succeeds — the account did not lose anything, the operation gained a requirement. `forms.data.read`, `pages.get`, `menu.get`, `journal.get`, `settings.general.get`, `settings.attributesSets.get`, `journal.delete`, `files.create` and `files.delete` are keys where this is the usual explanation.
 
 `AdminsController_getAllAvailablePermissionsKeys` returns every key the instance recognises. Compare it against the admin's own map before concluding anything: a key in that list and absent from the map is a grant to ask for, and a key in neither is one you have misremembered.
 
