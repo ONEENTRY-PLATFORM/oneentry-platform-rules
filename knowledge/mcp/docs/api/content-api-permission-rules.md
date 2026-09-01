@@ -94,6 +94,39 @@ Toggling that one flag is also how you verify a report either way, in both direc
 
 A change is not visible to the public API immediately — a read can answer under the old rules for a few minutes. `AdminUserPermissionsController_flushCache` — `POST /api/admin/user-permissions/cache/flush` — makes it immediate, and needs the `userPermissions.update` permission. Without the flush, re-test after the wait rather than concluding the write did not land.
 
+## Give a group a route it does not have yet
+
+`AdminUserGroupsController_updateGroupPermission` — `PUT /api/admin/user-groups/{groupId}/permissions/{permissionId}/change` — links one existing record to a group, which is how a group reaches a route it does not yet have. The body states which way:
+
+```json
+{ "state": "attach" }
+```
+
+`"detach"` removes the link. The body is required: no `state`, or any value other than these two, answers `400` and writes nothing. Both directions are idempotent — attaching what is already linked, detaching what is not — so repeating a call is safe and never flips the state back.
+
+A group holds one record per `path`. Attaching a second record whose path a linked one already covers answers `409 Group already has a permission for this path`; adjust the rules on the record already linked instead of granting a second.
+
+Linking and unlinking reach the Content API at once — unlike a rules edit, they need no flush and no wait.
+
+## Why the group permission list is not proof of a grant
+
+`AdminUserGroupsController_findAllPermissionForOneGroup` — `GET /api/admin/user-groups/{id}/permissions` — is the obvious way to confirm a grant, and reading it as "the routes this group has" is wrong. It carries two kinds of record: those linked to the group, and those linked to no group at all, offered so you can pick one to grant.
+
+Presence proves nothing on its own. Read `isAttached` on the row:
+
+```json
+{
+  "id": 83,
+  "path": "/api/content/integration-collections/marker/{marker}/rows",
+  "groupId": 1,
+  "isAttached": true
+}
+```
+
+`isAttached: false` always comes with `groupId: null` and means the record is linked nowhere. Those records are not last in the list — they come first, so the first item is the least likely one to be granted. Add `?isUnused=1` to see only them.
+
+A route granted through a parent group reads `isAttached: true` with that parent's id in `groupId`, not the id you asked for. That is inheritance working, not a mislabelled row.
+
 ## Read the rules before reporting a public answer
 
 Two shapes look exactly like defects and are not:
@@ -113,5 +146,7 @@ The sequence is the same for both: find the record whose `path` matches the addr
 - **Assuming a new project ships with public writes closed.** File upload is open by default.
 - **Sending a partial `rules` object.** It replaces the whole of it.
 - **Re-testing a rule change in the same second** and concluding it did not apply.
+- **Confirming a grant by finding the record in the group list.** Read `isAttached`.
+- **Calling the link operation twice to be sure.** It is idempotent, not a toggle.
 
 → `mcp/docs/api/users-and-groups#diagnosing-a-content-api-refusal` · `mcp/docs/api/verification-recipes#permissions`

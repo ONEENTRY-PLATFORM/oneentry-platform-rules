@@ -51,7 +51,7 @@ A site showing the same small number of items for every listing is hitting a rea
 | Works for one language only | Not permissions — content exists in one locale |
 | A listing read with `POST` is refused | The **add** rule opens it, not a read rule |
 
-The refusal names the rule and the record to fix — `requires the "addRule" rule of the group permission (permissionId: 36)`. Which flag opens which method is in `mcp/docs/api/content-api-permission-rules#the-five-rules-and-what-each-one-opens`.
+The refusal names the rule and the record to fix — `requires the "addRule" rule to be enabled on the permission (permissionId: 36) linked to the user group`. Which flag opens which method is in `mcp/docs/api/content-api-permission-rules#the-five-rules-and-what-each-one-opens`.
 
 Rule out the first row before changing any rules: it looks exactly like a closed project, and the group's own rules will show the routes as granted the whole time.
 
