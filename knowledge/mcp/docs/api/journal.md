@@ -8,7 +8,7 @@ This is **not** the audit file this server writes. Two separate records, kept by
 
 ## Reading the journal
 
-`JournalController_list` — `GET /journal` — answers `{ "items": [...], "total": <number> }`. The read needs no permission of its own.
+`JournalController_list` — `GET /journal` — answers `{ "items": [...], "total": <number> }`. Reading needs `journal.get`. Without it the call answers `403 Forbidden resource`, and the message does not name the key. The same key covers the session-traffic listing beside it.
 
 Narrow it with query parameters rather than paging and filtering yourself:
 
@@ -42,7 +42,7 @@ Clearing requires `journal.delete`. Without it the call answers `403 Forbidden r
 
 **The permission is checked before the window is validated.** A call with no `from` and no `to`, made without the grant, answers `403` rather than `400` — so the missing window is still there once the grant arrives. Fix the permission, then expect to fix the window too, and read the `400` as a second problem rather than a sign the first one was misdiagnosed.
 
-`journal.delete` is one of the keys an older admin account will not hold. Check it against the list of keys the instance recognises before treating the refusal as a configuration fault.
+`journal.delete` and `journal.get` are both keys an older admin account will not hold. Check it against the list of keys the instance recognises before treating the refusal as a configuration fault.
 
 → `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it`
 
