@@ -87,7 +87,7 @@ Mutations on the instance's own configuration — admins, modules, backups, sett
 
 ## Permissions are checked before the request is sent
 
-Each operation declares the permission it needs, and this server refuses locally when the admin does not hold it — nothing is sent. **Ask for the grant** and stop: no retry and no sibling operation gets past it.
+Most operations declare the permission they need, and this server refuses locally when the admin lacks it. Some declare none — admin accounts among them — and there the `403` comes from the instance. **Ask for the grant**; retrying cannot work.
 
 → `mcp/docs/api/admins-and-permissions`
 
