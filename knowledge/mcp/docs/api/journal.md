@@ -56,6 +56,26 @@ A successful clear returns the count and nothing else:
 
 `affected` is how many entries were removed. `0` is a complete answer, not a failure: it means the window held nothing, which is what an over-narrow `from`/`to` or a `moduleName` that matched no entry produces. Report the number rather than "done" — it is the only evidence of what the call actually took, and the entries are gone either way.
 
+## Clearing session traffic is a separate call
+
+`AdminJournalTrafficController_clear` — `DELETE /journal/traffic` — removes session-traffic records, and it is gated on `journal.delete`, the same key as the journal clear. Without the key the call answers `403 Forbidden resource` and the message does not name it; with no token at all it answers `401`.
+
+Its window rules are **not** the journal's. `from` and `to` are each optional here, and whichever one you leave off is left unbounded — omit both and the call takes every closed session on the instance. No `400` will stop you. Send both, always.
+
+```text
+DELETE /journal/traffic?from=2026-01-01T00:00:00.000Z&to=2026-01-31T23:59:59.999Z
+```
+
+What you do send is checked: a `from` later than the `to`, or a span wider than 31 days, answers `400`. Narrow it further with `adminId`. A `status` parameter is accepted and then ignored — sessions that are still open are never removed, so this call cannot sign a working admin out.
+
+The count comes back under a different name than the journal clear:
+
+```json
+{ "deleted": 0 }
+```
+
+`deleted: 0` means the window held nothing, exactly as `affected: 0` does on `JournalController_clear`.
+
 ## Not the same record as the servers audit log
 
 Both answer "what changed", and mixing them up leads to reading the wrong one:
@@ -77,6 +97,7 @@ A change made in the admin panel is in the journal and not in the audit log. A c
 - **Reading a `403` on the clear as a bad window.** The permission is checked first.
 - **Treating `affected: 0` as an error.** The window was empty.
 - **Widening the window to be safe.** Wider deletes more, and the entries do not come back.
+- **Expecting the traffic clear to reject a missing window.** It accepts one and takes everything closed.
 - **Looking for a panel change in this server's audit log.** It is in the journal.
 - **Using the journal to recover a deleted entity.** It records that the change happened, not the entity.
 
