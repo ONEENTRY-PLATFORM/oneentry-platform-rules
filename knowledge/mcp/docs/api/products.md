@@ -90,7 +90,8 @@ Consequences worth knowing:
 
 - One attribute per set carries that role. Marking a second one is a schema change with visible effects.
 - The value is a number or `null`. `null` means "no price set", not zero — do not coerce it.
-- Changing a price has effects beyond the product record: anything that reacts to prices reacts to the change, and not always immediately.
+- The product's own `price` is recomputed from that attribute, not set directly. A read straight after the write still shows the old number while the attribute already holds the new one — re-read after a pause, and never repeat the write.
+- A set with no attribute marked as the price gives its products none: `price` reads `null` for every one.
 
 ## Products live in the page tree
 

@@ -16,6 +16,24 @@ In order, and stop at the first that fits:
 
 A block used on a single page is an extra object in the tree: a human opens the blocks section and finds records that are reused nowhere. If a page needs ten fields, that is ten attributes, not a block.
 
+## Where interface labels belong
+
+Text that belongs to the interface rather than to any one entity — a button caption, an empty-cart message, a thank-you line — has no natural home on a page or a block. Put it on an attribute set of the `system` type, and keep the text in each attribute's `initialValue`.
+
+`initialValue` is stored on the **schema** rather than on any entity, and it comes back when the set is read. That is what lets the text exist with no carrier at all: a `system` set attaches to nothing, so the labels share no lifecycle with a page, nobody edits them by opening unrelated content, and deleting content never takes them along.
+
+It is locale-keyed like every other localized field on an attribute, one level deeper than the shape suggests:
+
+```json
+{ "initialValue": { "en_US": { "value": "Add to cart" } } }
+```
+
+Group the sets the way a person would look for them — one per screen or subsystem, rather than one set holding every string on the instance.
+
+The alternative is worse in a specific way: a `forPages` or `forBlocks` set has to hang off a real entity, so the labels become part of that entity's content and inherit its visibility, its locale coverage and its deletion.
+
+→ `mcp/docs/api/attribute-sets#attribute-set-types-are-provisioned` · `mcp/docs/api/locales`
+
 ## A page is many attributes not one editor field
 
 A page such as "about us" is a heading, a lead paragraph, several sections, images and captions. Each part is its own attribute of its own type.

@@ -156,6 +156,9 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | How do I set the order of menu items | `mcp/docs/api/menus#ordering-items` |
 | Why is my event refused on this module | `mcp/docs/api/events#an-event-on-another-module-is-refused` |
 | Why does my form event send no mail | `mcp/docs/api/events#an-event-with-no-recipient-looks-configured` |
+| Where do I put button captions and interface text | `mcp/docs/api/content-modelling#where-interface-labels-belong` |
+| Why is my product price still the old number | `mcp/docs/api/products#prices-and-the-price-attribute` |
+| Why does a re-run of my import duplicate everything | `mcp/docs/api/import#re-running-an-import` |
 | How do I write a list or radioButton value | `mcp/docs/api/attribute-types#the-value-form-of-a-list-and-a-radiobutton` |
 | Why is my coupon working for everybody | `mcp/docs/api/discounts#which-operation-created-a-coupon-decides-its-reuse` |
 | How do I import reviews from another system | `mcp/docs/api/rating-forms-and-reviews#importing-reviews-from-another-system` |
