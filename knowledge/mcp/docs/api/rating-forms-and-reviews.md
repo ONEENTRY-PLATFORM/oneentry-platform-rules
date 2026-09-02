@@ -44,6 +44,20 @@ Read the form first and send the whole list back: an omitted `formModuleConfigs`
 
 → `mcp/docs/api/forms-and-form-data#a-form-must-be-bound-before-it-accepts-submissions`
 
+## A new rating form is not readable by a storefront
+
+A form carries `isPrivate`, and a form nobody marked public is `isPrivate: true`. While it is, the public listing of that marker answers `403` — so a review widget reading the marker shows nothing, however many reviews the form holds, and the operator listing of the same marker still shows them all.
+
+Open the form with an ordinary update, then read it back and check the value came through:
+
+```json
+{ "isPrivate": false }
+```
+
+Do this as the last step of building a review form. A widget that renders empty on a form you just filled with reviews is this flag far more often than it is the aggregate delay.
+
+→ `mcp/docs/api/form-submissions#why-a-public-read-of-a-marker-answers-403`
+
 ## The score field must be marked as the rating value
 
 One field of the form carries the score, and it must be marked with `isRatingValue`. Without that mark the form is rejected as having no rating marker, and the message names the marker rather than the field you forgot to flag.

@@ -2,7 +2,7 @@
 
 What visitors submitted against a form: how the listing is called, how to narrow it to one page or one product, and what comes back. The listing has one supported method and two filters that are easy to confuse with each other.
 
-Read this when a listing returns everything, nothing, or a shape you did not expect. Both read routes are permission-gated, so start with the next section if what you have is a `403`.
+Read this when a listing returns everything, nothing, or a shape you did not expect. Both operator read routes are permission-gated and the public read is gated by a flag on the form itself, so a `403` has two possible causes — start with the next section, then with the one on public reads.
 
 → `mcp/docs/api/forms-and-form-data` · `mcp/docs/api/rating-forms-and-reviews`
 
@@ -48,6 +48,20 @@ POST /form-data/marker/{marker}?langCode=en_US
 ```
 
 If a total will not fall to zero after you delete every submission you can see, the remainder is in a status or a locale your listing did not ask for — not data you lost.
+
+## Why a public read of a marker answers 403
+
+A form carries `isPrivate`, and it decides whether the **public** listing of that marker is answered at all. A form is `isPrivate: true` unless someone set it otherwise, and while it is, the public read answers `403 This form's submissions are not publicly readable` — no items, no total, no partial answer. Holding `forms.data.read` does not change it: the grant governs the operator routes, this flag governs the public one.
+
+Make a form's submissions readable by a storefront with an ordinary form update, then read the form back and check the value came through:
+
+```json
+{ "isPrivate": false }
+```
+
+The operator listing of the same marker is unaffected either way, so an operator read that works is no evidence that a visitor's will. When a storefront shows reviews or comments, check `isPrivate` on that form before looking anywhere else: a form nobody marked public refuses the read, and it refuses it the same way whether it holds two entries or two thousand.
+
+→ `mcp/docs/api/forms-and-form-data#an-update-drops-every-config-you-do-not-send-back`
 
 ## Reading the submissions of one page or product
 
@@ -106,6 +120,7 @@ Some submissions carry a status an operator moves through as they process it, wi
 - **Paging from the body.** `limit` and `offset` are query parameters; in the body they answer `400`.
 - **Sending a status in upper case.** The five values are lowercase.
 - **Reading a `403` as a missing form.** Both read routes need `forms.data.read`.
+- **Reading the public listing of a form nobody marked public.** It answers `403` until the form carries `isPrivate: false`.
 - **Comparing the count against a listing.** They have different scopes; pass the same `langCode` to both.
 
 → `mcp/docs/api/forms-and-form-data#a-form-must-be-bound-before-it-accepts-submissions` · `mcp/docs/api/verification-recipes#forms`
