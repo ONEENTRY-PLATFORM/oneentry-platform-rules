@@ -33,7 +33,7 @@ No request was sent — ask for the grant instead of retrying.
 
 Your operation was never sent, so nothing changed. The refusal is final: retrying, changing the body, or reaching for a neighbouring operation with the same requirement all fail identically.
 
-Two things it does not tell you. If the server could not read the admin's permissions at all, the list is empty, the local check is **skipped**, and refusals arrive as 403 from the instance instead — an empty `permissions` in `cms_whoami` means "unknown", not "none". And the check does not know a requirement for every operation: the ones that manage admin accounts are refused by the instance rather than locally, so a call that mutates an admin can pass the local check and still answer 403.
+Two things it does not tell you. If the server could not read the admin's permissions at all, the list is empty, the local check is **skipped**, and refusals arrive as 403 from the instance instead — an empty `permissions` in `cms_whoami` means "unknown", not "none". And the check does not know a requirement for every operation: where it knows none it stays quiet and the call goes out, so a call that passed the local check can still answer 403.
 
 Treat a call that was not refused locally as unverified, not as permitted.
 
