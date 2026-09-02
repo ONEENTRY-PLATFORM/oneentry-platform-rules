@@ -59,7 +59,9 @@ Before a large run, check the counters. After a failed run, find out what was cr
 
 Whether a second run updates or duplicates depends on whether the template identifies existing records. If it does not, a re-run creates everything again.
 
-Establish which behaviour the template has — with a two-row test — before re-running anything at scale.
+What identifies an existing record is a flag on an attribute in the set: `isSku` or `isUniqueKey` marks the field rows are matched against. A set carrying neither has nothing to match on, so every run inserts.
+
+Check the set for that flag first, then confirm the behaviour with a two-row test before re-running anything at scale.
 
 ## Reading what a session did
 
