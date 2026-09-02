@@ -78,7 +78,7 @@ No request was sent — ask for the grant instead of retrying.
 Three details matter:
 
 - The check only runs when the server was able to read the admin's permissions. If it could not, the check is skipped rather than treated as a denial — so a call may still come back `403` from the instance.
-- The check knows a requirement for most operations, not all. Where it knows none it stays quiet and the call goes out, so silence is not evidence the admin holds anything. Operations that manage admin accounts are the case to remember: their refusals arrive as `403` from the instance.
+- The check knows a requirement for most operations, not all. Where it knows none it stays quiet and the call goes out, so silence is not evidence the admin holds anything and the `403` arrives from the instance.
 - A permission refusal is final. Retrying, changing the body, or trying a neighbouring operation that needs the same permission will not help. Ask for the grant.
 
 → `mcp/docs/api/admins-and-permissions`
