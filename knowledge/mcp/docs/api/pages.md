@@ -47,6 +47,21 @@ cms_api_search { "query": "pages position" }
 
 → `mcp/docs/server/payload-conventions#position-is-a-lexorank-string-or-a-number`
 
+## Ordering products on a page
+
+A product's place in a page's catalogue is a lexorank position on the product-and-page pair, and it has its own operation:
+
+```text
+PUT /api/admin/pages/{pageId}/products/{productId}/position
+  { "position": { "leftObjectId": 19, "rightObjectId": null } }
+```
+
+Neighbours are named by product id. A neighbour left out — omitted or `null` — means "no neighbour on that side", which is how a product goes to either end of the row. A body carrying no `position` object answers `400` naming that field; `destinationId` on its own is not a substitute for it. In a row of one kind leave `leftObjectType` and `rightObjectType` out: a kind borrowed from another list answers `400` naming the side, the neighbour id and the kind that was looked for, and the product keeps the place it had.
+
+Read the new order back with a product list sorted by position, and make that request address **one** page — either the per-page listing, or the general listing whose body is a single filter carrying one page URL. A position sort on a request that addresses no single page comes back in creation order instead, and the move reads as if it did nothing.
+
+The public read of the same page by URL returns that order in the same direction, so `sortOrder` means the same thing on both sides. Sort descending to reproduce the order the panel shows.
+
 ## Create a page
 
 1. Resolve the general type by name.
