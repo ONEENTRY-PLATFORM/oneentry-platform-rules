@@ -95,9 +95,11 @@ Consequences worth knowing:
 
 ## Products live in the page tree
 
-A product is attached to a page — typically a `catalog_page` — which is what gives it a place in the catalogue. The page relationship is how a site navigates to it.
+A product is attached to a page of general type `catalog_page`, which is what gives it a place in the catalogue. The page relationship is how a site navigates to it.
 
-Resolve the parent page before creating a product, and prefer the page URL over an id when you are given a target by a human.
+Only that type is accepted: `productPages` pointing at any other page type answers `400` naming the field, on create and on update alike.
+
+Resolve the parent page and check its general type before creating a product, and prefer the page URL over an id when you are given a target by a human.
 
 → `mcp/docs/api/pages`
 
