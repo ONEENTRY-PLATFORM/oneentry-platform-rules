@@ -154,6 +154,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does the panel show one selected option out of four | `mcp/docs/api/list-options-and-extra-values#several-selected-options-need-multiselect` |
 | Why did my menu arrive with more items than it has | `mcp/docs/api/menus#parent-references-are-polymorphic` |
 | How do I set the order of menu items | `mcp/docs/api/menus#ordering-items` |
+| How do I set the order of products on a page | `mcp/docs/api/pages#ordering-products-on-a-page` |
+| Why does my product reorder look like it did nothing | `mcp/docs/api/pages#ordering-products-on-a-page` |
 | Why is my event refused on this module | `mcp/docs/api/events#an-event-on-another-module-is-refused` |
 | Why does my form event send no mail | `mcp/docs/api/events#an-event-with-no-recipient-looks-configured` |
 | Where do I put button captions and interface text | `mcp/docs/api/content-modelling#where-interface-labels-belong` |
