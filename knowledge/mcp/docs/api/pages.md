@@ -33,6 +33,14 @@ Two habits keep tree work correct:
 - **Read the parent before creating a child.** You need its id, and you want to see what its existing children look like.
 - **Do not build a tree bottom-up.** Create the parent, read back its id, then create children against it.
 
+## Why a catalog page filter returns plain pages
+
+A paginated page listing takes a page-type filter in its body and a `parentId` in the query, and that is how a catalogue tree is walked one level at a time. Filtering on `catalog_page` deliberately returns more than catalog pages: a plain page is included whenever a catalog page sits **anywhere below it**, at any depth, not only as a direct child. That is what lets a tree render plain pages as folders all the way down to a nested catalogue.
+
+So read each row's own general type before you treat it as a catalogue. A row that came back under a `catalog_page` filter may still be a `common_page` acting as a folder; descend into it with another listing call on its id.
+
+The same rule drives the boolean `hasNestedCatalogPages` on a page read. It is `true` for **every** ancestor of a catalog page, not just its immediate parent, so you can expand a branch from the root without probing each level first.
+
 ## Positions inside a parent
 
 Ordering among siblings uses a **lexorank string** on the parent-scoped operations, not a number. Never sort those values numerically, and never reorder by patching the field.
@@ -129,5 +137,6 @@ The delete operation may accept flags controlling what happens to dependent cont
 - **Reordering by patching position.** Use the position operation.
 - **Reading a trimmed block list as the whole set.** A read restriction caps it, and the response gives no sign.
 - **Sending `parentId: null` to mean "leave it".** That is the instruction to move the page to the root.
+- **Treating every row of a catalog-filtered listing as a catalogue.** Ancestors of a nested catalog page come back too. Check each row's general type.
 
 → `mcp/docs/api/verification-recipes#pages`
