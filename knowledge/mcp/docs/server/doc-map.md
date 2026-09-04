@@ -117,6 +117,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/content-api-sign-in-and-cart` | Building the account or cart pages of a site |
 | `mcp/docs/api/password-reset` | A visitor cannot sign in and needs a new password |
 | `mcp/docs/api/admins-and-permissions` | An operation was refused for lack of a permission |
+| `mcp/docs/api/admin-page-scope` | Delegating one branch of the page tree, or a page write refused for an admin who holds the key |
 
 ## Instance configuration
 
@@ -185,6 +186,9 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why did an operation that worked start answering 403 | `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it` |
 | Why is my upload or file delete refused with 403 | `mcp/docs/api/files-and-uploads#admin-uploads-and-deletes-need-file-permissions` |
 | Why was my admin permission write refused with 400 | `mcp/docs/api/admins-and-permissions#an-unrecognised-permission-key-is-refused-with-400` |
+| How do I limit an admin to one section of the site | `mcp/docs/api/admin-page-scope#the-value-is-a-list-of-page-ids-not-a-boolean` |
+| Why is my page create or delete refused with 403 | `mcp/docs/api/admin-page-scope#what-a-refusal-tells-you` |
+| How do I lift a page scope restriction | `mcp/docs/api/admin-page-scope#there-is-no-empty-list` |
 | Why does a search by meaning return nothing for a kind | `mcp/docs/api/index-attributes#why-a-search-by-meaning-finds-nothing-for-a-kind` |
 | Can an export permission be granted | `mcp/docs/api/admins-and-permissions#exporting-data-has-its-own-permissions` |
 | Why does every public list stop at ten | `mcp/docs/api/content-api-permission-rules#a-restricted-read-caps-the-list-at-ten` |

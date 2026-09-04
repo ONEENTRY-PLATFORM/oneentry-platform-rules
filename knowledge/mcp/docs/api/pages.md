@@ -138,5 +138,6 @@ The delete operation may accept flags controlling what happens to dependent cont
 - **Reading a trimmed block list as the whole set.** A read restriction caps it, and the response gives no sign.
 - **Sending `parentId: null` to mean "leave it".** That is the instruction to move the page to the root.
 - **Treating every row of a catalog-filtered listing as a catalogue.** Ancestors of a nested catalog page come back too. Check each row's general type.
+- **Reading a `403` on a page write as a missing permission.** The account may hold the key and be confined to another branch of the tree.
 
-→ `mcp/docs/api/verification-recipes#pages`
+→ `mcp/docs/api/verification-recipes#pages` · `mcp/docs/api/admin-page-scope#which-page-operations-the-scope-governs`
