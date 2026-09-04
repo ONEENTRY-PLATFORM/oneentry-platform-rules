@@ -16,9 +16,11 @@ Each operation declares the key it requires. `cms_api_describe` shows it as `per
 
 A write that carries a key outside the vocabulary is refused with `400`, and **nothing** is stored — not the unrecognised key, and not the valid keys sent beside it. It applies to every write carrying a `permissions` map: creating an admin, and updating one.
 
-The response names every offending key in one go, so a single call finds all the mistakes in a payload rather than one per attempt. A recognised key carrying a value that is neither `true` nor `false` is refused the same way — with one exception: `admins.modules`, which scopes the areas an admin sees, takes a list of area identifiers instead of a boolean.
+The response names every offending key in one go, so a single call finds all the mistakes in a payload rather than one per attempt. A recognised key carrying a value that is neither `true` nor `false` is refused the same way — with two exceptions. `admins.modules`, which scopes the areas an admin sees, takes a list of area identifiers. `pages.scope`, which confines an admin to branches of the page tree, takes a non-empty list of page ids — `[]` included, every other shape is refused.
 
-Take the vocabulary from `AdminsController_getAllAvailablePermissionsKeys` and send only keys it returns. A key that reads like the neighbour of a real one is not thereby real: `admins.get` exists, `pages.scope` does not.
+Take the vocabulary from `AdminsController_getAllAvailablePermissionsKeys` and send only keys it returns. A key that reads like the neighbour of a real one is not thereby real: `pages.get` exists, `pages.read` does not.
+
+→ `mcp/docs/api/admin-page-scope#the-value-is-a-list-of-page-ids-not-a-boolean`
 
 This matters most when you edit a map you just read. Change the value you meant to change and send the rest back untouched — a key you invented or mistyped on the way through takes the whole write down with it.
 
