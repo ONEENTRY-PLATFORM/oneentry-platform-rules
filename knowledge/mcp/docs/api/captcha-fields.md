@@ -29,7 +29,34 @@ Writing a field set whose `spam` field names no provider is refused, so you cann
   "message": "Captcha is not configured for spam attribute(s): 'captcha'. Set captchaKind to 'google' or 'yandex' — a spam attribute without it verifies nothing" }
 ```
 
-A field already stored without a provider refuses every submission against its form, naming the marker, until you set one. With `yandex`, put its secret key in the field's additional fields under the marker `secret_key`; `google` needs no secret on the field.
+A field already stored without a provider refuses every submission against its form, naming the marker, until you set one. With `yandex`, put its secret key in the field's additional fields under the marker `secret_key` — in the locale-keyed list, so `additionalFields.<locale>` is where the entry with that marker has to be. A missing one answers `400 We can't find 'secret_key' value in spam's additional fields`. `google` needs no secret on the field, for the reason in the next section.
+
+## Where the google site key comes from
+
+For `google` the instance holds both halves of the pair. It generates the keys itself and keeps the secret, which is why the field carries none — and why a `google` field cannot be made to verify against a key from somewhere else.
+
+The keys are managed under `/api/admin/system/captcha-keys`, and all four operations want `settings.general.update`:
+
+```text
+AdminSystemController_getGeneratedCaptchaKeys   GET    lists key, keyName, domainNames, createTime
+AdminSystemController_generateCaptchaKey        POST   captcha-keys/generate
+AdminSystemController_updateCaptchaKey          PUT    captcha-keys/{key}   changes its domains
+AdminSystemController_deleteCaptchaKey          DELETE captcha-keys/{key}
+```
+
+Generating one takes `domainNames` and `keyName`, both required strings. `domainNames` is a **comma-separated list in one string, with no spaces** — `example.com,shop.example.com`, not an array. `keyName` must match the marker pattern, so no spaces in it either.
+
+The field records which of those keys its form is meant to use, in `settings.captcha` beside `captchaKind`, as a `key` and the `domainNames` it was generated for. That record is for whoever builds the page: it is what the site embeds, and the submission check does not read it. So correcting it fixes a form that sends the wrong token, and fixes nothing about a token that has already been sent.
+
+Older fields `captchaKey`, `captchaKeyName` and `captchaKeyDomain` sit flat on the attribute and mean the same thing. Where a field carries both, `settings.captcha` is the one to write; do not add the flat form to a new field.
+
+**A domain not on the key's list is the likeliest cause of a refusal nobody can reproduce.** It fails for a visitor on the live domain while passing from a machine on a listed one, and the answer is the generic validation failure either way — it never names the domain. Read the key's `domainNames` first, and remember `localhost` is a domain like any other: absent from the list, local testing fails too.
+
+## A valid token can still be refused
+
+The `google` check is a risk assessment, not a yes-or-no on the token. The instance sends the value straight to the provider and gets back both a verdict on the token and a score for how much the visitor looks like a person; a token that is genuinely valid is still refused when the score is low.
+
+That matters because the refusal is the same `Captcha Validation Failed` message either way. If the shape is right and the key and domain are right, further edits to the payload cannot help — the next thing to change is on the provider's side, not in the request.
 
 ## Hiding the captcha field switches the check off
 
