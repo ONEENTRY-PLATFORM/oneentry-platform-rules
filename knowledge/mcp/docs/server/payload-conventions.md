@@ -87,6 +87,8 @@ Ordering comes in two forms, and which one you get depends on the endpoint:
 
 Two rules follow. Never sort a lexorank value numerically — it sorts as text, and `0|i0000n:` versus `0|hzzzzz:` is meaningful only as a string comparison. And never reorder by patching the field: each entity that supports ordering has a dedicated position operation, and using it is the only way the surrounding items get renumbered correctly.
 
+The trailing colon is part of the value, and repeated inserts between two neighbours put more characters **after** it — `0|i00006:i` and `0|hzzzzz:1` are ordinary values, not corrupt ones. So treat the whole string as opaque: compare it, never parse it, never trim at the colon, and never assume a fixed length.
+
 Sending the read form straight back is safe on a page update: the string is accepted and ignored, so read-modify-write does not have to strip a field it never asked for. It still does not reorder anything — that is the position operation's job.
 
 ## marker is portable id is not
