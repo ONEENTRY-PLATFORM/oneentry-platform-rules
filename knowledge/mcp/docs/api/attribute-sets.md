@@ -75,14 +75,18 @@ The locale level is not only for values. Inside a set, an attribute's own locali
 
 ```json
 {
-  "type": "text",
-  "identifier": "question",
-  "localizeInfos": { "en_US": { "title": "Your question" } },
-  "validators": { "en_US": { "requiredValidator": { "strict": true } } }
+  "type": "string",
+  "identifier": "first_name",
+  "localizeInfos": { "en_US": { "title": "First name" } },
+  "validators": { "en_US": {
+    "requiredValidator": { "strict": true },
+    "stringInspectionValidator": { "stringMin": "3", "stringMax": "20" } } },
+  "additionalFields": { "en_US": [
+    { "marker": "placeholder", "type": "string", "value": "Your name" } ] }
 }
 ```
 
-`listTitles` follows the same shape: a locale key, then the list of options. What sits **inside** an option does not — the extra value of an option is flat, and `additionalFields` is a separate marker-keyed list that holds no option data at all. Both are worth reading about before writing a choice field.
+The bounds are **strings**, not numbers, and an unset one is `""` rather than absent. `listTitles` and `additionalFields` are locale-first too — `additionalFields` a list per locale, each entry carrying its own `marker`. What sits **inside** a list option is not: an option's extra value is flat.
 
 → `mcp/docs/api/list-options-and-extra-values`
 

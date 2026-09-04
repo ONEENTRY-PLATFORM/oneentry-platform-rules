@@ -42,6 +42,28 @@ An event created with no `moduleId` at all is a template — see the notificatio
 
 `subject` is the mail subject, `template` the mail body, `push` the push body. A `mailing` field exists on the operation and belongs to the mailing module — a subject written there is stored and never used.
 
+## Which channels an event sends on
+
+`actions` is four independent booleans, and an event sends on every one that is `true`:
+
+```json
+{ "actions": { "isEmail": true, "isPush": true,
+               "isWebsocket": false, "isWorkflows": false } }
+```
+
+`isEmail` and `isPush` are the two a human means by "notify". `isWebsocket` pushes to a connected client and leaves no mail log. `isWorkflows` hands the event to a workflow rather than sending anything itself.
+
+The flags you leave out are off, so an event written with `{"isEmail": true}` alone sends no push — the commonest reason a customer gets a mail and no notification on their phone. Write all four when you mean to be explicit, and read them back before reporting a channel as configured.
+
+## Who an event goes to and how often
+
+Two more fields decide delivery, and neither has a safe default to leave alone:
+
+- **`whom`** — `all`, `subs`, `user_group`, `users_from_payload` or `emails_from_payload`. `subs` is the subscribers of that event, and `user_group` needs the group's id alongside it. The two `_from_payload` values take the recipients from whatever triggered the event rather than from the event's own configuration.
+- **`typeSchedule`** — `once` or `every_time`. On an event a subscriber sets a threshold against — "tell me when this price drops below" — `once` notifies them on the change that **crosses** it, and a further move in the same direction sends nothing. `every_time` sends on every change that leaves the value past the threshold.
+
+So an event that fired exactly once and then went quiet is usually `once` behaving correctly, not a trigger that stopped. Check the field before investigating the condition.
+
 ## The name of an event is title not name
 
 `name` is what the create body declares as required, and it is not what the admin panel shows: the list is built from `localizeInfos.<locale>.title`. An event created with `name` alone appears as untitled and is hard for a human to find again.

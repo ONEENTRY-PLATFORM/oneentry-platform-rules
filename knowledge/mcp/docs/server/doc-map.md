@@ -198,3 +198,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why is limit refused on the search | `mcp/docs/api/global-search#paging-one-kind-needs-limit-and-exactly-one-type` |
 | Why does the search never find my documents | `mcp/docs/api/global-search#what-global-search-never-finds` |
 | Where is the public search by meaning | `mcp/docs/api/global-search#semantic-search-over-one-kind-of-entity` |
+| Why do two order statuses both say they are the default | `mcp/docs/api/order-statuses#which-axis-a-status-belongs-to` |
+| Why is my captcha refusing a token that looks right | `mcp/docs/api/captcha-fields#a-valid-token-can-still-be-refused` |
+| Why did my event send a mail but no push | `mcp/docs/api/events#which-channels-an-event-sends-on` |
+| What belongs in a page's config object | `mcp/docs/api/pages#the-config-object-is-a-free-map-of-numbers` |
