@@ -29,11 +29,15 @@ There are nineteen types and no way to add a twentieth. Pick from the list.
 | `spam` | a captcha field; its value is a verification token — `mcp/docs/api/captcha-fields` |
 | `json` | an arbitrary JSON value |
 
-## Numbers are numbers and null is null
+## Numbers on an entity are whatever was written
 
-`integer`, `real` and `float` come back as a number or as `null`. An empty numeric attribute is **not** zero.
+In a **form submission** a numeric field is checked and arrives as a number or `null`. **On an entity it is not** — only `list` and the date types are shape-checked — so the value returns exactly as written, and project content is routinely numeric strings:
 
-That distinction matters when you branch on a value: treating `null` as `0` turns "no price set" into "free". Check for `null` explicitly.
+```json
+{ "integer_id2": "12", "integer_id9": "" }
+```
+
+An empty numeric attribute is `""` on an entity, `null` elsewhere, and **never** `0`. Treating either emptiness as `0` turns "no price set" into "free", and `"12" + 1` is `"121"`. Write numbers as numbers; reading them, coerce and test for emptiness first.
 
 ## Text has two forms
 
@@ -80,6 +84,8 @@ The value of a `textWithHeader` attribute is a list, and holding several heading
     "params": { "editorMode": "html" } } ]
 ```
 
+`params` takes `editorMode` — `html`, `md` or `plain` — and `isImageCompressed`. Older content carries other keys there; they are inert. Leave them alone on a read-modify-write rather than stripping them.
+
 An accordion of a dozen questions is one attribute with a dozen items — not one item with the questions marked up inside it, and not one attribute per question.
 
 → `mcp/docs/api/content-modelling#textwithheader-holds-several-heading-and-text-pairs`
@@ -117,6 +123,8 @@ Both store the option's id rather than its label, and the labels live in the att
 `[]` and `""` both clear the value. A bare string, or a list of bare strings, is refused with `400`; the message names the locale and the attribute key, states the expected form and shows an example.
 
 Writing the label where the id belongs does not work, in either type.
+
+Reading is looser than writing. `radioButton` is not shape-checked on an entity, so a value the admin panel wrote comes back as the **whole option object** — `title`, `value`, `extended`, `position` — while one written through the API is the bare string you sent. Take `value` out of it when it is an object; the object form is not a fault.
 
 ## The shape checks only see canonically named keys
 

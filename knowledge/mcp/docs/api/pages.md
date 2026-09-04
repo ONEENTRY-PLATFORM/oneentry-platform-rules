@@ -41,6 +41,22 @@ So read each row's own general type before you treat it as a catalogue. A row th
 
 The same rule drives the boolean `hasNestedCatalogPages` on a page read. It is `true` for **every** ancestor of a catalog page, not just its immediate parent, so you can expand a branch from the root without probing each level first.
 
+## The config object is a free map of numbers
+
+`config` holds display settings as a flat object of **numbers only** — no strings, no nesting. The platform stores it without reading it, so the keys are a convention between whoever writes the page and whoever renders it. A catalogue page carries its product grid:
+
+```json
+{ "config": { "rowsPerPage": 2, "productsPerRow": 5 } }
+```
+
+The schema's example shows different keys: a shape hint, not the vocabulary in use. Copy `config` from a sibling of the same kind and leave it `{}` otherwise — an invented key is accepted, stored and read by nothing.
+
+## categoryPath is derived not written
+
+`categoryPath` is the page URLs of a page's ancestors joined with `/` — `shop/category/soft_toy`. The same value appears on the link between a product and its catalogue page.
+
+The platform maintains it, recomputing when the page is updated or repositioned. Do not write it, and do not use it as an identifier: a read by URL takes the page URL alone. A page of type `external_page` never gets one, so it is absent rather than empty.
+
 ## Positions inside a parent
 
 Ordering among siblings uses a **lexorank string** on the parent-scoped operations, not a number. Never sort those values numerically, and never reorder by patching the field.

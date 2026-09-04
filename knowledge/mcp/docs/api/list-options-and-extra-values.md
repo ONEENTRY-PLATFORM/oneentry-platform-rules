@@ -44,9 +44,15 @@ For `image` and `file`, `extended.value` is a **single file record** — the who
 ```json
 { "title": "Dishwasher safe", "value": "dishwasher-safe", "position": 2,
   "extended": { "type": "image",
-                "value": { "filename": "dishwasher-safe.png",
-                           "downloadLink": "https://your-instance.example/files/dishwasher-safe.png" } } }
+                "value": { "size": 2138,
+                           "filename": "files/project/page/attribute-settings/image/badge.png",
+                           "contentType": "image/png",
+                           "previewLink": "",
+                           "downloadLink": "https://your-instance.example/cloud-static/files/project/page/attribute-settings/image/badge.png",
+                           "params": { "isImageCompressed": false } } } }
 ```
+
+Put the record back the way the upload returned it, whole. `filename` is the path within the instance's storage, `downloadLink` the address a site uses, and `previewLink` is empty until a preview template exists — copying only the two fields a site happens to need leaves an option the panel cannot render.
 
 This is the opposite of a `file` or `image` *attribute*, whose shape follows the number of files. A list of one here is stored and shown nowhere.
 
@@ -70,8 +76,18 @@ Two neighbouring fields look like the right home and are not:
 
 | field | what it actually is |
 |---|---|
-| `additionalFields` on the attribute | a separate list of fields, keyed by `marker`. It holds no option extras; an object written there stays in the schema unread |
+| `additionalFields` on the attribute | a locale-keyed list of extra settings for the **field as a whole**. It holds no option data; an object written there stays in the schema unread |
 | `image` on the option itself | accepted, stored, survives a read — and displayed by nothing |
+
+`additionalFields` follows the locale-first rule, and each entry carries its own `marker`, so the marker identifies an entry *within* a locale rather than replacing the locale key:
+
+```json
+{ "additionalFields": { "en_US": [
+    { "marker": "placeholder", "type": "string", "value": "Your name" },
+    { "marker": "type",        "type": "string", "value": "text" } ] } }
+```
+
+Written flat, without the locale level, it reaches the same place a flat `validators` map does: stored, returned by the raw read, and empty in the projection a site receives. This is also where a `yandex` captcha field keeps its `secret_key`, which is why that one has to be under a locale too.
 
 Three ways to attach a picture to an option, one that works, and the API response cannot tell them apart. Use `extended`.
 

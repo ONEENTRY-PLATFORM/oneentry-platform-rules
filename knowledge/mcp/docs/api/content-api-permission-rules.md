@@ -57,7 +57,7 @@ That is also the cheapest way to tell a trimmed read from an untrimmed one: ask 
 
 ## What a new instance grants the guest group
 
-Every content permission record provisioned with the instance is linked to the guest group, so the routes are open to anyone holding the application token from the start. Two things follow that are worth checking rather than assuming.
+Most content permission records provisioned with the instance are linked to the guest group, so those routes are open to anyone holding the application token from the start. The exceptions are the point: the subscription routes and the refund read are linked to **no group at all**, and where a `user` group exists the routes only a signed-in visitor should reach — the profile read-and-update, sign-out-everywhere — are linked there instead. A route missing from the guest list is as often deliberate as forgotten.
 
 **Nearly every read route is provisioned as a restricted read**, so that is the rule a new project starts from almost everywhere — with the caveat above that what it trims in practice varies by route. A couple ship with read-all instead — the active subscriptions list and the refund read — and the write-only routes carry no read rule at all, so treat "restricted" as the default to check rather than a guarantee.
 
