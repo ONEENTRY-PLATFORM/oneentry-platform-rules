@@ -186,7 +186,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why did an operation that worked start answering 403 | `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it` |
 | Why is my upload or file delete refused with 403 | `mcp/docs/api/files-and-uploads#admin-uploads-and-deletes-need-file-permissions` |
 | Why was my admin permission write refused with 400 | `mcp/docs/api/admins-and-permissions#an-unrecognised-permission-key-is-refused-with-400` |
-| How do I limit an admin to one section of the site | `mcp/docs/api/admin-page-scope#the-value-is-a-list-of-page-ids-not-a-boolean` |
+| How do I delegate one section of the site to an editor | `mcp/docs/api/admin-page-scope#delegating-a-section-of-the-site-to-an-editor` |
 | Why is my page create or delete refused with 403 | `mcp/docs/api/admin-page-scope#what-a-refusal-tells-you` |
 | How do I lift a page scope restriction | `mcp/docs/api/admin-page-scope#there-is-no-empty-list` |
 | Why does a search by meaning return nothing for a kind | `mcp/docs/api/index-attributes#why-a-search-by-meaning-finds-nothing-for-a-kind` |

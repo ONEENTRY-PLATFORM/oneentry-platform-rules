@@ -49,6 +49,32 @@ The map is written whole, so leaving the key out has to be deliberate: read the 
 
 A key absent from that response takes `true` or `false`. Call it before you build a permissions payload from the vocabulary — otherwise you send `true` for a key that wants a list, and the whole write is refused.
 
+## Delegating a section of the site to an editor
+
+Grant the page keys the editor needs and add `pages.scope` naming the roots of the branches they own. It goes in the same `permissions` map as everything else, when the account is created or later:
+
+```json
+{
+  "login": "parks-editor",
+  "email": "parks@your-instance.example",
+  "permissions": {
+    "pages.get": true,
+    "pages.create": true,
+    "pages.update": true,
+    "pages.delete": true,
+    "pages.scope": [12]
+  }
+}
+```
+
+That account edits every page under 12, answers `403` on a page in any other branch, and cannot create a root page. Two departments in one account are two ids in one list, not two accounts.
+
+The boundary exists only while the key is in the map: an account without it is unrestricted, so a colleague who copies the permissions of an unscoped editor gets the whole tree.
+
+Creating or updating an admin is confirm-gated, so show the map you are about to write and wait.
+
+→ `mcp/docs/api/admins-and-permissions#admin-mutations-are-permanently-gated`
+
 ## Which page operations the scope governs
 
 | Operation | What has to be in scope |
@@ -101,7 +127,8 @@ Several page operations are not governed by the scope at all — `AdminPagesCont
 
 ## Common mistakes
 
-- **Sending `[]` to lift the restriction.** It is a `400`. Omit the key.
+- **Sending `[]` to lift the restriction.** It is a `400`. Omit the key or send `false`.
+- **Granting it like a flag.** `true` is a `400` whatever else is in the map; the value is the list of roots.
 - **Sending the ids as strings.** `["12"]` is refused; `[12]` is not.
 - **Reading a `403` on a page write as a missing permission.** Check `pages.scope` first.
 - **Retrying a bulk delete id by id after a `403`.** Nothing was deleted; fix the list instead.
