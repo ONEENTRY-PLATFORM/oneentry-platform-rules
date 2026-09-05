@@ -16,7 +16,7 @@ Each operation declares the key it requires. `cms_api_describe` shows it as `per
 
 A write that carries a key outside the vocabulary is refused with `400`, and **nothing** is stored — not the unrecognised key, and not the valid keys sent beside it. It applies to every write carrying a `permissions` map: creating an admin, and updating one.
 
-The response names every offending key in one go, so a single call finds all the mistakes in a payload rather than one per attempt. A recognised key carrying a value that is neither `true` nor `false` is refused the same way — with two exceptions. `admins.modules`, which scopes the areas an admin sees, takes a list of area identifiers. `pages.scope`, which confines an admin to branches of the page tree, takes a non-empty list of page ids — `[]` included, every other shape is refused.
+The response names every offending key in one go, so a single call finds all the mistakes in a payload rather than one per attempt. A recognised key carrying a value that is neither `true` nor `false` is refused too, in a separate message naming the shape that value should have had. Two keys are not booleans: `admins.modules` takes a list of area identifiers, `pages.scope` a non-empty list of page ids or `false`. `AdminsController_getPermissionsValueTypes` returns exactly those keys with the shape each expects; anything it does not return takes `true` or `false`.
 
 Take the vocabulary from `AdminsController_getAllAvailablePermissionsKeys` and send only keys it returns. A key that reads like the neighbour of a real one is not thereby real: `pages.get` exists, `pages.read` does not.
 
