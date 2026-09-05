@@ -124,7 +124,7 @@ DELETE /api/admin/products/category/{pageId}
 { "ids": [ 104, 105 ] }
 ```
 
-The same route with the ids in the query string answers `500` instead of deleting anything. For one product, the single-delete operation needs no category.
+The same route with the ids in the query string answers `400` instead of deleting anything. For one product, the single-delete operation needs no category.
 
 Whichever you use, this is a destructive call: dry-run it, show the human the target, and count what is about to go.
 
