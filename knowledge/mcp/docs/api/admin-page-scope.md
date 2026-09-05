@@ -28,13 +28,26 @@ Nothing checks that the ids exist. A list naming a page that was deleted is stor
 
 ## There is no empty list
 
-`[]` is refused with `400`. So is `true`, a bare number, a string, and a list carrying `0`, a negative number, a fraction or a numeric string. The refusal is the one an unrecognised key gets, names `pages.scope` as the offender, and stores **nothing** — not the scope, and not the valid keys sent beside it.
+`[]` is refused with `400`. So is `true`, a bare number, a string, and a list carrying `0`, a negative number, a fraction, a numeric string, or an id beyond the 32-bit range. The refusal names `pages.scope`, states the shape the value should have had, and stores **nothing** — not the scope, and not the valid keys sent beside it. It is a different message from the one an unrecognised key gets: read it as "this key was granted the wrong way", not as "this key does not exist".
 
-To give an account the whole tree back, send its permissions **without the key**. Absence means no restriction, and it is the only way to lift one.
+To give an account the whole tree back, send its permissions **without the key**, or send `false` as the value. Both mean no restriction — `false` is what an editor sends when the branch list is left empty — and `true` is never accepted, because there is nothing for it to mean.
 
 The map is written whole, so leaving the key out has to be deliberate: read the map, delete that one entry, send the rest back untouched.
 
 → `mcp/docs/api/admins-and-permissions#never-replace-an-admins-permission-map`
+
+## How to tell which keys take a list
+
+`AdminsController_getAllAvailablePermissionsKeys` returns the vocabulary as a flat list of names and says nothing about the shape each value takes. `AdminsController_getPermissionsValueTypes` fills that in. It returns only the keys whose value is not a boolean, each with the shape expected of it:
+
+```json
+{
+  "admins.modules": "string[]",
+  "pages.scope": "number[]"
+}
+```
+
+A key absent from that response takes `true` or `false`. Call it before you build a permissions payload from the vocabulary — otherwise you send `true` for a key that wants a list, and the whole write is refused.
 
 ## Which page operations the scope governs
 
@@ -51,7 +64,7 @@ Reads are not governed by it. A scoped account still lists the root pages and re
 
 The check is on the parent, because that is what puts the new page inside a branch. A scoped account therefore **cannot create a root page**: a body with no `parentId`, or with `parentId: null`, answers `403`.
 
-A `parentId` that is present but is not a positive whole number — `0`, a negative number, a non-numeric string — answers `403` too. Do not read that as an argument the operation would otherwise have accepted; a scoped account has no way to create a page outside its branches.
+A `parentId` that is present but is not a positive whole number — `0`, a negative number, a non-numeric string, `true`, an id beyond the 32-bit range — answers `403` too, in a message about the unusable id rather than about root pages. Do not read that as an argument the operation would otherwise have accepted; a scoped account has no way to create a page outside its branches.
 
 A `parentId` naming a page that does not exist answers `403` as well, not `404`. The same holds for the path id on update and delete: outside the scope and never existed are the same answer, so a `403` here is not evidence that the page is real.
 
@@ -66,6 +79,8 @@ So a `403` from this operation never leaves a half-finished delete behind. Split
 ## What a refusal tells you
 
 The `403` names the page ids that caused it, so one call finds every offending id in the request rather than one per attempt. When the refusal is about the parent of a new page it says so instead.
+
+A third wording appears when the id in the request cannot be used at all — not a positive whole number, or beyond the 32-bit range. It names the unusable id rather than the scope, and it is the answer on every operation in the table above, not only on create. Send a real page id and the call is judged on the scope again.
 
 Read it as "this page is outside the branches I was given", not as "I lack the permission to edit pages". The two need different actions:
 
