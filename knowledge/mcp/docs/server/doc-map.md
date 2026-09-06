@@ -139,11 +139,9 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why was my call refused with nothing sent | `mcp/docs/server/allow-levels#a-level-refusal-happens-before-authentication` |
 | Why does my filter return nothing | `mcp/docs/api/filters#only-indexed-attributes-can-be-filtered` |
 | Why does creating this fail as a duplicate | `mcp/docs/api/baseline-data#silent-duplicates-versus-hard-failures` |
-| Where is the product list operation | `mcp/docs/api/products#listing-products` |
-| Why does the product list complain about `langCode` | `mcp/docs/api/products#listing-products` |
+| Where is the product list operation and why does it want `langCode` | `mcp/docs/api/products#listing-products` |
 | Why did my write answer 200 and change nothing | `mcp/docs/api/silent-no-ops` |
 | Why are my validators empty when a site reads the form | `mcp/docs/api/attribute-sets#two-reads-two-answers` |
-| How do I write a text field in a submission | `mcp/docs/api/attribute-types` |
 | What do I send as the value of a captcha field | `mcp/docs/api/captcha-fields#what-a-captcha-field-must-carry` |
 | Why is my captcha field accepting any token | `mcp/docs/api/captcha-fields#hiding-the-captcha-field-switches-the-check-off` |
 | Why do my uploaded images have no preview | `mcp/docs/api/files-and-uploads#no-preview-template-no-preview-and-no-error` |
@@ -155,8 +153,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does the panel show one selected option out of four | `mcp/docs/api/list-options-and-extra-values#several-selected-options-need-multiselect` |
 | Why did my menu arrive with more items than it has | `mcp/docs/api/menus#parent-references-are-polymorphic` |
 | How do I set the order of menu items | `mcp/docs/api/menus#ordering-items` |
-| How do I set the order of products on a page | `mcp/docs/api/pages#ordering-products-on-a-page` |
-| Why does my product reorder look like it did nothing | `mcp/docs/api/pages#ordering-products-on-a-page` |
+| How do I order products on a page and why did my reorder do nothing | `mcp/docs/api/pages#ordering-products-on-a-page` |
 | Why is my event refused on this module | `mcp/docs/api/events#an-event-on-another-module-is-refused` |
 | Why does my form event send no mail | `mcp/docs/api/events#an-event-with-no-recipient-looks-configured` |
 | Where do I put button captions and interface text | `mcp/docs/api/content-modelling#where-interface-labels-belong` |
@@ -186,6 +183,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why did an operation that worked start answering 403 | `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it` |
 | Why is my upload or file delete refused with 403 | `mcp/docs/api/files-and-uploads#admin-uploads-and-deletes-need-file-permissions` |
 | Why was my admin permission write refused with 400 | `mcp/docs/api/admins-and-permissions#an-unrecognised-permission-key-is-refused-with-400` |
+| Which permission values are not booleans | `mcp/docs/api/admins-and-permissions#a-recognised-key-with-the-wrong-value-is-a-different-400` |
+| Why does creating an admin answer 405 | `mcp/docs/api/admins-and-permissions#creating-an-admin-can-answer-405` |
 | How do I delegate one section of the site to an editor | `mcp/docs/api/admin-page-scope#delegating-a-section-of-the-site-to-an-editor` |
 | Why is my page create or delete refused with 403 | `mcp/docs/api/admin-page-scope#what-a-refusal-tells-you` |
 | How do I lift a page scope restriction | `mcp/docs/api/admin-page-scope#there-is-no-empty-list` |

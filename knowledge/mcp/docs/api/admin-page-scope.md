@@ -4,7 +4,7 @@
 
 Read it before delegating a section of a site to someone, and when a page write answers `403` while the same account edits other pages happily.
 
-→ `mcp/docs/api/admins-and-permissions#an-unrecognised-permission-key-is-refused-with-400` · `mcp/docs/api/pages#the-page-tree`
+→ `mcp/docs/api/admins-and-permissions#a-recognised-key-with-the-wrong-value-is-a-different-400` · `mcp/docs/api/pages#the-page-tree`
 
 ## The value is a list of page ids not a boolean
 
@@ -71,9 +71,9 @@ That account edits every page under 12, answers `403` on a page in any other bra
 
 The boundary exists only while the key is in the map: an account without it is unrestricted, so a colleague who copies the permissions of an unscoped editor gets the whole tree.
 
-Creating or updating an admin is confirm-gated, so show the map you are about to write and wait.
+Creating or updating an admin is confirm-gated, so show the map you are about to write and wait. If the create answers `405`, the instance is already holding as many admin accounts as it allows — grant the scope to an account that exists instead.
 
-→ `mcp/docs/api/admins-and-permissions#admin-mutations-are-permanently-gated`
+→ `mcp/docs/api/admins-and-permissions#creating-an-admin-can-answer-405`
 
 ## Which page operations the scope governs
 
