@@ -111,56 +111,15 @@ The field is a **full replacement**, not an addition. Send every group the user 
 
 The same call also writes `formData` and `notificationData` from whatever the body carries, so omitting them replaces them with empty values. Read the user first and send those fields back unchanged unless you mean to change them.
 
-## Add a sign-in provider for a social network
+## Where social network sign-in is configured
 
-Every social provider is created with `type: "oauth"`. There is no per-network type value — `"apple"` or `"yandex"` as a `type` is rejected. The network is named in the settings instead, under `oauthProvider`.
+Providers for Google, Apple, VK and the other supported networks are created here as well, with `type: "oauth"`, but their settings, the catalog that lists what each network requires, and the refusals they produce have their own document.
 
-```json
-{
-  "type": "oauth",
-  "identifier": "apple-signin",
-  "localizeInfos": { "en_US": { "title": "Sign in with Apple" } }
-}
-```
-
-Create the provider first, then set its settings with the update call. Settings with no `oauthProvider` are treated as Google, so providers configured before the other networks existed keep working untouched.
-
-`oauthAuthUrl` is required for every network, and it is the only setting a Content API reader can see. Secrets you store are never returned there.
-
-## Which settings each social network needs
-
-Ask the instance rather than guessing: `AdminUsersAuthProviderController_getOauthCatalog` — `GET /api/admin/users-auth-providers/oauth-catalog` — lists every supported network with the settings keys it requires.
-
-```json
-[
-  {
-    "key": "apple",
-    "tokenUrl": "https://appleid.apple.com/auth/token",
-    "requiredFields": [
-      "oauthClientId", "oauthAuthUrl",
-      "oauthTeamId", "oauthKeyId", "oauthPrivateKey"
-    ],
-    "optionalFields": ["oauthTokenUrl"]
-  }
-]
-```
-
-Most networks need `oauthClientId`, `oauthSecret` and `oauthAuthUrl`. Apple is the exception, and the catalog shows it: it takes key material — `oauthTeamId`, `oauthKeyId` and a private key — and asks for no `oauthSecret`, because the short-lived secret Apple requires is produced for each sign-in rather than stored. A hand-made value in `oauthSecret` is ignored for Apple.
-
-`oauthTokenUrl` is optional everywhere and overrides the network's standard endpoint when set.
-
-## Why a social sign-in answers 400
-
-- **The network reported an address it has not verified.** The sign-in is refused so an unverified address cannot claim an existing account. Ask the person to confirm their address with the network, then retry.
-- **The settings name a network the instance does not support.** Compare `oauthProvider` against the catalog; the value is case-sensitive.
-- **`oauthAuthUrl` is missing**, or the authorization code was issued for a different redirect address than the one sent with it.
-
-A returning person is recognised by the account id the network reports rather than by their address, so changing an email address at the network does not create a second account. One supported network reports no address at all; those accounts get a generated identifier instead. Signing in through two different networks still produces two separate users, even for one address.
+→ `mcp/docs/api/social-sign-in`
 
 ## Common mistakes
 
 - **Creating a permission that already exists.** Adjust the existing record.
-- **Inventing a `type` for a social network.** It is always `oauth`, plus `oauthProvider`.
 - **Creating a second `guest` group.** Succeeds silently, achieves nothing.
 - **Granting an admin permission to fix a Content API 403.** Different model.
 - **Rewriting group rules over a `403` on every route.** Check the token header first.

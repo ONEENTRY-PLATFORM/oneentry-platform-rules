@@ -115,6 +115,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/users-and-groups` | A Content API route returns a permission error |
 | `mcp/docs/api/content-api-permission-rules` | A public list is short, or a public write succeeded that should not have |
 | `mcp/docs/api/content-api-sign-in-and-cart` | Building the account or cart pages of a site |
+| `mcp/docs/api/social-sign-in` | Setting up Google, Apple, VK or another network to sign in with |
 | `mcp/docs/api/password-reset` | A visitor cannot sign in and needs a new password |
 | `mcp/docs/api/admins-and-permissions` | An operation was refused for lack of a permission |
 | `mcp/docs/api/admin-page-scope` | Delegating one branch of the page tree, or a page write refused for an admin who holds the key |
