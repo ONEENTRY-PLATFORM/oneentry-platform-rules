@@ -73,16 +73,15 @@ Reads are gated the same way writes are. An account that holds no keys reads not
 |---|---|
 | Pages | `pages.get` |
 | Admin accounts | `admins.get` |
-| General settings | `settings.general.get` |
 | Menus | `menu.get` |
 | Users | `users.get` |
 | Journal entries and session traffic | `journal.get` |
-| Attribute sets and their attributes | `settings.attributesSets.get` |
+| One attribute set, and the attributes inside it | `settings.attributesSets.get` |
 | Form submissions and their counts | `forms.data.read` |
 
 One key covers every read of that data rather than a single route: the listing, reading one by id, and the search and pagination forms beside it all require it. A `403` on one is not worked around by reaching for a neighbour.
 
-Helpers stay open. Checking whether a login, an email, a marker or a page URL is already taken, and reading the permission vocabulary, work without a read key.
+Helpers stay open. Checking whether a login, an email, a marker or a page URL is already taken, and reading the permission vocabulary, work without a read key. So do the two reads the admin panel issues on every load: `GET /settings-general` and the attribute-set listing `GET /attributes-sets` answer for any signed-in admin, and `401` with no token.
 
 ## A key can exist without any admin holding it
 
