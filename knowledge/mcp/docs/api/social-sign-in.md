@@ -92,9 +92,29 @@ Two consequences worth planning for:
 - One supported network reports no address at all. Those accounts are given a generated identifier, and they work normally.
 - Signing in through two different networks produces two separate users, even for one address, and even when both addresses match. There is no call that merges them.
 
+## A social account has no password
+
+An account created by a social sign-in carries no password at all. None is generated for it, and none can be guessed at: until the person sets one, a password sign-in with that login answers `401`.
+
+This differs from ordinary sign-up, which always establishes a password even when the form has no password field.
+
+To let such a person also sign in with a password, use the ordinary two-call sequence — request a one-time code, then set the password with it. That works on a social provider, and it needs the provider to have its code-sending event configured. Afterwards both ways in work for the same account.
+
+The login of a social account cannot be changed through the API. It belongs to the network, and the attempt is refused.
+
+## Does a social provider need a form
+
+No. Signing in with a network never reads one. Attach a form only if you want one of these:
+
+- the password and sign-up calls to work on the **same** provider marker;
+- the name and picture markers from the section above, which are fields on that form.
+
+Without a form, a password sign-in against a social provider's marker answers `400` naming the missing form. That check runs before the password is examined, so the message is about the form even when the password is also wrong.
+
 ## Common mistakes with social sign-in
 
 - **Inventing a `type` for a social network.** It is always `oauth`, plus `oauthProvider` in the settings.
+- **Waiting for a generated password to appear.** There is never one.
 - **Filling in `oauthSecret` for Apple.** It is ignored; supply the key material instead.
 - **Saving settings without consulting the catalog.** The call refuses and names what is missing.
 - **Expecting the network's name and picture to be stored.** Name the fields first.
