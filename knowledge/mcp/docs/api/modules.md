@@ -73,3 +73,4 @@ A module running in several replicas produces one stream per replica. `lines` ca
 - **Changing module wiring to fix a missing entity.** Look at the general type instead.
 - **Confusing visibility with permissions.** Two independent mechanisms.
 - **Treating the gate as a formality.** It exists because these changes are wide.
+- **Asking for a month of container logs in one call.** The window is capped at seven days.
