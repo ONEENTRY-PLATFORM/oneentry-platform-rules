@@ -59,6 +59,14 @@ Creating a module is not how a new content kind is introduced; general types and
 
 If the goal is "make this content appear in the admin panel", the answer is almost certainly a general type or an attribute set type, not a module.
 
+## What a container log read returns
+
+A container log read answers with an object, not a bare list: `lines` holds the log rows, `total` is how many rows came back, and `streams` is how many log streams the read covered.
+
+A module running in several replicas produces one stream per replica. `lines` carries the rows of every stream, merged and sorted by time, oldest first — so a single read is the whole picture, not one replica's view.
+
+`total` and `streams` are what make an empty result readable. `streams` of zero means nothing matched the module's container at all; `streams` above zero with `total` of zero means the stream exists and had no rows in the window you asked for. Check both before concluding that a line you are looking for was never written — widen the window or fix the module identifier instead.
+
 ## Common mistakes
 
 - **Creating a module.** Identifiers are not unique; you get a shadow.
