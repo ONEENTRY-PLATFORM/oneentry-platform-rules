@@ -22,10 +22,11 @@ Before creating a document, check whether the fact already has a home. Facts bel
 ## Size limits that are not negotiable
 
 - File: 10 KB.
-- Section: 8 KB. The server truncates at 12 KB, and the margin is for safety.
-- `mcp/operating-rules`: 7.5 KB total, because it is concatenated whole into a resource.
+- Section: 8 KB. This is the only limit with a mechanism behind it: over 12288 bytes the server cuts the section when an agent reads it, so 8 KB is the margin under that.
+- `mcp/operating-rules`: 7.5 KB total, because it is concatenated whole into a resource. Here the whole-file size is the one that bites.
+- An index document is exempt from the file limit. `mcp/docs/server/doc-map` grows with the corpus, so nothing keeps it under 10 KB, and it is read section by section like everything else. Its sections still obey the 8 KB rule.
 
-These are **bytes**. If a document outgrows the limit, split it by subject into a second document and cross-link — do not split it mid-topic.
+These are **bytes**. If a document outgrows the limit, split it by subject into a second document and cross-link — do not split it mid-topic. Outgrowing a limit is never a reason to drop a fact an agent needs, or to file it somewhere worse. A section that outgrows it splits into sibling `##` sections by subject, which also gives each part a heading that can be searched for.
 
 ## Headings decide whether anything is found
 

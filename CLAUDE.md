@@ -39,7 +39,7 @@ These come from the server's indexer. Violating one does not produce an error; i
 | Text before the first `##` is the empty-anchor section | A file that opens straight into a heading cannot be read without an anchor. Every file needs a preamble. |
 | Anchors are slugged from heading text | Lowercase, punctuation stripped, spaces to hyphens, cut at 80 characters. Em dashes, slashes and emoji survive into the anchor and make it untypable. |
 | Duplicate slugs get `-2`, `-3` | Two headings that slug the same silently produce an unusable second anchor. |
-| A section over 12288 **bytes** is truncated | Work to 10 KB per file and 8 KB per section. Bytes, not characters. |
+| A section over 12288 **bytes** is truncated | The only size the server enforces, and it cuts the section on read. Work to 8 KB per section so edits have room. Bytes, not characters. |
 | Search boosts: heading ×4, docId ×3, doc title ×2, body ×1 | Headings and file names carry the retrieval. Write them as the question someone would ask. |
 | Search combines terms with OR, with prefix and fuzzy matching | Boilerplate repeated across documents makes every document a weak match for every query. |
 | Query tokens of two characters or fewer are dropped | Never make a short acronym load-bearing; expand it at least once per document. |
@@ -85,7 +85,9 @@ Ends with two to four pointers.
 ### Size
 
 - File ≤ 10 KB. Section ≤ 8 KB. Sweet spot: 300–1500 bytes per section, 8–15 sections per document.
-- `knowledge/mcp/operating-rules.md` ≤ 7.5 KB total, ≤ 700 bytes per section. It is concatenated whole into an MCP resource that clients pin into context.
+- Only the section limit has a mechanism: over 12288 bytes the server cuts the section when an agent reads it. 8 KB is the margin under that. The file limit keeps a document to one subject — a document read section by section costs nothing extra for being long. A document that runs over it is telling you to split it by subject, and is never a reason to cut a fact an agent needs or to file that fact somewhere worse.
+- **An index document is exempt from the file limit.** `knowledge/mcp/docs/server/doc-map.md` grows with the corpus, so no amount of splitting keeps it under 10 KB, and it is read section by section like any other document. Its sections obey the 8 KB rule; the file has no ceiling. Do not delete rows from it to satisfy a size rule, and do not park a fact somewhere worse because the index looks full.
+- `knowledge/mcp/operating-rules.md` ≤ 7.5 KB total, ≤ 700 bytes per section. It is concatenated whole into an MCP resource that clients pin into context, so here the whole-file size is the one that bites.
 
 ### Examples
 
@@ -174,7 +176,7 @@ A `docId` is referenced by agents, by cross-links in this corpus, and — for `m
 
 - [ ] One `# H1`; non-empty preamble before the first `##`.
 - [ ] No `###`; headings ≤ 60 chars, letters/digits/spaces/hyphens, unique, unnumbered.
-- [ ] File < 10 KB; every section < 8 KB.
+- [ ] File < 10 KB (an index document is exempt); every section < 8 KB.
 - [ ] Fences tagged and balanced.
 - [ ] Cross-links use `docId#anchor` and resolve.
 - [ ] `doc-map.md` updated if a document was added.
