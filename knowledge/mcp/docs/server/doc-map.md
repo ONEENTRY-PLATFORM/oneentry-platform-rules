@@ -131,56 +131,13 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/import` | Bulk-loading content from a file |
 | `mcp/docs/api/ai-gateway` | The platform's own model-calling feature |
 
-## Answers to the questions asked most
+## Answers about permissions and refusals
 
 | Question | Go to |
 |---|---|
-| Why did my attributes come back empty | `mcp/docs/api/attribute-sets#two-levels-always` |
-| Why is what I just wrote missing from a list or a public read | `mcp/docs/api/index-attributes#when-a-written-value-becomes-searchable` |
 | Why was my call refused with nothing sent | `mcp/docs/server/allow-levels#a-level-refusal-happens-before-authentication` |
-| Why does my filter return nothing | `mcp/docs/api/filters#only-indexed-attributes-can-be-filtered` |
-| Why does creating this fail as a duplicate | `mcp/docs/api/baseline-data#silent-duplicates-versus-hard-failures` |
-| Where is the product list operation and why does it want `langCode` | `mcp/docs/api/products#listing-products` |
-| Why did my write answer 200 and change nothing | `mcp/docs/api/silent-no-ops` |
-| Why are my validators empty when a site reads the form | `mcp/docs/api/attribute-sets#two-reads-two-answers` |
-| What do I send as the value of a captcha field | `mcp/docs/api/captcha-fields#what-a-captcha-field-must-carry` |
-| Why is my captcha field accepting any token | `mcp/docs/api/captcha-fields#hiding-the-captcha-field-switches-the-check-off` |
-| Why do my uploaded images have no preview | `mcp/docs/api/files-and-uploads#no-preview-template-no-preview-and-no-error` |
-| Why did my menu item jump to the top level after an update | `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it` |
-| How do I create a menu with its pages | `mcp/docs/api/menus#creating-a-menu-with-its-pages` |
-| How do I upload a file through this server | `mcp/docs/server/cms-upload-file` |
-| Where do the rating and aggregation settings live | `mcp/docs/api/rating-forms-and-reviews#the-rating-settings-live-in-the-module-config` |
-| How do I put an image or a colour on a list option | `mcp/docs/api/list-options-and-extra-values#extra-values-sit-in-extended-with-no-locale-key` |
-| Why does the panel show one selected option out of four | `mcp/docs/api/list-options-and-extra-values#several-selected-options-need-multiselect` |
-| Why did my menu arrive with more items than it has | `mcp/docs/api/menus#parent-references-are-polymorphic` |
-| How do I set the order of menu items | `mcp/docs/api/menus#ordering-items` |
-| How do I order products on a page and why did my reorder do nothing | `mcp/docs/api/pages#ordering-products-on-a-page` |
-| Why is my event refused on this module | `mcp/docs/api/events#an-event-on-another-module-is-refused` |
-| Why does my form event send no mail | `mcp/docs/api/events#an-event-with-no-recipient-looks-configured` |
-| Where do I put button captions and interface text | `mcp/docs/api/content-modelling#where-interface-labels-belong` |
-| Why is my product price still the old number | `mcp/docs/api/products#prices-and-the-price-attribute` |
-| Why does a re-run of my import duplicate everything | `mcp/docs/api/import#re-running-an-import` |
-| How do I write a list or radioButton value | `mcp/docs/api/attribute-types#the-value-form-of-a-list-and-a-radiobutton` |
-| Why is my coupon working for everybody | `mcp/docs/api/discounts#which-operation-created-a-coupon-decides-its-reuse` |
-| How do I import reviews from another system | `mcp/docs/api/rating-forms-and-reviews#importing-reviews-from-another-system` |
-| What is averageValue next to the star rating | `mcp/docs/api/rating-forms-and-reviews#what-the-rating-aggregate-carries` |
-| Why was my second review refused as already rated | `mcp/docs/api/rating-forms-and-reviews#only-a-submission-with-a-score-counts-as-a-rating` |
-| How does a visitor sign out | `mcp/docs/api/content-api-sign-in-and-cart#where-the-session-routes-live` |
-| How does a visitor reset a forgotten password | `mcp/docs/api/password-reset#two-calls-in-order` |
-| Why is the password change asking for a code | `mcp/docs/api/password-reset#the-code-is-required-on-every-provider` |
-| Where does alt text for an image live | `mcp/docs/api/files-and-uploads#a-file-record-has-nowhere-to-keep-alt-text` |
-| Why do old images still show the old thumbnail size | `mcp/docs/api/templates-and-previews#changing-a-preview-template-does-not-re-crop-old-images` |
-| I regenerated previews and one image is unchanged | `mcp/docs/api/templates-and-previews#one-unchanged-preview-does-not-mean-it-failed` |
-| Did my event actually send anything | `mcp/docs/api/events#checking-whether-an-event-actually-sent-mail` |
-| Why did my block disappear from its pages after an edit | `mcp/docs/api/blocks#what-an-update-does-to-the-pages-a-block-is-on` |
-| Why does my similar-products block answer 400 | `mcp/docs/api/similar-product-blocks#manual-or-automatic-decides-what-a-request-returns` |
-| Why is my similar-products block empty or short | `mcp/docs/api/similar-product-blocks#why-a-block-comes-back-short` |
 | Why does every public read answer 403 | `mcp/docs/api/content-api-reads#public-reads-use-the-x-app-token-header` |
-| Why is my guest cart empty after adding to it | `mcp/docs/api/content-api-sign-in-and-cart#the-guest-cart-needs-a-uuid-in-x-guest-id` |
-| Why did submissions vanish after a form edit | `mcp/docs/api/forms-and-form-data#an-update-drops-every-config-you-do-not-send-back` |
-| How do I delete something safely | `mcp/docs/server/confirm-and-dry-run` |
 | Why can I not list the submissions of a form | `mcp/docs/api/form-submissions#both-read-routes-need-the-forms-data-read-permission` |
-| Why does clearing the journal answer 400 | `mcp/docs/api/journal#clearing-the-journal-needs-an-explicit-window` |
 | Why did an operation that worked start answering 403 | `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it` |
 | Why is my upload or file delete refused with 403 | `mcp/docs/api/files-and-uploads#admin-uploads-and-deletes-need-file-permissions` |
 | Why was my admin permission write refused with 400 | `mcp/docs/api/admins-and-permissions#an-unrecognised-permission-key-is-refused-with-400` |
@@ -189,16 +146,105 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | How do I delegate one section of the site to an editor | `mcp/docs/api/admin-page-scope#delegating-a-section-of-the-site-to-an-editor` |
 | Why is my page create or delete refused with 403 | `mcp/docs/api/admin-page-scope#what-a-refusal-tells-you` |
 | How do I lift a page scope restriction | `mcp/docs/api/admin-page-scope#there-is-no-empty-list` |
-| Why does a search by meaning return nothing for a kind | `mcp/docs/api/index-attributes#why-a-search-by-meaning-finds-nothing-for-a-kind` |
 | Can an export permission be granted | `mcp/docs/api/admins-and-permissions#exporting-data-has-its-own-permissions` |
 | Why does every public list stop at ten | `mcp/docs/api/content-api-permission-rules#a-restricted-read-caps-the-list-at-ten` |
 | Why can a public token upload a file | `mcp/docs/api/content-api-permission-rules#why-a-public-token-can-upload-a-file` |
 | Where is the restricted read length set | `mcp/docs/api/content-api-permission-rules#where-the-restricted-length-is-set-and-read` |
+
+## Answers about writes that changed nothing
+
+| Question | Go to |
+|---|---|
+| Why is what I just wrote missing from a list or a public read | `mcp/docs/api/index-attributes#when-a-written-value-becomes-searchable` |
+| Why does creating this fail as a duplicate | `mcp/docs/api/baseline-data#silent-duplicates-versus-hard-failures` |
+| Why did my write answer 200 and change nothing | `mcp/docs/api/silent-no-ops` |
+| Why did my menu item jump to the top level after an update | `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it` |
+| Why does a re-run of my import duplicate everything | `mcp/docs/api/import#re-running-an-import` |
+| Why did my block disappear from its pages after an edit | `mcp/docs/api/blocks#what-an-update-does-to-the-pages-a-block-is-on` |
+| Why did submissions vanish after a form edit | `mcp/docs/api/forms-and-form-data#an-update-drops-every-config-you-do-not-send-back` |
+| How do I delete something safely | `mcp/docs/server/confirm-and-dry-run` |
+| Why does clearing the journal answer 400 | `mcp/docs/api/journal#clearing-the-journal-needs-an-explicit-window` |
+
+## Answers about search and filters
+
+| Question | Go to |
+|---|---|
+| Why does my filter return nothing | `mcp/docs/api/filters#only-indexed-attributes-can-be-filtered` |
+| Why does a search by meaning return nothing for a kind | `mcp/docs/api/index-attributes#why-a-search-by-meaning-finds-nothing-for-a-kind` |
 | Why does the site search return only five results | `mcp/docs/api/global-search#results-come-back-grouped-in-fives` |
 | Why is limit refused on the search | `mcp/docs/api/global-search#paging-one-kind-needs-limit-and-exactly-one-type` |
 | Why does the search never find my documents | `mcp/docs/api/global-search#what-global-search-never-finds` |
 | Where is the public search by meaning | `mcp/docs/api/global-search#semantic-search-over-one-kind-of-entity` |
-| Why do two order statuses both say they are the default | `mcp/docs/api/order-statuses#which-axis-a-status-belongs-to` |
-| Why is my captcha refusing a token that looks right | `mcp/docs/api/captcha-fields#a-valid-token-can-still-be-refused` |
-| Why did my event send a mail but no push | `mcp/docs/api/events#which-channels-an-event-sends-on` |
+
+## Answers about attributes and values
+
+| Question | Go to |
+|---|---|
+| Why did my attributes come back empty | `mcp/docs/api/attribute-sets#two-levels-always` |
+| Why are my validators empty when a site reads the form | `mcp/docs/api/attribute-sets#two-reads-two-answers` |
+| How do I put an image or a colour on a list option | `mcp/docs/api/list-options-and-extra-values#extra-values-sit-in-extended-with-no-locale-key` |
+| Why does the panel show one selected option out of four | `mcp/docs/api/list-options-and-extra-values#several-selected-options-need-multiselect` |
+| Where do I put button captions and interface text | `mcp/docs/api/content-modelling#where-interface-labels-belong` |
+| How do I write a list or radioButton value | `mcp/docs/api/attribute-types#the-value-form-of-a-list-and-a-radiobutton` |
 | What belongs in a page's config object | `mcp/docs/api/pages#the-config-object-is-a-free-map-of-numbers` |
+
+## Answers about content structure and ordering
+
+| Question | Go to |
+|---|---|
+| Where is the product list operation and why does it want `langCode` | `mcp/docs/api/products#listing-products` |
+| How do I create a menu with its pages | `mcp/docs/api/menus#creating-a-menu-with-its-pages` |
+| Why did my menu arrive with more items than it has | `mcp/docs/api/menus#parent-references-are-polymorphic` |
+| How do I set the order of menu items | `mcp/docs/api/menus#ordering-items` |
+| How do I order products on a page and why did my reorder do nothing | `mcp/docs/api/pages#ordering-products-on-a-page` |
+| Why is my product price still the old number | `mcp/docs/api/products#prices-and-the-price-attribute` |
+
+## Answers about files and previews
+
+| Question | Go to |
+|---|---|
+| Why do my uploaded images have no preview | `mcp/docs/api/files-and-uploads#no-preview-template-no-preview-and-no-error` |
+| How do I upload a file through this server | `mcp/docs/server/cms-upload-file` |
+| Where does alt text for an image live | `mcp/docs/api/files-and-uploads#a-file-record-has-nowhere-to-keep-alt-text` |
+| Why do old images still show the old thumbnail size | `mcp/docs/api/templates-and-previews#changing-a-preview-template-does-not-re-crop-old-images` |
+| I regenerated previews and one image is unchanged | `mcp/docs/api/templates-and-previews#one-unchanged-preview-does-not-mean-it-failed` |
+
+## Answers about forms and reviews
+
+| Question | Go to |
+|---|---|
+| What do I send as the value of a captcha field | `mcp/docs/api/captcha-fields#what-a-captcha-field-must-carry` |
+| Why is my captcha field accepting any token | `mcp/docs/api/captcha-fields#hiding-the-captcha-field-switches-the-check-off` |
+| Where do the rating and aggregation settings live | `mcp/docs/api/rating-forms-and-reviews#the-rating-settings-live-in-the-module-config` |
+| How do I import reviews from another system | `mcp/docs/api/rating-forms-and-reviews#importing-reviews-from-another-system` |
+| What is averageValue next to the star rating | `mcp/docs/api/rating-forms-and-reviews#what-the-rating-aggregate-carries` |
+| Why was my second review refused as already rated | `mcp/docs/api/rating-forms-and-reviews#only-a-submission-with-a-score-counts-as-a-rating` |
+| Why is my captcha refusing a token that looks right | `mcp/docs/api/captcha-fields#a-valid-token-can-still-be-refused` |
+| Why does my submission date filter answer 400 | `mcp/docs/api/form-submissions#how-to-write-a-date-bound-the-filter-accepts` |
+
+## Answers about events and notifications
+
+| Question | Go to |
+|---|---|
+| Why is my event refused on this module | `mcp/docs/api/events#an-event-on-another-module-is-refused` |
+| Why does my form event send no mail | `mcp/docs/api/events#an-event-with-no-recipient-looks-configured` |
+| Did my event actually send anything | `mcp/docs/api/events#checking-whether-an-event-actually-sent-mail` |
+| Why did my event send a mail but no push | `mcp/docs/api/events#which-channels-an-event-sends-on` |
+
+## Answers about visitors and sessions
+
+| Question | Go to |
+|---|---|
+| How does a visitor sign out | `mcp/docs/api/content-api-sign-in-and-cart#where-the-session-routes-live` |
+| How does a visitor reset a forgotten password | `mcp/docs/api/password-reset#two-calls-in-order` |
+| Why is the password change asking for a code | `mcp/docs/api/password-reset#the-code-is-required-on-every-provider` |
+| Why is my guest cart empty after adding to it | `mcp/docs/api/content-api-sign-in-and-cart#the-guest-cart-needs-a-uuid-in-x-guest-id` |
+
+## Answers about commerce and product blocks
+
+| Question | Go to |
+|---|---|
+| Why is my coupon working for everybody | `mcp/docs/api/discounts#which-operation-created-a-coupon-decides-its-reuse` |
+| Why does my similar-products block answer 400 | `mcp/docs/api/similar-product-blocks#manual-or-automatic-decides-what-a-request-returns` |
+| Why is my similar-products block empty or short | `mcp/docs/api/similar-product-blocks#why-a-block-comes-back-short` |
+| Why do two order statuses both say they are the default | `mcp/docs/api/order-statuses#which-axis-a-status-belongs-to` |
