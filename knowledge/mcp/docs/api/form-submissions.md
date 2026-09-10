@@ -81,7 +81,7 @@ The body accepts these keys and no others:
 |---|---|
 | `entityIdentifier` | narrows to one entity, as above |
 | `parentId` | `0` returns root-level entries only; an id returns that entry's replies |
-| `dateFrom`, `dateTo` | range over the submission time |
+| `dateFrom`, `dateTo` | range over the submission time, see below |
 | `status` | array of statuses, lowercase: `sent`, `moderation`, `approved`, `banned`, `deleted` |
 | `userIdentifier` | the submitter's login |
 | `isSentByAdmin` | `true` keeps only what an operator submitted |
@@ -89,6 +89,20 @@ The body accepts these keys and no others:
 Any other key answers `400 property <name> should not exist`, so a misspelled key is refused rather than dropped: a `400` here is telling you the key is wrong, not the value. Pagination is not part of the body — `limit` and `offset` are query parameters and are refused in the body like any other unknown key.
 
 A `parentId` that is not an integer answers `400`. A status outside the list answers `400` and the message names the five that are accepted, so send them lowercase.
+
+## How to write a date bound the filter accepts
+
+`dateFrom` and `dateTo` take `YYYY-MM-DD`, optionally followed by a time of day separated by a **space**. A bound the filter cannot read answers `400` before the listing runs, naming the field and both accepted formats.
+
+```json
+{ "dateFrom": "2026-08-01", "dateTo": "2026-08-31" }
+```
+
+An ISO timestamp is how this usually goes wrong: the `T` is refused with or without a zone, so replace it with a space. An unpadded `2026-9-1`, and a date that cannot exist like `2026-13-45`, are refused the same way — a `400` here is about the value, not the key.
+
+A bound with no time of day covers that whole day: a `dateTo` of `2026-08-31` keeps a submission made at `23:40`, so `23:59:59` adds nothing.
+
+To leave a bound open, omit the key or send an empty string — both mean no bound on that side, so an unfilled filter field can go as it is.
 
 ## What formModuleConfigId narrows and what it cannot
 
@@ -119,6 +133,7 @@ Some submissions carry a status an operator moves through as they process it, wi
 - **Asking for the extended mode by habit.** The plain one already names the entity.
 - **Paging from the body.** `limit` and `offset` are query parameters; in the body they answer `400`.
 - **Sending a status in upper case.** The five values are lowercase.
+- **Sending an ISO timestamp as a date bound.** The `T` is refused; use a space.
 - **Reading a `403` as a missing form.** Both read routes need `forms.data.read`.
 - **Reading the public listing of a form nobody marked public.** It answers `403` until the form carries `isPrivate: false`.
 - **Comparing the count against a listing.** They have different scopes; pass the same `langCode` to both.
