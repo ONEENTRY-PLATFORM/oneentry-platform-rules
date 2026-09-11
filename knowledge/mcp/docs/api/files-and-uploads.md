@@ -182,7 +182,7 @@ Find the references first. If you cannot establish what uses a file, say so befo
 
 Nothing about the file limits the delete. Its type, its age and who put it there do not matter: a file a visitor stored through the public route is removed by the same call as one an administrator uploaded. The limit is the permission on the route — `files.delete` on the admin one; the public one grants storing and not removing by default, so removing is an administrator's call unless a group is given that permission too.
 
-The delete call names the file, **not** its stored path. It takes `type`, `entity` and `id` as its own parameters — the same folder values the upload used — and the file's own name separately. The name a record carries is the full path those folders produced, so passing that record's name back is the common mistake: the answer is `404`, which reads like "already gone" and is not. Send the last segment of the path alone.
+The delete call takes `type`, `entity` and `id` as its own parameters — the same folder values the upload used — and the file's name separately. That name is accepted in either form: the full path a stored record carries, or the last segment of that path on its own. Both address the same file, so handing back the name an upload returned removes it. The last segment alone is the form to prefer when you are unsure what an instance accepts. A name matching nothing stored under those folders answers `404`, and that `404` means the name, not the state of the file.
 
 ## Development mode differences
 
