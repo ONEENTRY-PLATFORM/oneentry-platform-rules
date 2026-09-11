@@ -142,7 +142,7 @@ Filters are the body of the list operation, and the body is an **array**: each e
 
 Only attributes that are indexed can be filtered on. A filter over a non-indexed attribute returns nothing rather than erroring, which reads as "no such products".
 
-→ `mcp/docs/api/filters` · `mcp/docs/api/index-attributes#what-issync-tells-you-about-an-empty-attributevalues`
+→ `mcp/docs/api/filters` · `mcp/docs/api/index-attributes#what-issync-tells-you-and-what-attributevalues-does-not`
 
 ## Common mistakes
 
