@@ -69,29 +69,30 @@ Do not add retry loops that re-send writes. Retry the **read**, if anything.
 
 → `mcp/operating-rules#a-read-straight-after-a-write-can-lag`
 
-## What isSync tells you about an empty attributeValues
+## What isSync tells you and what attributeValues does not
 
-Attribute values are published asynchronously. A product created with `attributesSets` filled can read back for a while with `attributeValues: {}` — no locale in it, no fields — while the admin read by id still shows every value. Under a bulk run that window is minutes rather than seconds.
+Attribute values are published a moment after the write that carries them, and the boolean `isSync` on a product read is how you tell whether that has happened for the locale you asked for.
 
-Product reads carry a boolean `isSync` beside `attributeValues`, and it is the only thing in the answer that separates the two states an empty map can mean.
+| `isSync` | What it says about the requested locale |
+|---|---|
+| `false` | Values are declared and not published yet. Read again. |
+| `true` | Nothing is on its way — either the values are published, or the locale declares none at all. |
 
-| `isSync` | `attributeValues` | What it means |
-|---|---|---|
-| `true` | populated | The values are published. |
-| `true` | empty | This locale declares no values. The answer is final. |
-| `false` | empty | Values are declared and not published yet. Read again. |
+`true` is therefore conclusive and `false` is the only value that means "wait". Read it on the **admin read by id**, which answers with `attributesSets` — your values exactly as you wrote them, present from the first read whatever the flag says. Values in `attributesSets` beside `isSync: false` is the ordinary picture a second after a create: the write landed, the published copy has not caught up.
 
-So `true` is conclusive: what you see is what that locale holds, and nothing is on its way. An empty `attributeValues` next to `isSync: false` is not evidence that the product has no values, and it is never a reason to write them a second time.
+A locale you never wrote answers `true` as well, because it declares nothing to publish. So `isSync` is per locale, not per product, and asking about a language the product has no values in is not a way to learn anything about the one it does.
+
+On a public read, where the values arrive as `attributeValues`, the same flag splits an empty one: `attributeValues: {}` with `isSync: true` means the locale genuinely declares no values.
 
 → `mcp/docs/api/products#listing-products`
 
-## Where a false isSync is ambiguous and when to stop
+## An unpublished product can be missing rather than empty
 
-Two limits. Ignore either one and a retry loop turns into a hang or a wrong conclusion.
+Until publication catches up, the public side may not carry the product **at all** — the read by id answers `404` and the catalogue listing does not count it — rather than carrying it with an empty `attributeValues`. Which of the two you see depends on the instance, and nothing in either answer says which.
 
-**The read path.** On admin product reads and on the products of a block, `false` carries the meaning above. Content API catalogue and single-product reads depend on the instance: some answer with an older, coarser flag where `false` only means "no indexed values are recorded for this product and locale yet". A product that declares no values answers `false` there too, so an empty `attributeValues` stays ambiguous on that path, and nothing in the response says which kind of instance you are on. Settle it with the admin read by id, which carries the precise flag everywhere.
+That `404` is the trap. It reads exactly like a create that failed, and it is not one: confirm with the admin read by id, which shows the product and its `attributesSets` immediately. Never repeat the create over it — you get a duplicate and the original publishes a moment later anyway.
 
-**Termination.** `false` is not guaranteed to become `true`. Where the attribute set is configured so that nothing in it is indexable, it stays `false` for good. Bound the loop by a small number of attempts with a pause between reads, then stop and report what is still `false` — do not keep reading, and do not rewrite the values to provoke it.
+`false` is also not guaranteed to become `true`. Where the attribute set is configured so that nothing in it is indexable, it stays `false` for good. Bound the loop by a small number of attempts with a pause between reads, then stop and report what is still `false` — do not keep reading, and do not rewrite the values to provoke it.
 
 ## Reading indexed values back
 
@@ -136,6 +137,7 @@ Importing or updating many entities at once means the queryable side lags by mor
 - **Assuming indexing is instant after marking an attribute.** Existing values are picked up progressively.
 - **Reading an empty search by meaning as no match.** Check the coverage for that kind first.
 - **Reading an empty `attributeValues` as "this product has no values".** Look at `isSync` before concluding either way.
+- **Reading a `404` on the public side as a failed create.** The product may not be published yet; confirm on the admin read by id.
 - **Polling until `isSync` turns `true`.** It may never turn. Bound the attempts and report what is still `false`.
 
 → `mcp/docs/api/verification-recipes`
