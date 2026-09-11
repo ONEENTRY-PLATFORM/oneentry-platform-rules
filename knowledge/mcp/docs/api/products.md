@@ -142,7 +142,7 @@ Filters are the body of the list operation, and the body is an **array**: each e
 
 Only attributes that are indexed can be filtered on. A filter over a non-indexed attribute returns nothing rather than erroring, which reads as "no such products".
 
-→ `mcp/docs/api/filters` · `mcp/docs/api/index-attributes`
+→ `mcp/docs/api/filters` · `mcp/docs/api/index-attributes#what-issync-tells-you-about-an-empty-attributevalues`
 
 ## Common mistakes
 
@@ -157,6 +157,7 @@ Only attributes that are indexed can be filtered on. A filter over a non-indexed
 - **Storing a rating or a review count as an attribute.** The platform calculates both.
 - **Treating a `null` price as zero.**
 - **Re-creating a product because the list did not show it yet.** Lists lag by seconds; read by id and never repeat a create.
+- **Rewriting values because `attributeValues` came back empty.** `isSync` says whether they are absent or unpublished.
 - **Deleting many products through the collection route.** It cannot carry the ids; use the category route with them in the body.
 
 → `mcp/docs/api/verification-recipes#products`

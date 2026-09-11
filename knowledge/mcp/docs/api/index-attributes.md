@@ -69,6 +69,30 @@ Do not add retry loops that re-send writes. Retry the **read**, if anything.
 
 → `mcp/operating-rules#a-read-straight-after-a-write-can-lag`
 
+## What isSync tells you about an empty attributeValues
+
+Attribute values are published asynchronously. A product created with `attributesSets` filled can read back for a while with `attributeValues: {}` — no locale in it, no fields — while the admin read by id still shows every value. Under a bulk run that window is minutes rather than seconds.
+
+Product reads carry a boolean `isSync` beside `attributeValues`, and it is the only thing in the answer that separates the two states an empty map can mean.
+
+| `isSync` | `attributeValues` | What it means |
+|---|---|---|
+| `true` | populated | The values are published. |
+| `true` | empty | This locale declares no values. The answer is final. |
+| `false` | empty | Values are declared and not published yet. Read again. |
+
+So `true` is conclusive: what you see is what that locale holds, and nothing is on its way. An empty `attributeValues` next to `isSync: false` is not evidence that the product has no values, and it is never a reason to write them a second time.
+
+→ `mcp/docs/api/products#listing-products`
+
+## Where a false isSync is ambiguous and when to stop
+
+Two limits. Ignore either one and a retry loop turns into a hang or a wrong conclusion.
+
+**The read path.** On admin product reads and on the products of a block, `false` carries the meaning above. Content API catalogue and single-product reads depend on the instance: some answer with an older, coarser flag where `false` only means "no indexed values are recorded for this product and locale yet". A product that declares no values answers `false` there too, so an empty `attributeValues` stays ambiguous on that path, and nothing in the response says which kind of instance you are on. Settle it with the admin read by id, which carries the precise flag everywhere.
+
+**Termination.** `false` is not guaranteed to become `true`. Where the attribute set is configured so that nothing in it is indexable, it stays `false` for good. Bound the loop by a small number of attempts with a pause between reads, then stop and report what is still `false` — do not keep reading, and do not rewrite the values to provoke it.
+
 ## Reading indexed values back
 
 There is an operation returning the distinct values an indexed attribute currently holds across the catalogue. Two good uses:
@@ -111,5 +135,7 @@ Importing or updating many entities at once means the queryable side lags by mor
 - **Verifying a bulk import by refreshing a listing.** Sample by id.
 - **Assuming indexing is instant after marking an attribute.** Existing values are picked up progressively.
 - **Reading an empty search by meaning as no match.** Check the coverage for that kind first.
+- **Reading an empty `attributeValues` as "this product has no values".** Look at `isSync` before concluding either way.
+- **Polling until `isSync` turns `true`.** It may never turn. Bound the attempts and report what is still `false`.
 
 → `mcp/docs/api/verification-recipes`
