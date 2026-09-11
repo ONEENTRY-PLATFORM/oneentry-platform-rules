@@ -104,10 +104,7 @@ Do not confuse it with the visitor route. Signing out one *customer* everywhere 
 | To sign out | Use |
 |---|---|
 | admins, across the instance | `POST /auth/logout/all-users` |
-| one admin, while updating them | `AdminsController_update` with `isLogoutAccounts: true` |
 | one visitor, on every device | `POST .../users-auth-providers/marker/{marker}/users/logout-all` |
-
-The middle one is a field on the ordinary admin update, not a route: sending it ends that admin's sessions as part of the save. It is ignored when the admin being updated is the one you are signed in as, so it cannot end your own session — but it is still a side effect of a call whose subject is something else, so leave it out unless signing that person out is part of what you were asked to do.
 
 Treat it as destructive: it ends sessions belonging to people who did not ask for it. Show the human what you are about to do and wait.
 
