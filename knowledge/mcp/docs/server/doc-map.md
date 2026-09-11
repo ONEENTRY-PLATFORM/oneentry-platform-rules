@@ -181,6 +181,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Question | Go to |
 |---|---|
 | Why did my attributes come back empty | `mcp/docs/api/attribute-sets#two-levels-always` |
+| Does an empty `attributeValues` mean no values or not published yet | `mcp/docs/api/index-attributes#what-issync-tells-you-about-an-empty-attributevalues` |
+| How long do I keep re-reading while `isSync` is false | `mcp/docs/api/index-attributes#where-a-false-issync-is-ambiguous-and-when-to-stop` |
 | Why are my validators empty when a site reads the form | `mcp/docs/api/attribute-sets#two-reads-two-answers` |
 | How do I put an image or a colour on a list option | `mcp/docs/api/list-options-and-extra-values#extra-values-sit-in-extended-with-no-locale-key` |
 | Why does the panel show one selected option out of four | `mcp/docs/api/list-options-and-extra-values#several-selected-options-need-multiselect` |
