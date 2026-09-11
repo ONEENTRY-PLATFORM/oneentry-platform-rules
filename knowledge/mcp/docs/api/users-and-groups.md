@@ -65,6 +65,14 @@ Treat user data as personal data. Do not copy it into conversations, reports or 
 
 → `mcp/docs/api/block-types#audience-filtering`
 
+## Find a user by their login
+
+`AdminUsersController_findOneByIdentifier` — `GET /users/identifier/{identifier}` — takes a login and answers with that user's `id` and `identifier` and nothing else. The match is **exact**; a login no user carries answers `404`.
+
+Reach for it when an order, a submission or a row hands you a login and you need the id. The neighbouring quick search matches on containment instead, so `alex` also returns `alexandra` — taking the first result of that one is how an agent writes to the wrong person's account.
+
+A login is usually an email address, so the path segment carries `@` and a dot. Send it exactly as it was given rather than trimming it into something that looks like a marker.
+
 ## The isLogin field is what a user signs in with
 
 One attribute of a sign-in form carries the flag isLogin. Its value is not an ordinary profile field: it is the credential the person signs in with. Writing it in the user card moves the credential too, so the displayed value and the working one never drift apart. You do not name a form when you do it — the form of the user's own sign-in provider is used.

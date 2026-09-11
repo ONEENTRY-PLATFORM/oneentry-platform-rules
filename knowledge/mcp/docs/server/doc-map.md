@@ -183,6 +183,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why did my attributes come back empty | `mcp/docs/api/attribute-sets#two-levels-always` |
 | Does an empty `attributeValues` mean no values or not published yet | `mcp/docs/api/index-attributes#what-issync-tells-you-and-what-attributevalues-does-not` |
 | How long do I keep re-reading while `isSync` is false | `mcp/docs/api/index-attributes#an-unpublished-product-can-be-missing-rather-than-empty` |
+| How do I read one attribute value without the set | `mcp/docs/api/attribute-sets#reading-one-value-by-its-attribute-marker` |
 | Why are my validators empty when a site reads the form | `mcp/docs/api/attribute-sets#two-reads-two-answers` |
 | How do I put an image or a colour on a list option | `mcp/docs/api/list-options-and-extra-values#extra-values-sit-in-extended-with-no-locale-key` |
 | Why does the panel show one selected option out of four | `mcp/docs/api/list-options-and-extra-values#several-selected-options-need-multiselect` |
@@ -241,6 +242,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | How does a visitor reset a forgotten password | `mcp/docs/api/password-reset#two-calls-in-order` |
 | Why is the password change asking for a code | `mcp/docs/api/password-reset#the-code-is-required-on-every-provider` |
 | Why is my guest cart empty after adding to it | `mcp/docs/api/content-api-sign-in-and-cart#the-guest-cart-needs-a-uuid-in-x-guest-id` |
+| How do I turn a login into a user id | `mcp/docs/api/users-and-groups#find-a-user-by-their-login` |
 
 ## Answers about commerce and product blocks
 

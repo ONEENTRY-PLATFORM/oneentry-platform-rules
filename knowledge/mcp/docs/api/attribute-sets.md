@@ -32,6 +32,33 @@ Inside `attributesSets` the key is the attribute's type followed by `_id` and it
 
 `string_id42` is the attribute of type `string` with id 42. You cannot construct these from markers, and you cannot guess the ids — they come from the set.
 
+## Reading one value by its attribute marker
+
+There is one route that addresses a value by marker instead, and it is the only way to read a value without holding the set. `AdminSystemController_getOneAttributeValue` — `GET /system/attribute-value/{type}/{id}/{marker}`:
+
+```json
+{ "marker": "price", "attributeType": "float", "value": "12.0" }
+```
+
+`marker` is the attribute's **identifier inside the set** — not the `<type>_id<id>` key and not a position in the schema. The route resolves it against whatever set the record itself carries, which is why the caller does not need to know that set. `langCode` is a query parameter and falls back to `en_US` when omitted.
+
+`type` is a closed list: `products`, `pages`, `blocks`, `forms`, `events`, `templates`, `template_previews`, `admins`. Users, orders and discounts are not reachable this way — read those entities whole.
+
+Two answers look alike and mean different things:
+
+- `value: null` beside a real `attributeType` — the attribute is in the set and holds nothing for that locale.
+- `value: null` beside `attributeType: null` — the record carries **no attribute set at all**. Nothing is missing and nothing is wrong.
+
+A marker the record's set does not carry answers `404`, and so does an id no record has. That `404` is the only thing protecting you from a typo in the marker, and it is absent in the second case above: on a record with no set, *every* marker answers `200` with both fields `null`, invented ones included. Do not read one of those as "this attribute is empty".
+
+The value comes back in the shape its type uses, not flattened to a string: a number stays a number, and a date, a list entry and an image are objects here.
+
+The route declares no permission in the catalog, so an authenticated admin reaches it and the local pre-check has nothing to compare.
+
+There are marker-addressed **writes** under `/system` as well, one for a single record and one for several. They are the counterpart of this read and not of an ordinary entity update: they name the set explicitly and take values as a locale-keyed list of marker, type and value. Read their shape with `cms_api_describe` before using one, and reach for the entity's own update when you are changing more than an attribute.
+
+Everything else in this document still holds. `attributesSets` on the entity itself is never keyed by marker, and no amount of marker support on these routes changes that.
+
 ## Two levels always
 
 The outer key is a locale code, the inner key is the attribute key. Both levels are required, on every write, for every attribute — including ones whose value is not really language-dependent.

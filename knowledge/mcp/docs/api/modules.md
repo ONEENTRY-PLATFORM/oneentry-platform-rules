@@ -67,6 +67,8 @@ A module running in several replicas produces one stream per replica. `lines` ca
 
 `total` and `streams` are what make an empty result readable. `streams` of zero means nothing matched the module's container at all; `streams` above zero with `total` of zero means the stream exists and had no rows in the window you asked for. Check both before concluding that a line you are looking for was never written — widen the window or fix the module identifier instead.
 
+Two refusals here belong to the read and not to the module. A bound that is not a date, or a start later than the end, answers `400` naming the field, and nothing is fetched. When the log store cannot be reached the answer is `502 Log storage is currently unavailable` — a statement about the store, carrying nothing about the module and nothing that narrowing the window will change. Report it and stop; a tight retry loop is the wrong response to either.
+
 ## Common mistakes
 
 - **Creating a module.** Identifiers are not unique; you get a shadow.
