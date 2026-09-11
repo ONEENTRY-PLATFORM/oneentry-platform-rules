@@ -49,7 +49,9 @@ Two answers look alike and mean different things:
 - `value: null` beside a real `attributeType` — the attribute is in the set and holds nothing for that locale.
 - `value: null` beside `attributeType: null` — the record carries **no attribute set at all**. Nothing is missing and nothing is wrong.
 
-A marker the record's set does not carry answers `404`, and so does an id no record has. The value comes back in the shape its type uses, not flattened to a string: a date, a list entry and an image are objects here.
+A marker the record's set does not carry answers `404`, and so does an id no record has. That `404` is the only thing protecting you from a typo in the marker, and it is absent in the second case above: on a record with no set, *every* marker answers `200` with both fields `null`, invented ones included. Do not read one of those as "this attribute is empty".
+
+The value comes back in the shape its type uses, not flattened to a string: a number stays a number, and a date, a list entry and an image are objects here.
 
 The route declares no permission in the catalog, so an authenticated admin reaches it and the local pre-check has nothing to compare.
 
