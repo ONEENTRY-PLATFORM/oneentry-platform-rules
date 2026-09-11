@@ -18,9 +18,9 @@ A batch write that reports success can still have missed one object: the respons
 
 After a batch, **re-read every entity you touched** and compare the field you set. Retry only the ones that do not match. A sample check scales the wrong way: one miss in a hundred is a handful of empty fields in a catalogue of thousands, and the customer finds them.
 
-On products, an empty `attributeValues` on that re-read does not yet mean the write was lost — attribute values publish behind the write, and under a bulk run the lag is minutes. Close the step by re-reading the ones whose `isSync` is `false`, bounded by a number of attempts, instead of rewriting everything that came back empty. Rewriting is the expensive answer to a wait.
+Do that re-reading on the **admin** side, by id. Attribute values publish behind the write, and under a bulk run that lag is minutes: on the public side a product written seconds ago can come back with an empty `attributeValues`, or be missing from the listing and answer `404` by id, while the admin read already holds every value. Close the step by re-reading the records whose `isSync` is still `false`, bounded by a number of attempts — never by rewriting everything the public side did not show you. Rewriting is the expensive answer to a wait, and on a create it leaves a duplicate.
 
-→ `mcp/docs/api/silent-no-ops` · `mcp/docs/api/index-attributes#what-issync-tells-you-about-an-empty-attributevalues`
+→ `mcp/docs/api/silent-no-ops` · `mcp/docs/api/index-attributes#what-issync-tells-you-and-what-attributevalues-does-not`
 
 ## Read many entities in one call
 
