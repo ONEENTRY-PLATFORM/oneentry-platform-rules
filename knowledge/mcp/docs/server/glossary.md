@@ -60,6 +60,8 @@ Entries are alphabetical within each group.
 
 **identifier** — a stable string name on templates, menus, order statuses, modules and groups. Interchangeable in practice with *marker*, which is the word used on blocks, forms and general types.
 
+**isSync** — a read-only boolean on product reads saying whether the indexed values for the requested locale are current. `false` beside an empty `attributeValues` means "not published yet", not "no values".
+
 **langCode / locale code** — a code such as `en_US`. Read the active ones from the instance; never hardcode.
 
 **lexorank** — the string ordering scheme used by parent-scoped position fields. Sorts as text; never sort it numerically or patch it directly.
