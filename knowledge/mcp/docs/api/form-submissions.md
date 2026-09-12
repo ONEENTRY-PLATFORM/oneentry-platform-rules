@@ -100,7 +100,9 @@ A `parentId` that is not an integer answers `400`. A status outside the list ans
 
 An ISO timestamp is how this usually goes wrong: the `T` is refused with or without a zone, so replace it with a space. An unpadded `2026-9-1`, and a date that cannot exist like `2026-13-45`, are refused the same way — a `400` here is about the value, not the key.
 
-A bound with no time of day covers that whole day: a `dateTo` of `2026-08-31` keeps a submission made at `23:40`, so `23:59:59` adds nothing.
+A bound with no time of day covers that whole day: a `dateTo` of `2026-08-31` keeps a submission made at `23:40`.
+
+A bound that carries a time of day is applied at that instant, so it narrows the range inside the day: `{"dateFrom": "2026-08-31 09:00:00"}` keeps only what was submitted from 09:00 onward, and a `dateTo` of `2026-08-31 09:00:00` drops everything submitted later that day. Both bounds include the instant itself.
 
 To leave a bound open, omit the key or send an empty string — both mean no bound on that side, so an unfilled filter field can go as it is.
 
