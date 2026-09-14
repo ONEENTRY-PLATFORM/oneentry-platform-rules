@@ -108,6 +108,14 @@ Like every attribute value, it lives two levels deep, under a locale key and the
 
 → `mcp/docs/api/attribute-sets#two-levels-always`
 
+## A file belongs to the record it was uploaded under
+
+The `type`, `entity` and `id` an upload takes decide where the file is kept, and `id` is what ties it to a record. Deleting that record removes the files uploaded under it, whatever else points at them.
+
+So do not serve one stored file to two records by copying the attribute value from one into the other. The second record keeps a download link that answers `404` from the moment the first is deleted, while reading it still shows the value filled and the panel still shows the file. Upload the file a second time and reference the new record instead.
+
+A file uploaded under a different record — a page, say — is left alone when a product that references it is deleted. It is left alone when nothing references it any more, too: only the delete-file call removes it.
+
 ## One file is an object two are a list
 
 The value shape follows the **number of files**, not the entity kind:
