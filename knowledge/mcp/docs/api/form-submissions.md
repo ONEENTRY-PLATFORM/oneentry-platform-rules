@@ -102,7 +102,7 @@ An ISO timestamp is how this usually goes wrong: the `T` is refused with or with
 
 A bound with no time of day covers that whole day: a `dateTo` of `2026-08-31` keeps a submission made at `23:40`.
 
-A bound that carries a time of day is applied at that instant, so it narrows the range inside the day: `{"dateFrom": "2026-08-31 09:00:00"}` keeps only what was submitted from 09:00 onward, and a `dateTo` of `2026-08-31 09:00:00` drops everything submitted later that day. Both bounds include the instant itself.
+A bound that carries a time of day narrows the range inside the day: `{"dateFrom": "2026-08-31 09:00:00"}` keeps only what was submitted from 09:00 onward, and a `dateTo` of `2026-08-31 09:00:00` drops everything submitted later that day. Both bounds are inclusive, and a time of day is written to the whole second — so the second named in the bound counts in full on either side. A `dateTo` of `2026-08-31 23:59:59`, the usual way to write "end of the day", therefore keeps a submission recorded a fraction of a second later, within that same second.
 
 To leave a bound open, omit the key or send an empty string — both mean no bound on that side, so an unfilled filter field can go as it is.
 
