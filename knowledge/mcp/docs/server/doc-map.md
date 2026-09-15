@@ -93,6 +93,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/filters` | Narrowing a listing, or configuring facets |
 | `mcp/docs/api/index-attributes` | A filter finds nothing, or a new value is missing from a list |
 | `mcp/docs/api/global-search` | Locating an entity by a word a human used, or building a site search on the public one |
+| `mcp/docs/api/file-content-search` | Finding a document by words written inside it, or a document search that returns nothing |
 
 ## Commerce
 
@@ -140,6 +141,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why can I not list the submissions of a form | `mcp/docs/api/form-submissions#both-read-routes-need-the-forms-data-read-permission` |
 | Why did an operation that worked start answering 403 | `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it` |
 | Why is my upload or file delete refused with 403 | `mcp/docs/api/files-and-uploads#admin-uploads-and-deletes-need-file-permissions` |
+| Why is the document search refused with 403 | `mcp/docs/api/file-content-search#two-permissions-nobody-holds-yet` |
 | Why was my admin permission write refused with 400 | `mcp/docs/api/admins-and-permissions#an-unrecognised-permission-key-is-refused-with-400` |
 | Which permission values are not booleans | `mcp/docs/api/admins-and-permissions#a-recognised-key-with-the-wrong-value-is-a-different-400` |
 | Why does creating an admin answer 405 | `mcp/docs/api/admins-and-permissions#creating-an-admin-can-answer-405` |
@@ -174,6 +176,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does the site search return only five results | `mcp/docs/api/global-search#results-come-back-grouped-in-fives` |
 | Why is limit refused on the search | `mcp/docs/api/global-search#paging-one-kind-needs-limit-and-exactly-one-type` |
 | Why does the search never find my documents | `mcp/docs/api/global-search#what-global-search-never-finds` |
+| How do I search inside an attached document | `mcp/docs/api/file-content-search#a-result-is-a-whole-file-and-not-a-fragment` |
+| Why does my document search return an empty list | `mcp/docs/api/file-content-search#an-empty-result-that-has-a-reason-says-so` |
 | Where is the public search by meaning | `mcp/docs/api/global-search#semantic-search-over-one-kind-of-entity` |
 
 ## Answers about attributes and values
@@ -209,6 +213,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why do my uploaded images have no preview | `mcp/docs/api/files-and-uploads#no-preview-template-no-preview-and-no-error` |
 | How do I upload a file through this server | `mcp/docs/server/cms-upload-file` |
 | Where does alt text for an image live | `mcp/docs/api/files-and-uploads#a-file-record-has-nowhere-to-keep-alt-text` |
+| Why is a document I attached not searchable | `mcp/docs/api/file-content-search#why-a-document-you-attached-is-not-found` |
 | Why do old images still show the old thumbnail size | `mcp/docs/api/templates-and-previews#changing-a-preview-template-does-not-re-crop-old-images` |
 | I regenerated previews and one image is unchanged | `mcp/docs/api/templates-and-previews#one-unchanged-preview-does-not-mean-it-failed` |
 
