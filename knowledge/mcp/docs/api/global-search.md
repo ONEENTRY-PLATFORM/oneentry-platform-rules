@@ -55,6 +55,8 @@ Inside that mode an empty group is kept rather than dropped, so the shape of the
 
 The public address searches four kinds only — **products, pages, blocks and discounts** — and only records that are visible. A kind outside that set is dropped silently rather than refused, so asking for one and nothing else returns an empty answer, or the drilldown `400` above when `limit` is set.
 
+Results follow the caller's read rights. When the reading group cannot read `/api/content/blocks`, the blocks group is left out, whatever `visibility` says; include or exclude lists on that record narrow the blocks returned. The search record's own `additionalData`, keyed by kind, filters markers too — `{"blocks": {"identifiers": [...], "isExclude": true, "isInclude": false}}`. With `isExclude` the listed markers are removed; with `isInclude` only the listed markers are kept; an entry with neither flag set does not filter.
+
 Its permission record must be linked to the reading group. It is provisioned linked to the guest group, so a site usually has it, but an instance that predates the route may not.
 
 → `mcp/docs/api/content-api-permission-rules#the-five-rules-and-what-each-one-opens`
