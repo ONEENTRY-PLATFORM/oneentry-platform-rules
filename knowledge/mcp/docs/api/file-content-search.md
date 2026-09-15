@@ -110,10 +110,21 @@ Check its entry in `GET /files/content-index` before concluding the search is at
 - `done` — searchable. With `truncated: true` only the first part of a long document is.
 - `unsupported` — the format is not enabled for this instance.
 - `no_extractor` — this instance has no reader for that format.
-- `too_large`, `encrypted`, `no_text_layer`, `type_mismatch`, `archive_rejected` — properties of the document itself. Retrying changes nothing; these are answers.
+- `too_large`, `encrypted`, `corrupt`, `type_mismatch`, `archive_rejected` — properties of the document itself. Retrying changes nothing; these are answers.
+- `no_text_layer` — pages, but no text in them: a scan. Retrying changes nothing, recognition can.
 - `failed` — worth one rebuild.
 
 A `tsConfig` of `simple` means the document's language has no word-form matching here: only the exact word will match, not its other forms.
+
+`lowConfidence: true` on an entry means the text was obtained but came out questionable — garbled encoding, run-together words. The document is searchable and ranks below clean ones. Say so when you offer it; do not quote it as if it read cleanly.
+
+## Making a scan readable one document at a time
+
+A document sitting at `no_text_layer` is almost always a scan: it has pages and no text in them. `AdminFileContentController_patch` takes `ocrRequested: true` for a single index entry and queues that one document for character recognition.
+
+One document at a time is the point. Recognition costs on the order of a second per page, so turning it on for a whole corpus is days of work, while one document a human actually needs is seconds. Read `capability.ocrAvailable` first — where recognition is unavailable the call answers `400` rather than accepting work it cannot do.
+
+Recognition is much slower than ordinary reading and runs apart from it, so the rest of the corpus keeps processing meanwhile. Re-read the entry to see the outcome instead of sending the call again.
 
 ## Attaching a document does not index it instantly
 
@@ -123,7 +134,7 @@ Clearing the attribute value removes the reference, and a file nothing reference
 
 ## Fixing a wrong language without reprocessing
 
-`AdminFileContentController_patch` takes `langCode` and `isExcluded` for one index entry.
+`AdminFileContentController_patch` takes `langCode`, `isExcluded` and `ocrRequested` for one index entry.
 
 Changing `langCode` sets `langSource` to `manual` and rebuilds the matching data from the text already held — the document is not read again, and a later reprocessing will not overwrite the correction. Use it when a detected language is wrong, which happens most on short documents and on documents mixing two languages.
 
@@ -139,13 +150,18 @@ Both need `files.contentIndex.manage`. If `language.allowManualOverride` is off,
 {
   "capability": { "tariffAllows": true, "extractorAvailable": true, "ocrAvailable": true, "embeddingAvailable": false },
   "processing": { "enabled": true, "queuePaused": false, "pending": 0 },
-  "coverage": { "files": 2, "done": 1, "failed": 0, "truncated": 0, "noExtractor": 0, "unsupported": 1, "excluded": 0 },
-  "storage": { "indexBytes": 311296, "budgetBytes": 536870912 },
+  "coverage": { "files": 2, "done": 1, "failed": 0, "truncated": 0, "lowConfidence": 0, "noExtractor": 0, "unsupported": 1, "corrupt": 0, "excluded": 0 },
+  "storage": { "indexBytes": 311296, "budgetBytes": 536870912, "overBudget": false },
   "languages": [{ "code": "en", "tsConfig": "english", "files": 1 }]
 }
 ```
 
 `tariffAllows` and `extractorAvailable` are separate on purpose and must be reported separately to a human: not on your plan and no reader available on this instance need different answers. `languages` is what the documents here are actually written in — use it to offer a language choice that cannot be empty.
+
+Two fields here explain a corpus that has quietly stopped growing while nothing reports an error:
+
+- `storage.overBudget: true` — the index has filled the space allowed it. New documents are no longer accepted and stay at `pending`; everything already indexed stays searchable and nothing is deleted. No amount of reprocessing moves a document out of this. Space has to be freed, or the allowance raised.
+- `processing.queuePaused: true` — processing is held on the instance itself. This is **not** the tenant's `enabled` setting and toggling that setting will not release it. Report it and stop; turning `enabled` off and on again only changes the tenant's own switch.
 
 ## Reprocessing a slice of the corpus
 
@@ -166,7 +182,9 @@ The answer is an acceptance, not a result. Read coverage again later rather than
 - **Rendering `snippet.text` as markup.** It is document text with control-character marks.
 - **Hiding `queryLanguage`.** A silent language choice is how a working search gets called broken.
 - **Reading an empty list without reading `warnings`.**
-- **Retrying an encrypted or unsupported document.** The status is the answer.
+- **Retrying an encrypted, corrupt or unsupported document.** The status is the answer.
+- **Rebuilding to clear `overBudget`.** Nothing reprocesses out of a full index.
+- **Turning recognition on for the whole instance** to read one scan. Ask for the one entry.
 - **Treating `truncated` as success.** Only the first part of a long document matches.
 - **Re-attaching a file that has not appeared yet.** That is a second reference, not a retry.
 - **Paging past `offset + limit` of 200.** Narrow the query instead.
