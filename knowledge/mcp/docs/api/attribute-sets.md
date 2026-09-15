@@ -93,6 +93,7 @@ Before you do either:
 - Check whether a suitable set already exists. Entities of one kind usually share one set, and a second set fragments the content model in a way that is awkward to undo.
 - Choose the attribute type from the closed list; there is no way to add a type.
 - Pick a marker that reads well in the admin panel — humans see it.
+- Give every attribute an `identifier`. It is the marker, and nothing enforces it: a definition without one is accepted, and the attribute is then unreachable — its values are stored but never come back in `attributeValues`.
 
 Dry run first, and read the set back to confirm the attribute's id before writing any values against it.
 
