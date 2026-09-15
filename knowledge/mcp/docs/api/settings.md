@@ -61,6 +61,10 @@ Read them to confirm whether a mechanism is configured. Leave changes to an oper
 
 Settings are the area where a well-meaning "tidy up" does the most damage, because a single record affects everything and nothing points at it to warn you.
 
+General settings also carry a `fileContentSearch` section, which decides whether documents attached to records are searchable by their contents. It is off until someone turns it on.
+
+→ `mcp/docs/api/file-content-search#nothing-is-indexed-until-someone-turns-it-on`
+
 ## Common mistakes
 
 - **Creating a settings record.** Silently duplicates.
