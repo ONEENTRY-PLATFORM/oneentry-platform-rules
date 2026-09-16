@@ -94,7 +94,11 @@ The fingerprint in `x-device-metadata` is the identity of the *device*, and thre
 - Signing in with a **different** fingerprint adds a session beside the first. `sessions` lists them, one entry per device.
 - `refresh` must carry the fingerprint the refresh token was issued to.
 
-Closing a session ends its access token **immediately**, before the token's own expiry — a read with it answers `401`. So sign-out is real server-side state, not a client discarding a cookie.
+Closing a session ends its access token **immediately**, before the token's own expiry. So sign-out is real server-side state, not a client discarding a cookie.
+
+What a read with such a token answers depends on the route. One that requires a signed-in visitor answers `401`. One open to anyone answers normally — but treats the caller as **anonymous**, applying the guest group's rules and returning exactly what a caller holding no token at all would see. A `200` after sign-out is therefore not evidence that the visitor is still signed in; compare the body against an anonymous call before concluding anything from the status alone.
+
+The same applies to every bearer the instance cannot tie to a live session: one whose signature does not check out, one carrying a payload assembled by hand, and one left over from an earlier sign-in on the same device after a later sign-in replaced that session. None of them carries the group membership of the visitor named inside it — group-restricted content answers to a live session or not at all.
 
 ## Signing in with a one-time code instead of a password
 
