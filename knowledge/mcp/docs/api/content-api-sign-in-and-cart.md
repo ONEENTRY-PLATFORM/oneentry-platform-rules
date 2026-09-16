@@ -47,6 +47,18 @@ A registration therefore needs no more than the locale and the credentials. Omit
   "authData": [ { "marker": "email", "value": "visitor@your-instance.example" } ] }
 ```
 
+## An email login is unique regardless of case
+
+Under an email sign-in provider one mailbox is one account however the address is spelled. `sign-up` answers `400` saying the login already exists when the address differs only in case from one already registered — `ANN@your-instance.example` after `ann@your-instance.example`. The same rule holds on the account page a visitor changes their own address from, and in the admin panel. Under a phone provider the match is exact.
+
+Signing in is not case-tolerant in the same way. The address is stored exactly as it was sent, and `auth`, the one-time-code routes and the password change all match it character for character. A visitor registered as `Ann@your-instance.example` must send that spelling: `ann@your-instance.example` is refused as though no such account existed.
+
+So the two rules only agree if the site picks one spelling. Lowercase the address in your own form before you send it — to `sign-up`, to `auth` and to the code routes alike — and neither the duplicate refusal nor the failed sign-in can happen.
+
+A visitor may respell their own address in a different case on the account page: their own account never counts as taken. Sign-in then expects the new spelling.
+
+→ `mcp/docs/api/users-and-groups#the-islogin-field-is-what-a-user-signs-in-with`
+
 ## Changing the address a visitor signs in with
 
 The profile update takes the sign-in field — the one flagged isLogin — like any other field of the form, and writing it moves the credential: from then on the visitor signs in with the new value and the old one stops working. Send it in `formData` under its own marker, exactly as you would any other field.

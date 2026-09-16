@@ -103,6 +103,10 @@ A real change answers `400` and writes nothing when:
 
 Nothing is written on refusal — neither the profile nor group membership changes, even when the same call also sends `groupIds`. Retry with a corrected value rather than splitting the call in two.
 
+Under an email sign-in provider, taken ignores case: an address already on another account blocks every spelling of itself, so `ANN@your-instance.example` is refused while `ann@your-instance.example` exists elsewhere. Under a phone provider the match is exact. The user's own account never counts as taken, so respelling their address in a different case is a change like any other and succeeds. The same rule governs registration and the account page a visitor uses.
+
+→ `mcp/docs/api/content-api-sign-in-and-cart#an-email-login-is-unique-regardless-of-case`
+
 The value is stored exactly as sent. Alone among the form's fields it is not escaped, so `&` and `<` survive and the person signs in with the characters you wrote.
 
 ## Create a group
