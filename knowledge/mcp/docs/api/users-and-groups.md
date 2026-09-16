@@ -34,6 +34,20 @@ So the workflow when a route is refused is:
 
 A permission path is unique per group, so creating one that exists fails — and a create is never the right move here anyway.
 
+## A group can skip every permission check
+
+A group carries `skipPermissions`. While it is `true`, members of that group reach Content API routes without the per-route check: a path that no permission record links to the group still answers `200`, and detaching the record changes nothing. Set on the `guest` group, it opens those routes to anyone holding the application token.
+
+`AdminUserGroupsController_update` — `PUT /api/admin/user-groups/{id}` — sets it, and `AdminUserGroupsController_findOne` returns it:
+
+```json
+{ "skipPermissions": false }
+```
+
+Read the field before concluding that a permission record is wrong: a route that answers `200` with nothing linked to the group is this field, and no edit to the record will close it.
+
+Both directions reach the Content API at once — no flush and no wait.
+
 ## Read limits are a rule not a missing permission
 
 A site showing the same small number of items for every listing is hitting a read restriction on the group, not running out of content — and that restriction is how every content route is provisioned. Check it before investigating anything else; lifting it is a rules change on the existing record, never a new one.
@@ -50,6 +64,7 @@ A site showing the same small number of items for every listing is hitting a rea
 | Works signed in, fails signed out | The rule is on the signed-in group, not on `guest` |
 | Works for one language only | Not permissions — content exists in one locale |
 | A listing read with `POST` is refused | The **add** rule opens it, not a read rule |
+| A route answers `200` with nothing linked to the group | The group carries `skipPermissions` |
 
 The refusal names the rule and the record to fix — `requires the "addRule" rule to be enabled on the permission (permissionId: 36) linked to the user group`. Which flag opens which method is in `mcp/docs/api/content-api-permission-rules#the-five-rules-and-what-each-one-opens`.
 
