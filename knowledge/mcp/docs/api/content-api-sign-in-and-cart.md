@@ -49,9 +49,9 @@ A registration therefore needs no more than the locale and the credentials. Omit
 
 ## An email login is unique regardless of case
 
-Under an email sign-in provider one mailbox is one account however the address is spelled. `sign-up` answers `400` saying the login already exists when the address differs only in case from one already registered — `ANN@your-instance.example` after `ann@your-instance.example`. The same rule holds on the account page a visitor changes their own address from, and in the admin panel. Under a phone provider the match is exact.
+Under an email sign-in provider one mailbox is one account however the address is spelled. `sign-up` answers `400` saying the login already exists when the address differs only in case from one already registered — `ANN@your-instance.example` after `ann@your-instance.example`. The same rule holds on the account page a visitor changes their own address from, and on the Admin API calls that register a user or edit their card. It is the ordinary taken refusal, so it fires on a login held by a removed user or by a user of a different provider just as readily. Under a phone provider the comparison is exact.
 
-Signing in is not case-tolerant in the same way. The address is stored exactly as it was sent, and `auth`, the one-time-code routes and the password change all match it character for character. A visitor registered as `Ann@your-instance.example` must send that spelling: `ann@your-instance.example` is refused as though no such account existed.
+Signing in is not case-tolerant in the same way. The address is stored exactly as it was sent, and `auth`, the one-time-code routes and the password change all match it character for character. A visitor registered as `Ann@your-instance.example` must send that spelling: `auth` answers `401 User with provided login not found`, and the code routes answer `400 User not found`, as though no such account existed.
 
 So the two rules only agree if the site picks one spelling. Lowercase the address in your own form before you send it — to `sign-up`, to `auth` and to the code routes alike — and neither the duplicate refusal nor the failed sign-in can happen.
 
