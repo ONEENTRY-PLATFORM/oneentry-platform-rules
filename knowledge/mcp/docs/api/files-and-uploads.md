@@ -32,6 +32,8 @@ A storefront does not need an admin session to attach a file. There is a public 
 
 `type`, `entity` and `id` are **folder names and nothing else**. No entity is checked to exist: nonsense values are accepted and simply produce a path nobody will look under. They are for tidiness, not for binding a file to anything.
 
+A folder name is a *name*, though. Each of the three must be one segment: a value containing `/` or `\`, or equal to `..` or `.`, is answered `400`, and the response names which of the three is at fault. This holds on upload, delete and download alike, and on both the admin and the public route. Send the values you mean — there is nothing to be gained by assembling a path inside them, and a download that answers `400` rather than `404` is telling you the parameters are malformed, not that the file is missing.
+
 Two consequences worth saying out loud when advising on this:
 
 - Anyone holding the site's public token can store a file on the instance, because the permission that governs the route is granted to the guest group by default. Storage quota is the exposed resource.
@@ -210,6 +212,7 @@ Do not assume a link you obtained on one instance works on another, and do not c
 - **Treating a stripped value as data loss.** The metadata is all there.
 - **Expecting the instance to refuse a file type.** It refuses none; the attribute's validators are the project's rule.
 - **Reading a `403` on upload or delete as a problem with the file.** The admin routes need `files.create` and `files.delete`.
+- **Assembling a path inside `type`, `id` or `entity`.** Each is a single folder name; a separator or `..` is a `400`.
 - **Deleting a file without finding its references.** Silent missing images.
 - **Copying a file reference between instances.** Upload again instead.
 - **Expecting an `alt` field on the upload record.** Put `alt` and `title` on the attribute slot instead.
