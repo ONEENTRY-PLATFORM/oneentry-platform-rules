@@ -40,7 +40,7 @@ An event created with no `moduleId` at all is a template — see the notificatio
     "push": "{{ product.title }} is now available" } } }
 ```
 
-`subject` is the mail subject, `template` the mail body, `push` the push body. A `mailing` field exists on the operation and belongs to the mailing module — a subject written there is stored and never used.
+`subject` is the mail subject, `template` the mail body, `push` the push body. A `mailing` field exists on the operation and carries the recurrence of a repeating mailing, nothing a human reads — a subject written there is stored and never used.
 
 ## Which channels an event sends on
 
@@ -63,6 +63,26 @@ Two more fields decide delivery, and neither has a safe default to leave alone:
 - **`typeSchedule`** — `once` or `every_time`. On an event a subscriber sets a threshold against — "tell me when this price drops below" — `once` notifies them on the change that **crosses** it, and a further move in the same direction sends nothing. `every_time` sends on every change that leaves the value past the threshold.
 
 So an event that fired exactly once and then went quiet is usually `once` behaving correctly, not a trigger that stopped. Check the field before investigating the condition.
+
+## When a recurring mailing runs
+
+A mailing that repeats on a clock rather than on a trigger is configured by the `mailing` object on the create and update bodies — there is no separate operation for it. `period` and `origin` decide the recurrence, `conditions` decides which recipients each run selects.
+
+`origin` is a timestamp, and it is **not** a start date. The mailing keeps the clock time of `origin` and repeats at the cadence `period` names; for the longer cadences it keeps the weekday, the day of month or the month as well. An `origin` in the past is ordinary and stops nothing.
+
+With `origin` on a Wednesday at `06:20`:
+
+| `period` | next run |
+|---|---|
+| `every_day` | the same day, `06:20` |
+| `every_week` | the next Wednesday, `06:20` |
+| `every_month` | the same day of the next month, `06:20` |
+| `every_year` | the same day and month next year, `06:20` |
+| `every_ndays` with `ndays: 3` | every third day, counted from that day of the month |
+
+The recurrence begins as soon as the create answers `201`; nothing else has to be called to arm it. An update **replaces** it: send the whole `mailing` object with the new `origin` and the previous recurrence is dropped rather than kept alongside. An update that leaves `mailing` out keeps the recurrence already running, so renaming an event does not disturb its schedule.
+
+Read the mail log to confirm what a recurrence actually did — a run that selected nobody leaves entries saying so.
 
 ## The name of an event is title not name
 
