@@ -97,13 +97,13 @@ A value counts as a change only when it differs from what the profile already ho
 A real change answers `400` and writes nothing when:
 
 - the value is blank;
-- it is already taken by another user, **including removed ones**;
+- it is already taken by another user, **including removed ones and users of a different sign-in provider**;
 - the body carries the marker under several locales with different values;
 - the account came from a social network, where the credential belongs to the network.
 
 Nothing is written on refusal — neither the profile nor group membership changes, even when the same call also sends `groupIds`. Retry with a corrected value rather than splitting the call in two.
 
-Under an email sign-in provider, taken ignores case: an address already on another account blocks every spelling of itself, so `ANN@your-instance.example` is refused while `ann@your-instance.example` exists elsewhere. Under a phone provider the match is exact. The user's own account never counts as taken, so respelling their address in a different case is a change like any other and succeeds. The same rule governs registration and the account page a visitor uses.
+Under an email sign-in provider, taken ignores case: an address already on another account blocks every spelling of itself, so `ANN@your-instance.example` is refused while `ann@your-instance.example` exists elsewhere. The provider you are writing under decides that, not the provider of the account already holding the value — under a phone provider the comparison is exact, and a case variant of an address an email account holds is accepted there as a new login. The user's own account never counts as taken, so respelling their address in a different case is a change like any other and succeeds. The same rule governs registration and the account page a visitor uses.
 
 → `mcp/docs/api/content-api-sign-in-and-cart#an-email-login-is-unique-regardless-of-case`
 
