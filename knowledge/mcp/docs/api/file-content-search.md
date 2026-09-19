@@ -35,6 +35,8 @@ Turning it **off** later does not delete anything. Existing documents stay searc
 
 Both are **new keys that no admin holds until someone grants them**, including the first admin of the instance. A `403` here is almost always that, not a misconfigured feature.
 
+`AdminFileContentController_getStatus` needs **neither** key and answers for any admin. Call it first: it tells you whether this instance can search file content at all, so a `403` from the search or the listings means the grant is missing rather than the feature being unavailable here. Report those two as different things — one is a grant a human can make, the other is not.
+
 They are deliberately separate from `files.create` and `files.delete`: being allowed to upload a file is not being allowed to read the text of every document on the instance. Granting the upload permissions does nothing for this search.
 
 → `mcp/docs/api/admins-and-permissions#asking-for-a-grant`
