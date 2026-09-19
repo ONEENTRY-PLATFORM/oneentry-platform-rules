@@ -160,8 +160,10 @@ A configured event tells you nothing about what it sent. `GET /events/{id}/email
 
 - `sent` — the platform accepted the message for sending. It is **not** a delivery receipt, so do not report a mail as received on the strength of it.
 - `failed` — sending was attempted and did not work; `error` says what happened.
-- `skipped` — it was deliberately not attempted, and the entry says why.
+- `skipped` — it was deliberately not attempted, and `error` says why.
 
-An event that asked for mail and resolved nobody now leaves a `skipped` row saying so, so **no entries at all** after a trigger you believe fired means the trigger did not reach the event — a question about its module and its condition, not about the message. Re-saving `subject` and `template` changes nothing either way.
+`skipped` with `error: no-email-body` means the message had no body: `localizeInfos.<locale>.template` is empty. A `subject` alone does not count. Fill `template` and the next trigger sends; rows already skipped stay skipped.
+
+An event that asked for mail and resolved nobody also leaves a `skipped` row, so **no entries at all** after a trigger you believe fired means the trigger did not reach the event — a question about its module and its condition, not about the message.
 
 → `mcp/docs/api/verification-recipes` · `mcp/docs/api/subscriptions`
