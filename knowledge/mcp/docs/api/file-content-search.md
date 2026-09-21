@@ -126,6 +126,8 @@ A document sitting at `no_text_layer` is almost always a scan: it has pages and 
 
 One document at a time is the point. Recognition costs on the order of a second per page, so turning it on for a whole corpus is days of work, while one document a human actually needs is seconds. Read `capability.ocrAvailable` first — where recognition is unavailable the call answers `400` rather than accepting work it cannot do.
 
+`capability.ocrAvailable` only says recognition runs here. Check `capability.ocrLanguages` as well: it lists the language codes this instance can recognise, and a document written in a language outside that list comes back as text that reads as nonsense rather than as a failure. Such an entry is usually marked `lowConfidence: true` and is worse than no text at all, because it is searchable and wrong. Where the language is not covered, say so instead of queueing the document.
+
 Recognition is much slower than ordinary reading and runs apart from it, so the rest of the corpus keeps processing meanwhile. Re-read the entry to see the outcome instead of sending the call again.
 
 ## Attaching a document does not index it instantly
@@ -150,7 +152,7 @@ Both need `files.contentIndex.manage`. If `language.allowManualOverride` is off,
 
 ```jsonc
 {
-  "capability": { "tariffAllows": true, "extractorAvailable": true, "ocrAvailable": true, "embeddingAvailable": false },
+  "capability": { "tariffAllows": true, "extractorAvailable": true, "ocrAvailable": true, "ocrLanguages": ["en", "ru"], "embeddingAvailable": false },
   "processing": { "enabled": true, "queuePaused": false, "pending": 0 },
   "coverage": { "files": 2, "done": 1, "failed": 0, "truncated": 0, "lowConfidence": 0, "noExtractor": 0, "unsupported": 1, "corrupt": 0, "excluded": 0 },
   "storage": { "indexBytes": 311296, "budgetBytes": 536870912, "overBudget": false },
@@ -159,6 +161,8 @@ Both need `files.contentIndex.manage`. If `language.allowManualOverride` is off,
 ```
 
 `tariffAllows` and `extractorAvailable` are separate on purpose and must be reported separately to a human: not on your plan and no reader available on this instance need different answers. `languages` is what the documents here are actually written in — use it to offer a language choice that cannot be empty.
+
+`ocrLanguages` is the separate answer for character recognition: the language codes this instance can recognise in a scan. It is not the same list as `languages`, which is what the already-indexed documents are written in, and it is not implied by `ocrAvailable`. A locale the instance serves may still be absent from it.
 
 Two fields here explain a corpus that has quietly stopped growing while nothing reports an error:
 
