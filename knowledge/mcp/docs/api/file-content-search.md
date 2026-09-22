@@ -19,7 +19,7 @@ Enable it in general settings, under a `fileContentSearch` section. Send the sec
     "enabled": true,
     "formats": ["txt", "md", "html", "pdf", "docx", "odt", "epub", "rtf"],
     "maxCharsPerFile": 500000,
-    "ownerTables": ["products", "pages", "blocks", "slides", "templates", "discounts"],
+    "ownerTables": ["products", "pages", "blocks", "slides", "templates", "discounts", "forms", "events"],
     "ocr": { "enabled": false, "maxPages": 50 },
     "language": { "mode": "auto", "fixed": "english", "allowManualOverride": true },
     "search": { "queryLanguageMode": "auto", "enableInfixStage": true }
@@ -28,6 +28,20 @@ Enable it in general settings, under a `fileContentSearch` section. Send the sec
 ```
 
 Turning it **off** later does not delete anything. Existing documents stay searchable; only new work stops.
+
+## Which sections can have their files searched
+
+`ownerTables` decides which sections are read. It accepts every section whose records carry an attribute set, because that is where a file attribute can live:
+
+`products`, `pages`, `blocks`, `slides`, `templates`, `discounts`, `forms`, `events`, `user_groups`, `users`, `admins`
+
+The first eight are on by default. `users`, `user_groups` and `admins` are **accepted but off**, and stay off through an upgrade: the documents there belong to customers and staff, and reading them into a search index is a decision somebody makes rather than something an upgrade does. Add them only when a human asked for exactly that, and say what it means first — every admin holding `files.contentSearch` and that section can then read the text of those documents.
+
+Files attached to form submissions and to orders are **not** searchable and cannot be enabled. They are not held as attribute values, so no reader ever reaches them. Offer a different route for those rather than an `ownerTables` entry that will be rejected.
+
+A section left out of `ownerTables` is not read at all: no index entry appears for its files, so an absent entry is the expected answer rather than a sign that processing failed. Turning the section on and then saving the record again is what creates the entry.
+
+Each section is also filtered per admin: a result names its owner record, and both the result and that name are limited to the sections the admin can reach. Two admins can get different result counts for the same query, and neither is wrong.
 
 ## Two permissions nobody holds yet
 
@@ -106,6 +120,8 @@ Pass `langCode` when the human tells you the language. An unknown value is refus
 
 ## Why a document you attached is not found
 
+First check that the document has an entry at all. **No entry** means no reader ever looked at the file, and the usual cause is the owner section being absent from `ownerTables` — see the section above. An entry that exists tells a different story.
+
 Check its entry in `GET /files/content-index` before concluding the search is at fault. Each entry carries a `status`, and several of them mean the text was never obtained:
 
 - `pending` — not processed yet, or the format is not enabled in settings.
@@ -152,7 +168,7 @@ Both need `files.contentIndex.manage`. If `language.allowManualOverride` is off,
 
 ```jsonc
 {
-  "capability": { "tariffAllows": true, "extractorAvailable": true, "ocrAvailable": true, "ocrLanguages": ["en", "ru"], "embeddingAvailable": false },
+  "capability": { "tariffAllows": true, "extractorAvailable": true, "extractorReason": "ok", "ocrAvailable": true, "ocrLanguages": ["en", "ru"], "embeddingAvailable": false },
   "processing": { "enabled": true, "queuePaused": false, "pending": 0 },
   "coverage": { "files": 2, "done": 1, "failed": 0, "truncated": 0, "lowConfidence": 0, "noExtractor": 0, "unsupported": 1, "corrupt": 0, "excluded": 0 },
   "storage": { "indexBytes": 311296, "budgetBytes": 536870912, "overBudget": false },
@@ -160,7 +176,16 @@ Both need `files.contentIndex.manage`. If `language.allowManualOverride` is off,
 }
 ```
 
-`tariffAllows` and `extractorAvailable` are separate on purpose and must be reported separately to a human: not on your plan and no reader available on this instance need different answers. `languages` is what the documents here are actually written in — use it to offer a language choice that cannot be empty.
+`tariffAllows` and `extractorAvailable` are separate on purpose and must be reported separately to a human: not on your plan and no reader available on this instance need different answers.
+
+`extractorReason` says why reading is unavailable, and the three causes need three different answers — `extractorAvailable: false` alone sends every one of them to the same wrong place:
+
+- `ok` — reading works.
+- `not_configured` — this instance was never told where the reader is. A human with access to the instance configuration fixes it.
+- `unauthorized` — the reader answered and refused the call. A shared credential does not match on the two sides; also configuration, but a different field.
+- `unreachable` — nothing answered, or the reader failed. Operational, and nothing a tenant can do.
+
+Report the reason you were given rather than "unavailable". An unfamiliar value means a newer instance than you know about: say it verbatim instead of guessing. `languages` is what the documents here are actually written in — use it to offer a language choice that cannot be empty.
 
 `ocrLanguages` is the separate answer for character recognition: the language codes this instance can recognise in a scan. It is not the same list as `languages`, which is what the already-indexed documents are written in, and it is not implied by `ocrAvailable`. A locale the instance serves may still be absent from it.
 
