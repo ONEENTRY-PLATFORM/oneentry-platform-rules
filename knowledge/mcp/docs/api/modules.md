@@ -8,7 +8,7 @@ Eighteen are provisioned. Mutating them is permanently confirm-gated, and almost
 
 ## The modules you will find
 
-`settings`, `forms`, `catalog`, `content`, `admins`, `blocks`, `journal`, `menu`, `users`, `payments`, `events`, `orders`, `workflows`, `collections`, `discounts`, `import-data`, `subscriptions`, `filters`
+`settings`, `forms`, `catalog`, `content`, `admins`, `blocks`, `journal`, `menu`, `users`, `payments`, `events`, `orders`, `workflows`, `collections`, `discounts`, `import-data`, `subscriptions`, `filters`, `file-search`
 
 Read them rather than trusting the list:
 
