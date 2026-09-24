@@ -12,6 +12,10 @@ Document processing is **off on a new instance and stays off after an upgrade**.
 
 Enable it in general settings, under a `fileContentSearch` section. Send the section whole: a partial body replaces the keys you send and keeps the rest, so read before you write.
 
+Enabling it does **not** pick up files that were already attached before that moment. Coverage stays at zero, and the search stays empty, until something reprocesses them. After enabling, call `AdminFileContentController_rebuild` with `{ "scope": "missing" }` once. It finds the files already held in attribute values of the enabled owner sections and accepts them for processing. Files attached or changed later are picked up without it.
+
+On a large instance that one call accepts the whole existing corpus at once. Warn the user before calling it there, since processing a large corpus takes a long time.
+
 ```jsonc
 // PUT general settings, body
 {
@@ -198,7 +202,7 @@ Two fields here explain a corpus that has quietly stopped growing while nothing 
 
 `AdminFileContentController_rebuild` takes `{ "scope": … }` and answers how many documents it accepted for reprocessing.
 
-- `missing` — never processed, and anything that failed.
+- `missing` — never processed, including files attached before processing was enabled, and anything that failed.
 - `failed` — only failures. Document properties such as encrypted or unsupported are not retried.
 - `stale` — processed by an older reader than this instance now has.
 - `all` — everything.
@@ -209,6 +213,7 @@ The answer is an acceptance, not a result. Read coverage again later rather than
 ## Common mistakes
 
 - **Expecting results before enabling processing.** Off by default, and off after an upgrade.
+- **Expecting existing attachments to appear on their own after enabling.** Run one `missing` rebuild.
 - **Granting `files.create` to fix a `403`.** Uploading and reading text are separate permissions.
 - **Rendering `snippet.text` as markup.** It is document text with control-character marks.
 - **Hiding `queryLanguage`.** A silent language choice is how a working search gets called broken.
