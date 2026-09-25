@@ -219,7 +219,11 @@ Two fields here explain a corpus that has quietly stopped growing while nothing 
 
 `AdminFileContentController_rebuild` takes `{ "scope": … }` and answers how many documents it accepted for reprocessing.
 
-- `missing` — never processed, including files attached before processing was enabled, and anything that failed.
+- `missing` — never processed, including files attached before processing was enabled, plus every
+  document a retry can still finish: failures, and documents whose format had no reader when they
+  were first read. Use it after a reader becomes available on the instance — it is the bulk path
+  back for that slice, and `all` is not needed for it. A document waiting for recognition is not
+  in this slice: recognition is asked for one entry at a time, never by a rebuild.
 - `failed` — only failures. Document properties such as encrypted or unsupported are not retried.
 - `stale` — processed by an older reader than this instance now has.
 - `all` — everything.
@@ -236,6 +240,7 @@ The answer is an acceptance, not a result. Read coverage again later rather than
 - **Hiding `queryLanguage`.** A silent language choice is how a working search gets called broken.
 - **Reading an empty list without reading `warnings`.**
 - **Retrying an encrypted, corrupt or unsupported document.** The status is the answer.
+- **Reaching for `all` to recover documents that had no reader.** One `missing` rebuild takes them.
 - **Rebuilding to clear `overBudget`.** Nothing reprocesses out of a full index.
 - **Turning recognition on for the whole instance** to read one scan. Ask for the one entry.
 - **Treating `truncated` as success.** Only the first part of a long document matches.
