@@ -59,6 +59,23 @@ They are deliberately separate from `files.create` and `files.delete`: being all
 
 → `mcp/docs/api/admins-and-permissions#asking-for-a-grant`
 
+## The public search is a narrower surface with the same shape
+
+`GET /api/content/files/search` searches the same document text for a visitor. It answers the same envelope — `total`, `offset`, `limit`, `queryLanguage`, `warnings`, `items` — with the same snippet convention and the same pagination ceiling, so everything below about languages, warnings and snippets applies unchanged.
+
+Four differences decide whether a call works:
+
+- **`q` must be at least three characters.** Two are accepted on the admin side and answer `400` here.
+- **Only records a visitor may read contribute their files.** A record hidden from the site contributes nothing, and neither does one its groups may not read. Sections the instance holds for staff and customers are narrowed to the caller: the administrator section is never searched publicly at all, and the user and user-group sections return only the caller's own records, so a guest gets nothing from them.
+- **A result carries fewer fields.** `id`, `storageKey`, `extension`, `title`, `langCode`, `pageCount`, `rank`, `snippet`, `owners`, `ownersTotal` — and nothing describing the state of the index. Do not expect `status`, `isExcluded`, `truncated`, `lowConfidence`, `langSource`, `langConfidence` or `tsConfig` here; read those from the admin index listing.
+- **`ownerTables` in settings still decides.** What the instance does not process is not searchable publicly either, and the same request may be filtered further by the permission record's own section restrictions.
+
+The route needs a permission record for its path linked to the caller's group, like every public read. Without it the call answers `403` naming the route rather than an empty list — grant it the same way as any other public route. A new instance links it to the guest group.
+
+**Admin and public results differ legitimately and neither verifies the other.** A document found as an administrator and missing for a visitor usually means its record is hidden or closed to that group, not that the document fell out of the index. Check the record before touching anything about processing.
+
+→ `mcp/docs/api/content-api-permission-rules#give-a-group-a-route-it-does-not-have-yet`
+
 ## A result is a whole file and not a fragment
 
 `GET /files/search` takes `q` (two characters or more) and answers files. One file appears once however many times the term occurs inside it.
