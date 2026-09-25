@@ -220,11 +220,10 @@ Two fields here explain a corpus that has quietly stopped growing while nothing 
 `AdminFileContentController_rebuild` takes `{ "scope": … }` and answers how many documents it accepted for reprocessing.
 
 - `missing` — never processed, including files attached before processing was enabled, plus every
-  document a retry can still finish: failures, documents whose format had no reader when they
-  were first read, and documents left waiting for recognition. Use it after a reader or
-  recognition becomes available on the instance — it is the bulk path back for that slice, and
-  `all` is not needed for it. A document waiting for recognition only completes if recognition
-  is actually on for the project or asked for that entry; otherwise it returns to waiting.
+  document a retry can still finish: failures, and documents whose format had no reader when they
+  were first read. Use it after a reader becomes available on the instance — it is the bulk path
+  back for that slice, and `all` is not needed for it. A document waiting for recognition is not
+  in this slice: recognition is asked for one entry at a time, never by a rebuild.
 - `failed` — only failures. Document properties such as encrypted or unsupported are not retried.
 - `stale` — processed by an older reader than this instance now has.
 - `all` — everything.
