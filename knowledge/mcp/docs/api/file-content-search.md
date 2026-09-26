@@ -157,7 +157,7 @@ A `tsConfig` of `simple` means the document's language has no word-form matching
 
 `lowConfidence: true` on an entry means the text was obtained but came out questionable — garbled encoding, run-together words. The document is searchable and ranks below clean ones. List only those entries with `lowConfidence=true`. Say so when you offer it; do not quote it as if it read cleanly.
 
-## Making a scan readable one document at a time
+## Making a scan readable one document or a whole slice
 
 A document sitting at `no_text_layer` is almost always a scan: it has pages and no text in them. `AdminFileContentController_patch` takes `ocrRequested: true` for a single index entry and queues that one document for character recognition.
 
@@ -166,6 +166,8 @@ One document at a time is the point. Recognition costs on the order of a second 
 `capability.ocrAvailable` only says recognition runs here. Check `capability.ocrLanguages` as well: it lists the language codes this instance can recognise, and a document written in a language outside that list comes back as text that reads as nonsense rather than as a failure. Such an entry is usually marked `lowConfidence: true` and is worse than no text at all, because it is searchable and wrong. Where the language is not covered, say so instead of queueing the document.
 
 Recognition is much slower than ordinary reading and runs apart from it, so the rest of the corpus keeps processing meanwhile. Re-read the entry to see the outcome instead of sending the call again.
+
+When every scan on the instance has to be read — after recognition first becomes available, say — `AdminFileContentController_rebuild` with `{ "scope": "ocr" }` asks for the whole slice at once, and does to each entry in it exactly what the single-entry call does to one. It takes only the documents sitting at `no_text_layer` and skips the ones excluded from search. It answers `400` in the same case the single-entry call does, when `capability.ocrAvailable` is not true. Prefer the single entry while a human is waiting on one document: the slice is charged a second per page over every scan in it.
 
 ## Attaching a document does not index it instantly
 
@@ -227,10 +229,13 @@ Two fields here explain a corpus that has quietly stopped growing while nothing 
   document a retry can still finish: failures, and documents whose format had no reader when they
   were first read. Use it after a reader becomes available on the instance — it is the bulk path
   back for that slice, and `all` is not needed for it. A document waiting for recognition is not
-  in this slice: recognition is asked for one entry at a time, never by a rebuild.
+  in this slice — `ocr` is the scope for those, and no other scope reads a scan.
 - `failed` — only failures. Document properties such as encrypted or unsupported are not retried.
 - `stale` — processed by an older reader than this instance now has.
 - `all` — everything.
+- `ocr` — every scan waiting for recognition, excluded documents aside. The only scope that
+  recognises anything: the others read a scan again and leave it exactly where it was. Needs
+  `capability.ocrAvailable`, and answers `400` without it.
 - `one` — a single document; `storageKey` is then required, and omitting it answers `400`.
 
 The answer is an acceptance, not a result. Follow it in `processing.rebuild` of the status: `total` is how many documents the last rebuild accepted, `remaining` how many still wait, and `startedAt` when it began. `remaining: 0` means that run is finished. `remaining` can include other documents waiting at the same time, so it never exceeds `total`. The field is `null` when no rebuild ran in the last day. Poll every few seconds, not in a tight loop, and do not start another rebuild while `remaining` is above zero.
@@ -245,6 +250,7 @@ The answer is an acceptance, not a result. Follow it in `processing.rebuild` of 
 - **Reading an empty list without reading `warnings`.**
 - **Retrying an encrypted, corrupt or unsupported document.** The status is the answer.
 - **Reaching for `all` to recover documents that had no reader.** One `missing` rebuild takes them.
+- **Rebuilding a scan with any scope but `ocr`.** It comes back exactly as it went in.
 - **Rebuilding to clear `overBudget`.** Nothing reprocesses out of a full index.
 - **Turning recognition on for the whole instance** to read one scan. Ask for the one entry.
 - **Treating `truncated` as success.** Only the first part of a long document matches.
