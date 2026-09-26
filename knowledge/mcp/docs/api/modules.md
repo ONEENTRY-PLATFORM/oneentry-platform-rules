@@ -59,6 +59,49 @@ Creating a module is not how a new content kind is introduced; general types and
 
 If the goal is "make this content appear in the admin panel", the answer is almost certainly a general type or an attribute set type, not a module.
 
+## What a custom module needs before it deploys
+
+Besides the provisioned panel sections, an instance can run a **custom** module: a container image the platform pulls and runs for the project. Creating the record and running the container are two separate calls, and creating the record starts nothing.
+
+The record is created with `type` of `custom` and carries a free-form `config` object. The deploy call takes **no request body** — it reads that stored `config`. Exactly one option is required: `config.docker.image`, the image reference including its tag. Everything else is optional: `config.docker.host`, `config.docker.user` and `config.docker.pass` for an image in a private registry, and `config.env` — an **array** of `{ "name": …, "value": … }` pairs — for environment variables.
+
+```json
+{
+  "identifier": "agenda_sync",
+  "localizeInfos": { "en_US": { "title": "Agenda sync" } },
+  "type": "custom",
+  "config": {
+    "docker": { "image": "registry.your-instance.example/org/app:1.0.0" },
+    "env": [{ "name": "TARGET_URL", "value": "https://your-instance.example/feed" }]
+  }
+}
+```
+
+Any other key in `config` is accepted, stored and read back — and ignored when the module runs. A top-level `image`, a `command`, a `port`, a `repository` or a `git` object do nothing: the platform pulls a prebuilt image and does not build from source. Processor and memory limits are not taken from `config` either; they come from the instance settings.
+
+The create call validates none of this, so a wrong shape surfaces only at deploy: `400 Missing required options to deploy: config.docker.image`. The fix is to put the image under `config.docker.image` — as an object, not a string — and deploy again. Deploying a module that already runs replaces its container with the current `config`, so there is no separate update call to reach for.
+
+The deploy call answers with the identifier of the asynchronous task that creates the container, not with the container itself. Read the module state afterwards to see what happened.
+
+## What the container status values mean
+
+A container state read answers `status` and `actionRunning`. While an operation is in flight, `actionRunning` is `true` and `status` is that operation: `deploying`, `suspending`, `unsuspending` or `deleting`. Otherwise `status` describes the container:
+
+- `Not found` — no container exists for this module. **This is what a freshly created custom module reports**; it means "not deployed yet", not an error. Deploy is what creates the container.
+- `Not ready` — starting up. Read again; a container that stays `Not ready` long enough is reported as `Failed`.
+- `Running latest version` — running the image from the current `config`.
+- `Running old version` — running an older image. Deploy again to roll it forward.
+- `Suspended` — stopped by a suspend call, and resumable.
+- `Failed` — the last operation did not succeed. Read the container log before deploying again.
+
+A state read needs a reachable container platform, so on an instance where it is unavailable this read answers 5xx while the record itself still reads back normally.
+
+## Why a module cannot run on a schedule
+
+There is no schedule, interval or cron option — not in `config`, not on any module call. A `schedule` key in `config` is one of the ignored keys above: it is stored, echoed back, and does nothing. Deploy starts a long-running container and leaves it running; the platform only starts, suspends, resumes and deletes it.
+
+So recurring work belongs inside the image: the container schedules itself and stays up between runs. Scheduled events are not an alternative — an event's actions send notifications and cannot refresh content.
+
 ## What a container log read returns
 
 A container log read answers with an object, not a bare list: `lines` holds the log rows, `total` is how many rows came back, and `streams` is how many log streams the read covered.
@@ -76,3 +119,6 @@ Two refusals here belong to the read and not to the module. A bound that is not 
 - **Confusing visibility with permissions.** Two independent mechanisms.
 - **Treating the gate as a formality.** It exists because these changes are wide.
 - **Asking for a month of container logs in one call.** The window is capped at seven days.
+- **Expecting a created custom module to be running.** Creating the record starts nothing; deploy does.
+- **Putting the image anywhere but `config.docker.image`.** Other keys are stored and ignored.
+- **Looking for a schedule option.** There is none; the container schedules itself.
