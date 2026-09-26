@@ -143,7 +143,7 @@ Pass `langCode` when the human tells you the language. An unknown value is refus
 
 First check that the document has an entry at all. **No entry** means no reader ever looked at the file, and the usual cause is the owner section being absent from `ownerTables` — see the section above. An entry that exists tells a different story.
 
-Check its entry in `GET /files/content-index` before concluding the search is at fault. Each entry carries a `status`, and several of them mean the text was never obtained:
+Check its entry in `GET /files/content-index` before concluding the search is at fault. Each entry carries `owners` and `ownersTotal` in the same shape as a search result, so you can open the referencing record and check the attribute value itself. Each entry also carries a `status`, and several of them mean the text was never obtained:
 
 - `pending` — not processed yet, or the format is not enabled in settings.
 - `done` — searchable. With `truncated: true` only the first part of a long document is.
@@ -155,7 +155,7 @@ Check its entry in `GET /files/content-index` before concluding the search is at
 
 A `tsConfig` of `simple` means the document's language has no word-form matching here: only the exact word will match, not its other forms.
 
-`lowConfidence: true` on an entry means the text was obtained but came out questionable — garbled encoding, run-together words. The document is searchable and ranks below clean ones. Say so when you offer it; do not quote it as if it read cleanly.
+`lowConfidence: true` on an entry means the text was obtained but came out questionable — garbled encoding, run-together words. The document is searchable and ranks below clean ones. List only those entries with `lowConfidence=true`. Say so when you offer it; do not quote it as if it read cleanly.
 
 ## Making a scan readable one document at a time
 
@@ -190,12 +190,16 @@ Both need `files.contentIndex.manage`. If `language.allowManualOverride` is off,
 ```jsonc
 {
   "capability": { "tariffAllows": true, "extractorAvailable": true, "extractorReason": "ok", "ocrAvailable": true, "ocrLanguages": ["en", "ru"], "embeddingAvailable": false },
-  "processing": { "enabled": true, "queuePaused": false, "pending": 0 },
+  "processing": { "enabled": true, "queuePaused": false, "pending": 0, "rebuild": null },
   "coverage": { "files": 2, "done": 1, "failed": 0, "truncated": 0, "lowConfidence": 0, "noExtractor": 0, "unsupported": 1, "corrupt": 0, "excluded": 0 },
   "storage": { "indexBytes": 311296, "budgetBytes": 536870912, "overBudget": false },
   "languages": [{ "code": "en", "tsConfig": "english", "files": 1 }]
 }
 ```
+
+`coverage` counts only files that a record in a section **this admin can reach** references — exactly the rows `GET /files/content-index` lists for the same filter. Two admins can see different coverage, and neither is wrong. `done` means searchable now, so it leaves out manually excluded documents; its listing is `status=done&excluded=false`, where `excluded=false` is a filter and not the absence of one.
+
+`embeddingAvailable` says whether vector search answers on this instance at the moment of the call.
 
 `tariffAllows` and `extractorAvailable` are separate on purpose and must be reported separately to a human: not on your plan and no reader available on this instance need different answers.
 
@@ -229,7 +233,7 @@ Two fields here explain a corpus that has quietly stopped growing while nothing 
 - `all` — everything.
 - `one` — a single document; `storageKey` is then required, and omitting it answers `400`.
 
-The answer is an acceptance, not a result. Read coverage again later rather than assuming it finished.
+The answer is an acceptance, not a result. Follow it in `processing.rebuild` of the status: `total` is how many documents the last rebuild accepted, `remaining` how many still wait, and `startedAt` when it began. `remaining: 0` means that run is finished. `remaining` can include other documents waiting at the same time, so it never exceeds `total`. The field is `null` when no rebuild ran in the last day. Poll every few seconds, not in a tight loop, and do not start another rebuild while `remaining` is above zero.
 
 ## Common mistakes
 
