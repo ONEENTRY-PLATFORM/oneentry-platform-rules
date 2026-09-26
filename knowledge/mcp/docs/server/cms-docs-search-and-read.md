@@ -32,7 +32,7 @@ The index matches terms with OR, with prefix and fuzzy matching, and weights a s
 
 Words of two characters or fewer are dropped entirely, so never let a short acronym carry the query.
 
-The corpus is English. A question in another language will not find an English document — the search does not translate.
+The corpus is English. Apart from a few dozen common Russian terms the search maps to English, a question in another language will not find an English document.
 
 ## When nothing matches
 

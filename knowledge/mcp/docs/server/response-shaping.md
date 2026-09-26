@@ -69,6 +69,16 @@ The rest of the object survives intact. This stops one embedded file from consum
 
 If you genuinely need the bytes, fetch the file from its URL outside this server.
 
+## Credentials are redacted
+
+A non-empty string under a key whose name ends in `secret`, `secretKey`, `serverKey`, `apiKey`, `privateKey`, `password`, `accessToken` or `refreshToken` — case and `_` or `-` ignored — is replaced in every response and dry run target:
+
+```json
+{ "settings": { "shopId": "123", "secretKey": "[redacted secret: omit this field when writing]" } }
+```
+
+An empty value is left as it is, so you can still tell a key that is not set. A write whose body still carries the placeholder is refused before anything is sent: sending it would replace the real key with the placeholder text. Leave such fields out of the body, or ask the human for the real value.
+
 ## Dry run targets are summarised separately
 
 The `target` in a dry run has its own, smaller budget of about 4 KB, because its job is to let a human recognise what is about to change — not to deliver the data.

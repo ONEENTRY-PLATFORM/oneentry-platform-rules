@@ -128,7 +128,7 @@ If a human asks you to "give this admin the same rights as that one", read both 
 
 ## Admin mutations are permanently gated
 
-Every mutating operation under the admins area requires a confirm token at every allow level. So does everything under platform settings, modules, backups and payment webhooks.
+Every mutating operation under the admins area requires a confirm token at every allow level. So does everything under platform settings, modules, user permissions, and group permission changes — the full list is in `mcp/docs/server/allow-levels#paths-that-are-always-confirm-gated`.
 
 A dry run gives you the target; show it, wait for agreement, then confirm.
 

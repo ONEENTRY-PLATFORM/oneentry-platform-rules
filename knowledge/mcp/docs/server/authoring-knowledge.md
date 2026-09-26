@@ -60,7 +60,7 @@ Put pointers in the preamble and in one final section. Do not repeat a link bloc
 
 ## Language policy
 
-English, throughout. The tool descriptions, refusal messages, operation ids and API summaries an agent is holding are all English, and the search does not translate — a document in another language cannot be reached from the text that would send someone looking for it.
+English, throughout. The tool descriptions, refusal messages, operation ids and API summaries an agent is holding are all English, and the search maps only a few dozen common Russian terms to English — a document in another language cannot be reached from the text that would send someone looking for it.
 
 Material that exists only in another language is translated, never pasted.
 

@@ -10,7 +10,7 @@ Credentials never travel as tool arguments. In local mode they come from the env
 
 **Login and password.** Set `ONEENTRY_CMS_LOGIN` and `ONEENTRY_CMS_PASSWORD`. The server logs in against the Admin API and holds the resulting tokens in memory only. Nothing is written to disk.
 
-**A pre-issued access token.** Set `ONEENTRY_CMS_TOKEN`. The token is used as-is. There is no refresh token in this mode, so when it expires the server cannot recover on its own — see below.
+**A pre-issued access token.** Set `ONEENTRY_CMS_TOKEN`. The token is used as-is. There is no refresh token in this mode, so when it expires — a token lives 24 hours — the server cannot recover on its own. See below.
 
 The password is only ever read from the environment; `--password` is refused outright, because command-line arguments are visible in the machine's process list.
 
@@ -28,8 +28,14 @@ There is no blind retrying beyond that. A repeated mutation would risk creating 
 With a pre-issued token and no login and password, step 3 is unavailable:
 
 ```text
-Access token rejected and no login/password available to re-authenticate.
+Access token rejected and no login/password available to re-authenticate. A token lives 24 hours, and any new sign-in with the same admin account revokes it.
 ```
+
+## One session per admin account
+
+The instance keeps one session per admin. Every sign-in with that account — in the admin panel, from another server, or from another remote session — revokes the tokens issued before it. A server sharing an account with a person keeps logging them out and being logged out in turn.
+
+Give the server an admin account of its own. When a call fails with status 401 and a hint naming this, that is the usual cause; parallel calls inside one session share a single sign-in and do not cause it.
 
 ## Developer accounts are rejected
 

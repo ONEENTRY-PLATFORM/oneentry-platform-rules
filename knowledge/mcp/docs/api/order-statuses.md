@@ -73,7 +73,7 @@ payment.paid             payment.expired           payment.canceled
 refund.pending           refund.partial            refund.full
 ```
 
-The `order` and `fulfillment` maps may use any of them. The **`payment` map may not**: it takes only the payment and refund triggers, so `order.created` in a payment map is refused rather than ignored.
+The `order` and `fulfillment` maps may use any of them. The **`payment` map may not**: it takes only the payment and refund triggers other than `payment.link_created`, so `order.created` or `payment.link_created` in a payment map is refused rather than ignored.
 
 Anything outside the catalogue — a despatch scan, a timer, a message from a warehouse — has no trigger, and the merchant's own integration sets the status directly. So "the status did not move" is worth checking against this list before it is treated as a fault: an event with no trigger name was never going to move anything.
 

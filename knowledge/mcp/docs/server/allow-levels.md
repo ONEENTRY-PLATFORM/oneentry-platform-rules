@@ -58,11 +58,11 @@ DELETE /menus/{id} is a "destructive" operation, but this server runs with
 
 Regardless of the allow level, **mutations** under these paths always require a confirm token:
 
-`immutable-settings` · `admins` · `backups` · `modules` · `payments/webhook` · `settings-general` · `system/captcha-keys` · `auth/logout/all-users`
+`immutable-settings` · `admins` · `modules` · `settings-general` · `system/captcha-keys` · `auth` · `users-auth-providers` · `user-permissions` · `user-groups/{groupId}/permissions` · `payments/accounts` · `ai-gateway/routers` · `events/settings` · `import/from-blueprint` · `entity-versions/…/restore` · `workflows` · `index-attributes/reindex-all` · `index-attributes/stop` · `locales/{code}/set-active` · `system/update-attribute-values` · `system/update-multiple-attribute-values` · `system/positions/maintenance`
 
 `GET` on those paths is unaffected — reading them is ordinary.
 
-These are the areas where a mistake is either irreversible or invisible: platform limits, the accounts that can undo your work, backups, the module wiring the whole admin panel hangs off, payment callbacks, and global settings. `cms_api_describe` reports `alwaysConfirm: true` for every operation in the group.
+These are the areas where a mistake is either irreversible or invisible: platform limits, the accounts that can undo your work, the module wiring the whole admin panel hangs off, global settings, sign-in and permission grants, stored provider credentials, and the bulk operations that rewrite or restore data wholesale. A `{name}` segment stands for any one path segment. `cms_api_describe` reports `alwaysConfirm: true` for every operation in the group.
 
 The gate is not a formality. Show the human the dry run's `target`, say what you intend to change, and wait for them to agree in this conversation.
 
