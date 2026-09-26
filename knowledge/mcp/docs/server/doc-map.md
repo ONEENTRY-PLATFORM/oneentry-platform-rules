@@ -131,6 +131,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/settings` | Instance-wide settings, limits and quota |
 | `mcp/docs/api/import` | Bulk-loading content from a file |
 | `mcp/docs/api/ai-gateway` | The platform's own model-calling feature |
+| `mcp/docs/api/ui-component-configs` | Changing how an admin panel table or form looks, or giving an admin a screen template |
 
 ## Answers about permissions and refusals
 
@@ -152,6 +153,11 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does every public list stop at ten | `mcp/docs/api/content-api-permission-rules#a-restricted-read-caps-the-list-at-ten` |
 | Why can a public token upload a file | `mcp/docs/api/content-api-permission-rules#why-a-public-token-can-upload-a-file` |
 | Where is the restricted read length set | `mcp/docs/api/content-api-permission-rules#where-the-restricted-length-is-set-and-read` |
+| Why is changing an AI account refused with 403 | `mcp/docs/api/ai-gateway#who-may-create-change-or-delete-an-account` |
+| Why is every AI job refused with 429 | `mcp/docs/api/ai-gateway#refused-with-429-because-the-account-limit-is-used-up` |
+| Why did an AI job complete with an empty result | `mcp/docs/api/ai-gateway#a-completed-job-with-an-empty-result-ran-out-of-budget` |
+| Why can I not delete a screen template | `mcp/docs/api/ui-component-configs#a-template-that-is-still-assigned-cannot-be-deleted` |
+| Why is saving the constructor agent's template refused with 400 | `mcp/docs/api/ui-component-configs#saving-a-template-that-refers-to-an-unsaved-recipe` |
 
 ## Answers about writes that changed nothing
 
