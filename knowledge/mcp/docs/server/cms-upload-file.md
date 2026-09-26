@@ -20,9 +20,10 @@ cms_upload_file { "path": "assets/mug.png", "type": "image", "entity": "product"
 ```
 
 - `path` is absolute or relative to the server's upload root;
-- `type`, `entity` and `id` say what the file is and what it belongs to;
-- `template` is the **numeric id** of a preview-template record — see below;
-- `compress` asks the instance to compress an image, `edit` replaces an existing file.
+- `type`, `entity` and `id` say what the file is and what it belongs to, and all three are required;
+- `template` is the **id** or the string **identifier** of a preview-template record — see below;
+- `compress` asks the instance to compress an image;
+- `edit: true` keeps the original file name and overwrites a stored file of that name. Without it the instance adds a timestamp suffix, so nothing is overwritten.
 
 Local mode only. In remote mode the filesystem belongs to whoever hosts the server rather than to the caller, so the tool refuses and names the other one.
 
@@ -51,12 +52,12 @@ A refusal here happens before anything is read or sent, and says so. Report it t
 
 ## Get a preview template id first
 
-`template` is the numeric id of a preview-template record, not a flag and not a filename. A fresh instance has **no such records**.
+`template` is the id or the identifier of a preview-template record, not a flag and not a filename. A fresh instance has **no such records**.
 
 Upload an image without a valid id and the file is stored correctly, no preview link is generated, and nothing reports a problem. The only repair is uploading the file again — so on a run of any size this is the first thing to settle:
 
 1. read the preview templates; if there are none, create one;
-2. take the numeric id from the response;
+2. take its id or identifier from the response;
 3. upload with that id and confirm the returned record carries a preview link.
 
 The preview matters beyond thumbnails: the inline placeholder a site shows while the full image loads comes from it, so an image without one cannot be rendered progressively.

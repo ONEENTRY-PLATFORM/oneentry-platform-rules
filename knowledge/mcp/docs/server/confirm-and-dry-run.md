@@ -48,7 +48,7 @@ When the operation has no sibling `GET` — a create, for instance — there is 
 Two cases, both independent of the allow level:
 
 - **Deletes**, at `--allow=destructive`. The reason reads `DELETE /menus/{id} is irreversible.`
-- **Any mutation on a permanently gated path** — `immutable-settings`, `admins`, `backups`, `modules`, `payments/webhook`, `settings-general`, `system/captcha-keys`, `auth/logout/all-users`. The reason reads `/admins is on the permanently confirm-gated list; it always needs an explicit confirm token.`
+- **Any mutation on a permanently gated path** — the list is in `mcp/docs/server/allow-levels#paths-that-are-always-confirm-gated`, and `cms_guide` prints it. The reason reads `/admins is on the permanently confirm-gated list; it always needs an explicit confirm token.`
 
 Everything else at a sufficient allow level runs on the first call.
 

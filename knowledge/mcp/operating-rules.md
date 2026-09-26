@@ -81,7 +81,7 @@ Two lists start **empty**: product statuses and template previews. Nothing repor
 
 ## Never touch these without a human saying so
 
-Mutations on the instance's own configuration — admins, modules, backups, settings — are confirm-gated at every allow level, and `cms_guide` prints the list. State what you intend to change, show the dry run's `target`, wait for a yes.
+Mutations on the instance's own configuration — admins, modules, permissions, settings — are confirm-gated at every allow level, and `cms_guide` prints the list. State what you intend to change, show the dry run's `target`, wait for a yes.
 
 → `mcp/docs/server/allow-levels#paths-that-are-always-confirm-gated`
 

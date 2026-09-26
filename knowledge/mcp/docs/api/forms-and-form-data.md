@@ -8,7 +8,7 @@ The create payload has a shape the API document does not show, so read the first
 
 ## Create a form with a wrapped body
 
-Send the payload nested under `newForm`, and include `type` even though the schema omits it:
+Send the payload nested under `newForm`, and always include `type`:
 
 ```json
 { "newForm": { "identifier": "contact-us",
@@ -17,7 +17,7 @@ Send the payload nested under `newForm`, and include `type` even though the sche
                "localizeInfos": { "en_US": { "title": "Contact us" } } } }
 ```
 
-The API document shows the fields unwrapped. The wrapped body is the supported route; a flat one has been observed to succeed on some instances, and that is undefined behaviour rather than an alternative.
+The API document shows the fields unwrapped. Every instance accepts the wrapped body. Some also accept the flat one, and others answer 5xx to it, so the wrapped body is the one to send.
 
 → `mcp/operating-rules#operations-with-a-single-supported-path`
 
@@ -29,9 +29,9 @@ The API document shows the fields unwrapped. The wrapped body is the supported r
 - a **form type** and a **processing type** — what kind of form it is, what happens to a submission;
 - **module configs** — the bindings naming which module and entities the form belongs to, who may submit and how ratings behave. A form without one accepts nothing; see below.
 
-## The form type is missing from the schema
+## Always send the form type
 
-`type` has a closed set of values and is **absent from the create schema**. It is nonetheless accepted and stored, so a body built from the schema alone creates a form with `type: null` and nothing says so.
+`type` has a closed set of values. Some instances list it in the create schema and refuse an unknown value with 400. Others leave it out of the schema, accept it anyway, and create a form with `type: null` when it is omitted — and nothing says so. Send it on every create.
 
 | value | what it is for |
 |---|---|

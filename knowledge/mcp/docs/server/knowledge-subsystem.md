@@ -10,13 +10,13 @@ Read this to understand what `cms_whoami` is telling you about the documentation
 
 By default: the public repository `ONEENTRY-PLATFORM/oneentry-platform-rules` at ref `main`. Both are configurable — `--knowledge-repo` and `--knowledge-ref` — and the ref may be a branch, a tag or a commit, so an instance can be pinned to a known corpus.
 
-Editing a document there takes effect on the next restart of any server, with no package release. That is the whole point of the design.
+Editing a document there takes effect when a server next starts with its cached copy older than the refresh interval, with no package release. A running server keeps the corpus it started with. That is the whole point of the design.
 
 ## How a document becomes searchable
 
 1. Only files matching `knowledge/**/*.md` are taken from the repository.
 2. Each file's path under `knowledge/`, minus `.md`, becomes its `docId`.
-3. Each file is split into sections at its `##` headings. Text before the first heading becomes the preamble, addressed by an empty anchor.
+3. Each file is split into sections at its `##` and `###` headings. Text before the first heading becomes the preamble, addressed by an empty anchor.
 4. Each section is indexed on its heading, the document title, the docId and its body — headings weighted most heavily.
 
 So a document's path and its headings, not its prose, determine whether it can be found.
@@ -39,7 +39,7 @@ The repository is downloaded once as an archive of a specific commit and unpacke
 | Repository unreachable, cache present | Uses the cache and reports `source: cache` |
 | Repository unreachable, no cache | Falls back to the bundled rules and says so |
 
-The refresh interval is one hour by default (`--knowledge-ttl`). A `GITHUB` token is optional and only raises the API rate limit; the repository is public.
+The refresh interval is one hour by default (`--knowledge-ttl`). An `ONEENTRY_GITHUB_TOKEN` is optional and only raises the API rate limit; the repository is public.
 
 ## Running offline or from a local path
 
@@ -68,7 +68,7 @@ In that state a search returning nothing means nothing is loaded, not that nothi
 
 ## What the search cannot do
 
-- **It does not translate.** The corpus is English; a question in another language will not reach it.
+- **It barely translates.** The corpus is English. A few dozen common Russian terms are mapped to their English equivalents; anything else in another language will not reach it.
 - **It does not reason.** It matches terms, weighted by where they appear. Phrase a query the way a heading is written.
 - **It ignores very short words.** Tokens of two characters or fewer are dropped, so an unexpanded acronym can silently carry no signal.
 - **It has no notion of recency.** Every document is equally current, which is why a stale document is worse here than a missing one.

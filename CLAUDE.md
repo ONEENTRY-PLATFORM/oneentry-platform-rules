@@ -10,7 +10,7 @@ The server ships no documentation. At startup it downloads this repository at re
 
 Two consequences, both load-bearing:
 
-- **`main` is production.** There is no staging. A change reaches running servers when their cache expires, within an hour by default. A broken document is a broken product.
+- **`main` is production.** There is no staging. A running server keeps the corpus it started with; a change reaches a server when it next starts with a cached copy older than an hour (the default refresh interval). A broken document is a broken product.
 - **This repository is public and permanent.** A revert does not unpublish anything — archives are cached and mirrored. Publishing internal detail here is not an incident you can fix by deleting a line.
 
 ## Start of each session — mandatory checklist
@@ -34,16 +34,16 @@ These come from the server's indexer. Violating one does not produce an error; i
 |---|---|
 | Only `knowledge/**/*.md` is indexed | Anything an agent needs at runtime lives under `knowledge/`. Root files are invisible to the server. |
 | `docId` = path under `knowledge/` minus `.md` | The path *is* the public identifier. Renaming a file breaks every link and every agent that memorised it. |
-| `<name>/index.md` collapses to `<name>` | Never create `index.md` — it can collide with a sibling `<name>.md` and the loser vanishes. |
+| `<name>/index.md` collapses to `<name>` | Never create `index.md` — it collides with a sibling `<name>.md`, and the server skips the one that sorts second with a startup warning. |
 | Sections split at `##` **and `###`** | Use `##` only. `####` and deeper are safe for inner structure. |
 | Text before the first `##` is the empty-anchor section | A file that opens straight into a heading cannot be read without an anchor. Every file needs a preamble. |
-| Anchors are slugged from heading text | Lowercase, punctuation stripped, spaces to hyphens, cut at 80 characters. Em dashes, slashes and emoji survive into the anchor and make it untypable. |
-| Duplicate slugs get `-2`, `-3` | Two headings that slug the same silently produce an unusable second anchor. |
+| Anchors are slugged from heading text | Lowercase, spaces to hyphens, cut at 80 characters. Only `` ` * _ [ ] ( ) : , . / \ « » " ' ? ! ; `` are stripped; em dashes, `&`, `+`, `#` and emoji survive into the anchor and make it untypable. |
+| Duplicate slugs get `-2`, `-3`, skipping any suffix already taken | Two headings that slug the same silently produce an unusable second anchor. |
 | A section over 12288 **bytes** is truncated | The only size the server enforces, and it cuts the section on read. Work to 8 KB per section so edits have room. Bytes, not characters. |
 | Search boosts: heading ×4, docId ×3, doc title ×2, body ×1 | Headings and file names carry the retrieval. Write them as the question someone would ask. |
 | Search combines terms with OR, with prefix and fuzzy matching | Boilerplate repeated across documents makes every document a weak match for every query. |
 | Query tokens of two characters or fewer are dropped | Never make a short acronym load-bearing; expand it at least once per document. |
-| Search does not translate | English only. |
+| Search maps only a few dozen common Russian terms to English | Write English only. |
 
 ## Hard rules
 
