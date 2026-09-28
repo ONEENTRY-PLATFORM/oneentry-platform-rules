@@ -167,7 +167,7 @@ One document at a time is the point. Recognition costs on the order of a second 
 
 Recognition is much slower than ordinary reading and runs apart from it, so the rest of the corpus keeps processing meanwhile. Re-read the entry to see the outcome instead of sending the call again.
 
-When every scan on the instance has to be read — after recognition first becomes available, say — `AdminFileContentController_rebuild` with `{ "scope": "ocr" }` asks for the whole slice at once, and does to each entry in it exactly what the single-entry call does to one. It takes only the documents sitting at `no_text_layer` and skips the ones excluded from search. It answers `400` in the same case the single-entry call does, when `capability.ocrAvailable` is not true. Prefer the single entry while a human is waiting on one document: the slice is charged a second per page over every scan in it.
+When every scan on the instance has to be read — after recognition first becomes available, say — `AdminFileContentController_rebuild` with `{ "scope": "ocr" }` asks for the whole slice at once, and queues each entry in it for recognition the way the single-entry call queues one. It takes only the documents sitting at `no_text_layer` and skips the ones excluded from search. Its answer counts the entries it actually queued, and only those entries carry the recognition request; where it queues nothing the slice stays as it was. It answers `400` in the same case the single-entry call does, when `capability.ocrAvailable` is not true. Prefer the single entry while a human is waiting on one document: the slice is charged a second per page over every scan in it.
 
 ## Attaching a document does not index it instantly
 
