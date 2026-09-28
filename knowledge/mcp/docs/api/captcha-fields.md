@@ -16,7 +16,14 @@ The field's type is `spam`, and it takes a value like any other field. The value
                              "value": { "event": { "token": "03AFcWe...", "siteKey": "6Lc000AAAAA" } } } ] } }
 ```
 
-That object is handed to the verification provider unchanged, so the two keys and their nesting are the whole contract. A value in any other shape is refused exactly as a failed check is — in the answer, a wrong shape and an automated visitor look identical.
+That object is handed to the verification provider unchanged, so the two keys and their nesting are the whole contract. A `google` field checks the shape before it calls the provider, and names what it wanted:
+
+```json
+{ "statusCode": 400,
+  "message": "Spam field value has the wrong shape; expected { event: { token, siteKey } }" }
+```
+
+So that message means the request is wrong, and `Captcha Validation Failed` means the request was well-formed and the check itself refused it. Sending the entry with `value` set to `null` counts as sending no value at all, and answers `formData doesn't have spam attribute` — the same as omitting the entry.
 
 ## The field must name a verification provider
 
@@ -81,11 +88,12 @@ Request a fresh token inside the submit handler, every time, including after a r
 | Status | Message | What to change |
 |---|---|---|
 | `400` | `Captcha is not configured for spam attribute '<marker>': set captchaKind to 'google' or 'yandex'` | the field names no provider, so nothing was ever verified; set one on the field |
-| `400` | `formData doesn't have spam attribute` | the form has a captcha field that is not hidden and your `formData` carries no entry for its marker |
-| `400` | `Captcha Validation Failed, captcha type is: google` | the token was refused or had expired, or the value was not shaped as above. The message names the provider, never the reason |
+| `400` | `formData doesn't have spam attribute` | the form has a captcha field that is not hidden and your `formData` carries no entry for its marker, or the entry carries `null` |
+| `400` | `Spam field value has the wrong shape; expected { event: { token, siteKey } }` | the entry is there and carries something other than that object; send the value exactly as shown above |
+| `400` | `Captcha Validation Failed, captcha type is: google` | the value reached the provider and the provider refused it: the token was refused, had expired, or scored too low. The message names the provider, never which of those |
 | `400` | `Your form has more than 1 span attribute whereas the only one is possible` | the form's field list has two captcha fields that are not hidden; leave one |
 
-The middle row covers several causes at once, among them a site key that does not belong to the credentials the instance verifies with. When every submission is refused, including one you know came from a person, suspect the configuration before the client.
+The last row covers several causes at once, among them a site key that does not belong to the credentials the instance verifies with. When every submission is refused, including one you know came from a person, suspect the configuration before the client.
 
 ## Which forms can use a captcha field
 
