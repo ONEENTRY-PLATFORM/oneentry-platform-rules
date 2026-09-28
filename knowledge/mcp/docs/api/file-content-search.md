@@ -171,6 +171,8 @@ When every scan on the instance has to be read — after recognition first becom
 
 Sending `{ "scope": "ocr" }` a second time does not ask for the same scans twice. An entry leaves the slice the moment recognition has been asked for it, so a repeat picks up only scans added since — and on an instance where nothing was added it accepts nothing. This matters because the slice keeps a scan at `no_text_layer` until recognition finishes and finds text, and because `processing.rebuild.remaining` reaches `0` long before recognition has worked through the queue: the run looks finished when it is not. Wait and re-read the entries rather than sending the call again. To ask again for one document that came back without text, use the single-entry `ocrRequested: true`, which always queues the document it names.
 
+A zero in the answer means nothing was taken, and nothing in the slice was changed. Recognition also needs processing enabled and space left in the index, so `{ "scope": "ocr" }` answers `201` with zero accepted while `processing.enabled` is false or `storage.overBudget` is true. Read both fields from the status before reading a zero as "there was nothing left to recognise": clear the condition and the same call takes the slice.
+
 ## Attaching a document does not index it instantly
 
 A file becomes searchable a while after the attribute value referencing it is saved — longer on a large instance. Re-read the index entry to confirm rather than attaching the file a second time; a second attachment creates a second reference, not a second attempt.
