@@ -229,7 +229,7 @@ Two fields here explain a corpus that has quietly stopped growing while nothing 
   document a retry can still finish: failures, and documents whose format had no reader when they
   were first read. Use it after a reader becomes available on the instance — it is the bulk path
   back for that slice, and `all` is not needed for it. A document waiting for recognition is not
-  in this slice — `ocr` is the scope for those, and no other scope reads a scan.
+  in this slice — `ocr` is the scope for those, and no other scope recognises one.
 - `failed` — only failures. Document properties such as encrypted or unsupported are not retried.
 - `stale` — processed by an older reader than this instance now has.
 - `all` — everything.
