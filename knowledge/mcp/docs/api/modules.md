@@ -44,6 +44,20 @@ Diagnose the two separately.
 
 → `mcp/docs/api/admins-and-permissions`
 
+## Which permission keys the container calls need
+
+Deploying a custom module, suspending or resuming its container, and reading its state or logs each require a permission key. Holding the keys that let you read or edit the module record is not enough: a missing key answers `403 Forbidden resource` before anything is deployed, stopped or read.
+
+| Call | Key |
+|---|---|
+| Deploy a custom module | `settings.modules.upload` |
+| Suspend or resume its container | `settings.modules.switching` |
+| Read container state or container logs | `settings.modules.get` |
+
+`settings.modules.get` is one of the newer keys, so an admin provisioned before it existed does not hold it and sees `403` on state and log reads while the module record itself still reads back normally. Ask for the grant; the read has no open alternative.
+
+→ `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it`
+
 ## When a task really involves modules
 
 Rarely. The legitimate cases are inspection — reading which modules exist, to resolve a general type's placement or explain why a section is absent — and, occasionally, visibility changes an operator explicitly asks for.
@@ -131,6 +145,7 @@ Two refusals here belong to the read and not to the module. A bound that is not 
 - **Confusing visibility with permissions.** Two independent mechanisms.
 - **Treating the gate as a formality.** It exists because these changes are wide.
 - **Asking for a month of container logs in one call.** The window is capped at seven days.
+- **Reading container state or logs without `settings.modules.get`.** Gated apart from the record.
 - **Expecting a created custom module to be running.** Creating the record starts nothing; deploy does.
 - **Putting the image anywhere but `config.docker.image`.** Other keys are stored and ignored.
 - **Looking for a schedule option.** There is none; the container schedules itself.

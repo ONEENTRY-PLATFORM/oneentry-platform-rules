@@ -78,6 +78,7 @@ Reads are gated the same way writes are. An account that holds no keys reads not
 | Journal entries and session traffic | `journal.get` |
 | One attribute set, and the attributes inside it | `settings.attributesSets.get` |
 | Form submissions and their counts | `forms.data.read` |
+| Custom module container state and logs | `settings.modules.get` |
 
 One key covers every read of that data rather than a single route: the listing, reading one by id, and the search and pagination forms beside it all require it. A `403` on one is not worked around by reaching for a neighbour.
 
@@ -87,7 +88,7 @@ Helpers stay open. Checking whether a login, an email, a marker or a page URL is
 
 The vocabulary is fixed at any moment but it is not frozen: keys are added to the platform over time, and an admin provisioned before a key existed does not hold it. Nobody is granted it retroactively.
 
-So an operation that worked for months can begin answering `403` while every neighbouring operation still succeeds — the account did not lose anything, the operation gained a requirement. `forms.data.read`, `pages.get`, `menu.get`, `journal.get`, `menu.delete`, `files.create`, `settings.aiAccounts.update` and `uiComponentConfigs.edit` are keys where this is the usual explanation.
+So an operation that worked for months can begin answering `403` while every neighbouring operation still succeeds — the account did not lose anything, the operation gained a requirement. `forms.data.read`, `pages.get`, `menu.get`, `journal.get`, `menu.delete`, `files.create`, `settings.aiAccounts.update`, `uiComponentConfigs.edit` and `settings.modules.get` are keys where this is the usual explanation.
 
 `AdminsController_getAllAvailablePermissionsKeys` returns every key the instance recognises. Compare it against the admin's own map: a key in that list but not in the map is a grant to ask for; a key in neither is one you have misremembered.
 
