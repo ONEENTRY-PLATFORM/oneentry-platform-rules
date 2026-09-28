@@ -169,6 +169,8 @@ Recognition is much slower than ordinary reading and runs apart from it, so the 
 
 When every scan on the instance has to be read — after recognition first becomes available, say — `AdminFileContentController_rebuild` with `{ "scope": "ocr" }` asks for the whole slice at once, and does to each entry in it exactly what the single-entry call does to one. It takes only the documents sitting at `no_text_layer` and skips the ones excluded from search. It answers `400` in the same case the single-entry call does, when `capability.ocrAvailable` is not true. Prefer the single entry while a human is waiting on one document: the slice is charged a second per page over every scan in it.
 
+Sending `{ "scope": "ocr" }` a second time does not ask for the same scans twice. An entry leaves the slice the moment recognition has been asked for it, so a repeat picks up only scans added since — and on an instance where nothing was added it accepts nothing. This matters because the slice keeps a scan at `no_text_layer` until recognition finishes and finds text, and because `processing.rebuild.remaining` reaches `0` long before recognition has worked through the queue: the run looks finished when it is not. Wait and re-read the entries rather than sending the call again. To ask again for one document that came back without text, use the single-entry `ocrRequested: true`, which always queues the document it names.
+
 ## Attaching a document does not index it instantly
 
 A file becomes searchable a while after the attribute value referencing it is saved — longer on a large instance. Re-read the index entry to confirm rather than attaching the file a second time; a second attachment creates a second reference, not a second attempt.
@@ -233,7 +235,8 @@ Two fields here explain a corpus that has quietly stopped growing while nothing 
 - `failed` — only failures. Document properties such as encrypted or unsupported are not retried.
 - `stale` — processed by an older reader than this instance now has.
 - `all` — everything.
-- `ocr` — every scan waiting for recognition, excluded documents aside. The only scope that
+- `ocr` — every scan waiting for recognition, excluded documents aside, and only those not asked
+  for already: a repeat of this scope accepts nothing it accepted before. The only scope that
   recognises anything: the others read a scan again and leave it exactly where it was. Needs
   `capability.ocrAvailable`, and answers `400` without it.
 - `one` — a single document; `storageKey` is then required, and omitting it answers `400`.
