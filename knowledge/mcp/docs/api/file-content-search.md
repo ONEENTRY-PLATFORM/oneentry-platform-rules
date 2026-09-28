@@ -169,7 +169,9 @@ Recognition is much slower than ordinary reading and runs apart from it, so the 
 
 When every scan on the instance has to be read — after recognition first becomes available, say — `AdminFileContentController_rebuild` with `{ "scope": "ocr" }` asks for the whole slice at once, and queues each entry in it for recognition the way the single-entry call queues one. It takes only the documents sitting at `no_text_layer` and skips the ones excluded from search. Its answer counts the entries it actually queued, and only those entries carry the recognition request; where it queues nothing the slice stays as it was. It answers `400` in the same case the single-entry call does, when `capability.ocrAvailable` is not true. Prefer the single entry while a human is waiting on one document: the slice is charged a second per page over every scan in it.
 
-Sending `{ "scope": "ocr" }` a second time does not ask for the same scans twice. An entry leaves the slice the moment recognition has been asked for it, so a repeat picks up only scans added since — and on an instance where nothing was added it accepts nothing. This matters because the slice keeps a scan at `no_text_layer` until recognition finishes and finds text, and because `processing.rebuild.remaining` reaches `0` long before recognition has worked through the queue: the run looks finished when it is not. Wait and re-read the entries rather than sending the call again. To ask again for one document that came back without text, use the single-entry `ocrRequested: true`, which always queues the document it names.
+Sending `{ "scope": "ocr" }` a second time does not ask for the same scans twice while the first request is still outstanding. A scan leaves the slice for as long as recognition has been asked for it and has not finished, so a repeat sent during a run accepts nothing it accepted before. This matters because the slice keeps a scan at `no_text_layer` until recognition finishes and finds text, and because `processing.rebuild.remaining` reaches `0` long before recognition has worked through the queue: the run looks finished when it is not. Wait and re-read the entries rather than sending the call again.
+
+Once recognition has finished on a scan and still found no text, that scan is back in the slice. This is what makes the scope usable after the instance gains a language it could not read before, or after its reader is upgraded: send `{ "scope": "ocr" }` again and every such scan is asked for once more, without a call per document. Do not send it while the previous run is still working — you would only be waiting on the same answer. To ask again for one document on its own, the single-entry `ocrRequested: true` always queues the document it names.
 
 A zero in the answer means nothing was taken, and nothing in the slice was changed. Recognition also needs processing enabled and space left in the index, so `{ "scope": "ocr" }` answers `201` with zero accepted while `processing.enabled` is false or `storage.overBudget` is true. Read both fields from the status before reading a zero as "there was nothing left to recognise": clear the condition and the same call takes the slice.
 
@@ -237,10 +239,11 @@ Two fields here explain a corpus that has quietly stopped growing while nothing 
 - `failed` — only failures. Document properties such as encrypted or unsupported are not retried.
 - `stale` — processed by an older reader than this instance now has.
 - `all` — everything.
-- `ocr` — every scan waiting for recognition, excluded documents aside, and only those not asked
-  for already: a repeat of this scope accepts nothing it accepted before. The only scope that
-  recognises anything: the others read a scan again and leave it exactly where it was. Needs
-  `capability.ocrAvailable`, and answers `400` without it.
+- `ocr` — every scan not currently waiting on a recognition request, excluded documents aside:
+  scans never asked for, and scans whose last recognition finished and still found no text. A
+  scan with a request outstanding is left alone, so a repeat sent mid-run accepts nothing it
+  accepted before. The only scope that recognises anything: the others read a scan again and
+  leave it exactly where it was. Needs `capability.ocrAvailable`, and answers `400` without it.
 - `one` — a single document; `storageKey` is then required, and omitting it answers `400`.
 
 The answer is an acceptance, not a result. Follow it in `processing.rebuild` of the status: `total` is how many documents the last rebuild accepted, `remaining` how many still wait, and `startedAt` when it began. `remaining: 0` means that run is finished. `remaining` can include other documents waiting at the same time, so it never exceeds `total`. The field is `null` when no rebuild ran in the last day. Poll every few seconds, not in a tight loop, and do not start another rebuild while `remaining` is above zero.
