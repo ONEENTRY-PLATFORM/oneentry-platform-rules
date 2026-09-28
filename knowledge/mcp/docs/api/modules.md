@@ -83,6 +83,18 @@ The create call validates none of this, so a wrong shape surfaces only at deploy
 
 The deploy call answers with the identifier of the asynchronous task that creates the container, not with the container itself. Read the module state afterwards to see what happened.
 
+## Why a registry password reads back as three stars
+
+A private-registry password lives under `config.docker.pass`, and reads never return it. Both ways of reading a module — the module list and a read by identifier — answer `***` in that field whenever a password is stored. `config.docker.host`, `config.docker.user`, `config.docker.image` and `config.env` come back unchanged.
+
+So `***` is a marker, not a value: never carry it into a registry login, and never read it as a wrong password.
+
+Sending it back is how you keep the stored password. On an update, `config.docker.pass` of `***` leaves the stored password as it is rather than overwriting it, so reading a module and writing its whole `config` object back cannot destroy the credential. On a create there is nothing to keep, so the field is dropped and the module ends up with no password.
+
+Any other value replaces the password — to change it, send the new one. Deploy always uses the real stored password, whatever a read shows.
+
+One asymmetry: the create call echoes the `config` it was just sent, so a password submitted in clear text appears in that one response. The masking is on reads.
+
 ## What the container status values mean
 
 A container state read answers `status` and `actionRunning`. While an operation is in flight, `actionRunning` is `true` and `status` is that operation: `deploying`, `suspending`, `unsuspending` or `deleting`. Otherwise `status` describes the container:
@@ -122,3 +134,4 @@ Two refusals here belong to the read and not to the module. A bound that is not 
 - **Expecting a created custom module to be running.** Creating the record starts nothing; deploy does.
 - **Putting the image anywhere but `config.docker.image`.** Other keys are stored and ignored.
 - **Looking for a schedule option.** There is none; the container schedules itself.
+- **Reading `***` as a registry password.** It is a marker for a stored one; send it back to keep it.
