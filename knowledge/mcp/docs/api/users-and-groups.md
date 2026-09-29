@@ -58,7 +58,7 @@ A site showing the same small number of items for every listing is hitting a rea
 
 | Symptom | Usual cause |
 |---|---|
-| **Every** route answers `403 Resource is closed` | The application token was sent as a bearer instead of in `x-app-token` |
+| **Every** route answers `401` naming the app token | The token is missing, empty, unknown here, past its lifetime, or sent as a bearer instead of in `x-app-token` |
 | A permission error naming the route | The route is not granted to the group |
 | Every listing returns the same small count | A read restriction on the group |
 | Works signed in, fails signed out | The rule is on the signed-in group, not on `guest` |
@@ -68,7 +68,7 @@ A site showing the same small number of items for every listing is hitting a rea
 
 The refusal names the rule and the record to fix — `requires the "addRule" rule to be enabled on the permission (permissionId: 36) linked to the user group`. Which flag opens which method is in `mcp/docs/api/content-api-permission-rules#the-five-rules-and-what-each-one-opens`.
 
-Rule out the first row before changing any rules: it looks exactly like a closed project, and the group's own rules will show the routes as granted the whole time.
+Rule out the first row before changing any rules: the status tells the two apart — `401` is the token and no permission change touches it, `403` is the rules.
 
 → `mcp/docs/api/content-api-reads#public-reads-use-the-x-app-token-header`
 
