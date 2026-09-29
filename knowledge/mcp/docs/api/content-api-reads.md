@@ -8,27 +8,29 @@ Its rules are not the admin ones: a different header carries the token, some ent
 
 ## Public reads use the x-app-token header
 
-The token an application holds goes in `x-app-token`. Sent as `Authorization: Bearer` it is not seen at all, and every route answers `403`:
+The token an application holds goes in `x-app-token`. Sent as `Authorization: Bearer` it is not seen at all, and every route answers `401`:
 
 ```text
 GET /api/content/pages/root?langCode=en_US
-  Authorization: Bearer <app token>   → 403 {"message":"Resource is closed"}
+  Authorization: Bearer <app token>   → 401 {"message":"Invalid or missing app token"}
   x-app-token: <app token>            → 200 [ … ]
 ```
 
-The same `403` is what a request with no token gets, which is why the header is worth checking first: the two are indistinguishable from the response.
+The same `401` is what a request with no token, an empty header, or a token this instance does not hold gets. A token whose lifetime has run out answers `401 App token is expired`, which is the one case the message names outright.
 
-## A 403 that no permission change will fix
+The status is the split worth remembering: `401` is always the token, `403` is always the rules or a closed resource. A `403` is never worth chasing with a new token, and a `401` is never worth chasing with a permission change.
 
-`Resource is closed` on **every** route, for a project whose guest group grants those routes, is the header — not the rules.
+## A refusal that no permission change will fix
+
+`401` on **every** route, for a project whose guest group grants those routes, is the header — not the rules.
 
 Work through it in this order, and stop at the first one that explains it:
 
 1. The token is in `x-app-token`, not in an `Authorization` header.
-2. The token belongs to this instance.
-3. The guest group grants the route, and the read restriction on it is not what you are seeing.
+2. The header is present and not empty.
+3. The token belongs to this instance and its lifetime has not run out.
 
-Only the third is a permissions question, and it is the one people start with.
+If every route still answers `403` after that, the token is being accepted and the question is a permissions one — which is where people start, and it is the wrong end.
 
 → `mcp/docs/api/users-and-groups#diagnosing-a-content-api-refusal`
 
@@ -68,8 +70,8 @@ So check the work through the public route the site itself will call, with the l
 
 ## Common mistakes
 
-- **Sending the application token as a bearer.** Every route answers `403 Resource is closed`.
-- **Reading that `403` as a closed project** and rewriting the group permissions.
+- **Sending the application token as a bearer.** Every route answers `401 Invalid or missing app token`.
+- **Reading a token `401` as a closed project** and rewriting the group permissions.
 - **Repeating a write because the public read still shows the old value.** Wait and read again.
 - **Treating a trimmed list as the whole list.** The restricted read says nothing about being cut.
 - **Looking for a public address for an external page.** It arrives in the menu.
