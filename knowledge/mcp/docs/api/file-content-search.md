@@ -26,7 +26,12 @@ On a large instance that one call accepts the whole existing corpus at once. War
     "ownerTables": ["products", "pages", "blocks", "slides", "templates", "discounts", "forms", "events"],
     "ocr": { "enabled": false, "maxPages": 50 },
     "language": { "mode": "auto", "fixed": "english", "allowManualOverride": true },
-    "search": { "queryLanguageMode": "auto", "enableInfixStage": true }
+    "search": {
+      "queryLanguageMode": "auto",
+      "enableInfixStage": true,
+      "enableSemanticStage": false,
+      "enableFuzzyStage": false
+    }
   }
 }
 ```
@@ -37,11 +42,11 @@ Turning it **off** later does not delete anything. Existing documents stay searc
 
 `ownerTables` decides which sections are read. It accepts every section whose records carry an attribute set, because that is where a file attribute can live:
 
-`products`, `pages`, `blocks`, `slides`, `templates`, `discounts`, `forms`, `events`, `user_groups`, `users`, `admins`
+`products`, `pages`, `blocks`, `slides`, `templates`, `discounts`, `forms`, `events`, `orders`, `form_data`, `user_groups`, `users`, `admins`
 
-The first eight are on by default. `users`, `user_groups` and `admins` are **accepted but off**, and stay off through an upgrade: the documents there belong to customers and staff, and reading them into a search index is a decision somebody makes rather than something an upgrade does. Add them only when a human asked for exactly that, and say what it means first — every admin holding `files.contentSearch` and that section can then read the text of those documents.
+The first ten are on by default. `users`, `user_groups` and `admins` are **accepted but off**, and stay off through an upgrade: the documents there belong to customers and staff, and reading them into a search index is a decision somebody makes rather than something an upgrade does. Add them only when a human asked for exactly that, and say what it means first — every admin holding `files.contentSearch` and that section can then read the text of those documents.
 
-Files attached to form submissions and to orders are **not** searchable and cannot be enabled. They are not held as attribute values, so no reader ever reaches them. Offer a different route for those rather than an `ownerTables` entry that will be rejected.
+Files attached to orders and to form submissions are searchable on the admin side, as the `orders` and `form_data` sections. They are never searchable publicly, whatever `ownerTables` says: a visitor's own order attachments are not separated from anyone else's there, so the public search leaves both sections out. Existing attachments of those two sections are picked up the next time the order or the submission is saved, or by a `missing` rebuild.
 
 A section left out of `ownerTables` is not read at all: no index entry appears for its files, so an absent entry is the expected answer rather than a sign that processing failed. Turning the section on and then saving the record again is what creates the entry.
 
@@ -51,7 +56,7 @@ Each section is also filtered per admin: a result names its owner record, and bo
 
 `AdminFileContentController_search` and the index listings need `files.contentSearch`. Rebuilding and editing index entries need `files.contentIndex.manage`.
 
-Both are **new keys that no admin holds until someone grants them**, including the first admin of the instance. A `403` here is almost always that, not a misconfigured feature.
+The first admin of the instance holds both. **No other admin holds either until someone grants them**, and a `403` here is almost always that rather than a misconfigured feature.
 
 `AdminFileContentController_getStatus` needs **neither** key and answers for any admin. Call it first: it tells you whether this instance can search file content at all, so a `403` from the search or the listings means the grant is missing rather than the feature being unavailable here. Report those two as different things — one is a grant a human can make, the other is not.
 
@@ -138,6 +143,8 @@ Pass `langCode` when the human tells you the language. An unknown value is refus
 - `processing_disabled` — the index is not being kept up to date. Counts may be stale.
 - `query_too_common` — the query was made only of words too common to match on. Ask for a more specific term; do not retry.
 - `query_language_capped` — more candidate languages than the instance will search at once. Pass `langCode` to pick one.
+- `semantic_unavailable` — meaning-based matching is switched on but could not answer for this call, so only word matching ran. The result is narrower than it should be, not wrong; say so instead of reporting an empty list as final.
+- `fuzzy_fallback` — nothing matched the query as written and these results come from near-spellings of it. Offer them as "did you mean", and expect the snippet to show a word the human did not type.
 
 ## Why a document you attached is not found
 
@@ -199,7 +206,7 @@ Both need `files.contentIndex.manage`. If `language.allowManualOverride` is off,
 
 ```jsonc
 {
-  "capability": { "tariffAllows": true, "extractorAvailable": true, "extractorReason": "ok", "ocrAvailable": true, "ocrLanguages": ["en", "ru"], "embeddingAvailable": false },
+  "capability": { "tariffAllows": true, "extractorAvailable": true, "extractorReason": "ok", "ocrAvailable": true, "ocrLanguages": ["en", "ru"], "embeddingAvailable": true, "semanticStageEnabled": false, "fuzzyStageEnabled": false, "formats": ["txt", "md", "html", "pdf", "docx", "odt", "epub", "rtf"] },
   "processing": { "enabled": true, "queuePaused": false, "pending": 0, "rebuild": null },
   "coverage": { "files": 2, "done": 1, "failed": 0, "truncated": 0, "lowConfidence": 0, "noExtractor": 0, "unsupported": 1, "corrupt": 0, "excluded": 0 },
   "storage": { "indexBytes": 311296, "budgetBytes": 536870912, "overBudget": false },
@@ -209,7 +216,9 @@ Both need `files.contentIndex.manage`. If `language.allowManualOverride` is off,
 
 `coverage` counts only files that a record in a section **this admin can reach** references — exactly the rows `GET /files/content-index` lists for the same filter. Two admins can see different coverage, and neither is wrong. `done` means searchable now, so it leaves out manually excluded documents; its listing is `status=done&excluded=false`, where `excluded=false` is a filter and not the absence of one.
 
-`embeddingAvailable` says whether vector search answers on this instance at the moment of the call.
+`embeddingAvailable` says whether meaning-based matching can answer on this instance at the moment of the call. It is not the same as it being used: `semanticStageEnabled` and `fuzzyStageEnabled` say whether the two optional matching stages are switched on in settings, and both are off until someone turns them on. Report the pair, never one of them — available and unused is the state a human most often mistakes for broken.
+
+`formats` is what this instance can actually read, which is not the same list as the `formats` setting — that one is what the instance is allowed to read. A format present in the setting and absent here is why a document sits at `no_extractor`. An empty list means nothing answered about reading at all; read `extractorReason` then.
 
 `tariffAllows` and `extractorAvailable` are separate on purpose and must be reported separately to a human: not on your plan and no reader available on this instance need different answers.
 
@@ -246,9 +255,22 @@ Two fields here explain a corpus that has quietly stopped growing while nothing 
   scan with a request outstanding is left alone, so a repeat sent mid-run accepts nothing it
   accepted before. The only scope that recognises anything: the others read a scan again and
   leave it exactly where it was. Needs `capability.ocrAvailable`, and answers `400` without it.
+- `vectors` — no document is read again. It fills in meaning-based matching for text already held, which is what the corpus indexed before that matching existed lacks. Its answer counts fragments completed rather than documents accepted, and it works in batches: call it again while the number keeps coming back above zero. Nothing else recovers that slice, and until it is done a meaning-only query finds nothing however the setting is switched.
 - `one` — a single document; `storageKey` is then required, and omitting it answers `400`.
 
 The answer is an acceptance, not a result. Follow it in `processing.rebuild` of the status: `total` is how many documents the last rebuild accepted, `remaining` how many still wait, and `startedAt` when it began. `remaining: 0` means that run is finished. `remaining` can include other documents waiting at the same time, so it never exceeds `total`. The field is `null` when no rebuild ran in the last day. A rebuild that accepts nothing does not replace a run whose documents are still waiting, paused processing included: the status keeps that run's `total` and `startedAt`. Once nothing is waiting, the same call shows `total: 0`. Poll every few seconds, not in a tight loop, and do not start another rebuild while `remaining` is above zero.
+
+## Matching by meaning and past a typo
+
+Two optional stages sit beside word matching, both off until settings turn them on, and both reported in `capability`.
+
+**Meaning-based matching** finds a document that carries what was asked about while sharing no word with the query — "return conditions" reaching a document that says "how to exchange an item". Switch it on with `search.enableSemanticStage`, but only after `AdminFileContentController_rebuild` with `{ "scope": "vectors" }` has finished for the existing corpus: until then the stage has nothing to match against and the search behaves exactly as before, which reads as the setting doing nothing. Check `capability.embeddingAvailable` first — where it is false the stage is switched on and silently idle, and every answer carries `semantic_unavailable`.
+
+The two stages are merged, not chosen between: a document found either way appears once, and the unit of a result stays the whole file. `rank` then orders results by how well each did across both stages, so compare it only inside one answer — never between two answers, and never as a score.
+
+**Typo tolerance** (`search.enableFuzzyStage`) runs only when nothing matched at all, and marks its answer with the `fuzzy_fallback` warning. It cannot widen a query that already found something, so switching it on never changes a working search.
+
+Both stages obey everything else on this page unchanged: the same sections, the same per-admin filtering, the same pagination ceiling, the same snippet convention.
 
 ## Common mistakes
 
@@ -265,6 +287,8 @@ The answer is an acceptance, not a result. Follow it in `processing.rebuild` of 
 - **Turning recognition on for the whole instance** to read one scan. Ask for the one entry.
 - **Treating `truncated` as success.** Only the first part of a long document matches.
 - **Re-attaching a file that has not appeared yet.** That is a second reference, not a retry.
+- **Turning meaning-based matching on without the `vectors` rebuild.** The setting alone changes nothing.
+- **Reading an empty answer carrying `semantic_unavailable` as final.** Only word matching ran.
 - **Paging past `offset + limit` of 200.** Narrow the query instead.
 
 → `mcp/docs/api/files-and-uploads#referencing-a-file-from-an-attribute` · `mcp/docs/api/index-attributes#what-an-index-attribute-is`

@@ -63,12 +63,13 @@ Its permission record must be linked to the reading group. It is provisioned lin
 
 ## What global search never finds
 
-- **Files and documents.** Nothing is searched by file name or file content, and the attribute types that hold files, images, groups of images, JSON and captcha values are excluded from matching. A document attached to a page as an attribute value cannot be found this way at all. There is a separate admin search for the text inside attached documents.
+- **File names and file-valued attributes.** Nothing is matched by file name, and the attribute types that hold files, images, groups of images, JSON and captcha values are excluded from matching.
+- **Document text, publicly.** The admin address returns it in a group of its own, `files`: ask with `types=files` and expect a whole file per item, not a record — `fragment` carries the same control-character-marked snippet the document search returns. It needs that search's grant, so an admin without it gets no such group.
 - **Fields marked as passwords.** Excluded from every mode.
 - **Content in another language.** It does not translate.
 - **Anything unindexed.** What is searchable follows the same indexing rules as everything else.
 
-For an admin who must find a document by its contents, use the document search instead. For a public site that must do it, the texts still have to reach an index of the project's own — decide that early, because this search will not grow into it.
+For filters, paging or the records owning a document, use the document search itself: the group here is a shortcut, capped at ten items. For a public site that must search document text, the texts still have to reach an index of the project's own — decide that early, because this search will not grow into it.
 
 → `mcp/docs/api/file-content-search#a-result-is-a-whole-file-and-not-a-fragment` · `mcp/docs/api/index-attributes#what-an-index-attribute-is`
 
