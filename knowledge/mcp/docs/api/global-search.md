@@ -64,7 +64,7 @@ Its permission record must be linked to the reading group. It is provisioned lin
 ## What global search never finds
 
 - **File names and file-valued attributes.** Nothing is matched by file name, and the attribute types that hold files, images, groups of images, JSON and captcha values are excluded from matching.
-- **Document text, publicly.** The admin address returns it in a group of its own, `files`: ask with `types=files` and expect a whole file per item, not a record — `fragment` carries the same control-character-marked snippet the document search returns. It needs that search's grant, so an admin without it gets no such group.
+- **Document text, publicly.** The admin address returns it in a group of its own, `files`: ask with `types=files` and expect a whole file per item, not a record — `fragment` carries the same control-character-marked snippet the document search returns. It needs that search's grant, so an admin without it gets no such group, It is offered on the same plans as that search: where the plan excludes it, the group comes back empty rather than failing the whole answer, so read `capability.tariffAllows` from the document search status before calling an empty `files` group "nothing matched".
 - **Fields marked as passwords.** Excluded from every mode.
 - **Content in another language.** It does not translate.
 - **Anything unindexed.** What is searchable follows the same indexing rules as everything else.
