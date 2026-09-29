@@ -42,6 +42,29 @@ So verify with a **paused read**, and never repeat the write.
 
 → `mcp/docs/api/index-attributes#when-a-written-value-becomes-searchable`
 
+## What a 503 on a public read is telling you
+
+A public read answers `503` with a JSON body and a `Retry-After` header when too many
+requests are in flight for the instance at that moment:
+
+```text
+GET /api/content/products/103?langCode=en_US
+  x-app-token: <app token>
+  → 503 Retry-After: 1
+    {"statusCode":503,"message":"Content API is temporarily overloaded, retry shortly"}
+```
+
+Nothing is missing and nothing is deleted. Wait the number of seconds the header names and
+send the same request again; it succeeds once the burst passes.
+
+This is the answer a prerender or an export that fans out hundreds of parallel reads will
+meet first. Bound your own concurrency and retry on `503` rather than treating it as an
+absent entity — a build that maps `503` onto "not found" bakes a missing page into the
+output and keeps it until the next deploy.
+
+The health route keeps answering while reads are being shed, so a `503` on content plus a
+healthy instance is the expected combination, not a contradiction.
+
 ## Why a public list stops at the same number
 
 The rules of the reading group decide how much of a list the public sees, not just whether the call succeeds. Nearly every content route is provisioned as a restricted read, and where that is applied it trims the answer to a fixed count — ten unless the instance says otherwise — and marks it in no way at all.
@@ -74,6 +97,7 @@ So check the work through the public route the site itself will call, with the l
 - **Reading a token `401` as a closed project** and rewriting the group permissions.
 - **Repeating a write because the public read still shows the old value.** Wait and read again.
 - **Treating a trimmed list as the whole list.** The restricted read says nothing about being cut.
+- **Reading a `503` as missing content.** Respect `Retry-After` and send the read again.
 - **Looking for a public address for an external page.** It arrives in the menu.
 - **Verifying only through the admin read.** It is not what the site receives.
 
