@@ -103,7 +103,8 @@ The answer is `{ "items": [...], "total": n }`, and a `POST` that worked answers
 
 - `queryText` is required, up to 512 characters. `limit` defaults to 30 and `offset` pages, both as query parameters alongside `langCode`.
 - `total` counts the candidates found before paging, and is itself capped by `maxHits` — 100 by default, 500 at most.
-- `vectorDistanceThreshold` tightens or loosens the match, from 0 to 2, lower being stricter. Send `debug: true` and each item carries its `distance`, which is how you choose a threshold rather than guessing at one.
+- `vectorDistanceThreshold` tightens or loosens the match, from 0 to 2, lower being stricter. On products each item always carries its `distance`; for the other six kinds, ask for it with `debug: true`.
+- **A search by meaning never answers "nothing like that exists".** Every query lands somewhere, and a nonsense string can score closer than a real word, so no fixed threshold separates the two: rank on `distance` and cut the tail yourself.
 - The search covers **the whole instance**. There is no site, branch or parent parameter, so a project holding several sites gets all of them back and must narrow the results itself.
 - Pages come back whether or not they are visible. Each item carries `isVisible`; a site that shows results unfiltered will publish pages that were deliberately hidden.
 
