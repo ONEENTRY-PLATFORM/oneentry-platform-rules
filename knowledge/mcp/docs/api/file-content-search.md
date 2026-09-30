@@ -12,7 +12,7 @@ Document processing is **off on a new instance and stays off after an upgrade**.
 
 Enable it in general settings, under a `fileContentSearch` section. Send the section whole: a partial body replaces the keys you send and keeps the rest, so read before you write.
 
-Enabling it does **not** pick up files that were already attached before that moment. Coverage stays at zero, and the search stays empty, until something reprocesses them. After enabling, call `AdminFileContentController_rebuild` with `{ "scope": "missing" }` once. It finds the files already held in attribute values of the enabled owner sections and accepts them for processing. Files attached or changed later are picked up without it.
+Enabling it does **not** pick up files that were already attached before that moment. Coverage stays at zero, and the search stays empty, until something reprocesses them. After enabling, call `AdminFileContentController_rebuild` with `{ "scope": "missing" }` once. It finds the files already attached in every enabled owner section — those held in attribute values, and those attached to orders and form submissions — and accepts them for processing. Files attached or changed later are picked up without it.
 
 On a large instance that one call accepts the whole existing corpus at once. Warn the user before calling it there, since processing a large corpus takes a long time.
 
@@ -48,7 +48,7 @@ The first eight are on by default. The other five — `orders`, `form_data`, `us
 
 Files attached to orders and to form submissions are searchable on the admin side once `orders` and `form_data` are added to `ownerTables`. Until then nothing about them is read, and an order attachment that "cannot be found" is almost always that rather than a failure. They are never searchable publicly, whatever `ownerTables` says: a visitor's own order attachments are not separated from anyone else's there, so the public search leaves both sections out. Existing attachments of those two sections are picked up the next time the order or the submission is saved, or by a `missing` rebuild.
 
-A section left out of `ownerTables` is not read at all: no index entry appears for its files, so an absent entry is the expected answer rather than a sign that processing failed. Turning the section on and then saving the record again is what creates the entry.
+A section left out of `ownerTables` is not read at all: no index entry appears for its files, so an absent entry is the expected answer rather than a sign that processing failed. Adding the section is the first of two steps and creates nothing by itself — what creates the entries is a `missing` rebuild after it, for every section alike. Saving a single record again is the way to cover just that one.
 
 Each section is also filtered per admin: a result names its owner record, and both the result and that name are limited to the sections the admin can reach. Two admins can get different result counts for the same query, and neither is wrong.
 
