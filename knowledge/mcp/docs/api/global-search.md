@@ -98,7 +98,7 @@ curl -X POST "https://your-instance.example/api/content/pages/vector/search?lang
 
 ## Reading a semantic search answer
 
-The answer is `{ "items": [...], "total": n }`, and a `POST` that worked answers `201`. Every kind but products adds `indexReady`, which separates an empty answer from a kind nothing has been indexed for yet.
+The answer is `{ "items": [...], "total": n }`, and a `POST` that worked answers `201`. All seven kinds add `indexReady`: `false` separates an empty answer from a kind nothing has been indexed for yet, and comes back at once.
 
 - `queryText` is required, up to 512 characters. `limit` defaults to 30 and `offset` pages, both as query parameters alongside `langCode`.
 - `total` counts the candidates found before paging, and is itself capped by `maxHits` — 100 by default, 500 at most.
