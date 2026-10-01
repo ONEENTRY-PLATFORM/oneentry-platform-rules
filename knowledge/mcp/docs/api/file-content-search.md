@@ -173,9 +173,11 @@ Sending `{ "scope": "ocr" }` a second time does not ask for the same scans twice
 
 Once recognition has finished on a scan and still found no text, that scan is back in the slice. This is what makes the scope usable after the instance gains a language it could not read before, or after its reader is upgraded: send `{ "scope": "ocr" }` again and every such scan is asked for once more, without a call per document. Do not send it while the previous run is still working — you would only be waiting on the same answer. To ask again for one document on its own, send the single-entry `ocrRequested: true` for the entry you want.
 
-A zero in the answer means nothing was taken, and nothing in the slice was changed. Recognition also needs processing enabled and space left in the index, so `{ "scope": "ocr" }` answers `201` with zero accepted while `processing.enabled` is false or `storage.overBudget` is true. Read both fields from the status before reading a zero as "there was nothing left to recognise": clear the condition and the same call takes the slice.
+A zero in the answer means nothing was taken, and nothing in the slice was changed. Recognition also needs processing enabled, the instance's recognition setting on, and space left in the index, so `{ "scope": "ocr" }` answers `201` with zero accepted while `processing.enabled` is false, `fileContentSearch.ocr.enabled` is false, or `storage.overBudget` is true. Check all three before reading a zero as "there was nothing left to recognise": clear the condition and the same call takes the slice.
 
-The single-entry call is subject to the same condition, and says as little about it: while `processing.enabled` is false it answers `200` with `ocrRequested: true` on the entry, and no recognition is queued. Read `processing.enabled` from the status before reading that answer as work accepted. Nothing is lost by it — the entry stays in the `ocr` slice, so once processing is enabled `{ "scope": "ocr" }` takes it along with the rest and there is no need to repeat the single-entry call document by document.
+The single-entry call is subject to the same conditions, and says as little about them: while `processing.enabled` or `fileContentSearch.ocr.enabled` is false it answers `200` with `ocrRequested: true` on the entry, and no recognition is queued. Check both before reading that answer as work accepted. Nothing is lost by it — the entry stays in the `ocr` slice, so once the condition is cleared `{ "scope": "ocr" }` takes it along with the rest and there is no need to repeat the single-entry call document by document.
+
+The recognition setting is **off on a new instance**, and that is the condition worth checking first. `capability.ocrAvailable` can be true — the instance is able to recognise — while `fileContentSearch.ocr.enabled` is false, and then both calls answer success and queue nothing at all. The status does not carry that setting; read the `fileContentSearch` section of general settings for it. Turn it on by sending that section whole, the way any setting is changed, and the next request queues normally.
 
 ## Attaching a document does not index it instantly
 
@@ -263,6 +265,7 @@ The answer is an acceptance, not a result. Follow it in `processing.rebuild` of 
 - **Rebuilding a scan with any scope but `ocr`.** It comes back exactly as it went in.
 - **Rebuilding to clear `overBudget`.** Nothing reprocesses out of a full index.
 - **Turning recognition on for the whole instance** to read one scan. Ask for the one entry.
+- **Reading a recognition request as accepted while the setting is off.** Both calls answer success.
 - **Treating `truncated` as success.** Only the first part of a long document matches.
 - **Re-attaching a file that has not appeared yet.** That is a second reference, not a retry.
 - **Paging past `offset + limit` of 200.** Narrow the query instead.
