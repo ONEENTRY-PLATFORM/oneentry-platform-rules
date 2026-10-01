@@ -129,17 +129,35 @@ The `vectorized` and `total` sitting beside `byTable` count products alone. Read
 
 Importing or updating many entities at once means the queryable side lags by more than seconds. Verify a bulk change by sampling — read a handful of entities by id, then check the listing once, rather than polling the listing repeatedly.
 
-### How far behind the instance is right now
+## How far behind the instance is right now
 
 Before a bulk write, ask how much indexing work is already pending. `IndexAttributeController_getQueueStats` — `GET /index-attributes/queue-stats` — answers it, and the same object comes back as `queue` inside `GET /index-attributes/health`:
 
 ```json
-{ "waiting": 1495, "active": 2, "lagSeconds": 5400 }
+{ "queue": "...", "waiting": 1495, "active": 2, "completed": 23,
+  "failed": 184, "delayed": 1, "paused": false, "lagSeconds": 5400 }
 ```
 
 `lagSeconds` is how long the oldest pending item has been waiting. A value you write now becomes searchable and published no sooner than that. `null` means nothing is pending.
 
-A large `lagSeconds` is a reason to wait, or to split the job, before writing more — every write joins the end of the backlog. It is not a reason to repeat writes that have not shown up yet, and the counters staying the same for a minute do not mean nothing is happening: read `lagSeconds` again later and compare.
+`waiting`, `active`, `completed`, `failed` and `delayed` count pending and finished work. `paused` says whether the work is stopped altogether — that is the one field that means indexing is not progressing. `queue` is a label naming which work these numbers cover; treat it as opaque and never parse it.
+
+A large `lagSeconds` is a reason to wait, or to split the job, before writing more — every write joins the end of the backlog. It is not a reason to repeat writes that have not shown up yet.
+
+## The counters cover one stage and not the whole of indexing
+
+These numbers describe one stage only: the one that makes written values queryable. Getting a value into the copy that search reads is separate work, and nothing about it appears in these counters.
+
+So counters that do not move are not evidence that indexing has stopped. In the very same minute, entities can be going into search normally. `failed` accumulating is likewise a count of past failures, not a statement about now.
+
+Judge progress by `GET /index-attributes/health` instead, which reports it per kind of entity:
+
+```json
+{ "pages": { "attributes": 2, "attributesInIndexCount": 2, "isProblem": false,
+             "lastIndexedAt": "2026-09-30 14:08:22.667257+00" } }
+```
+
+`lastIndexedAt` moving forward is what says work is being done for that kind, and `attributesInIndexCount` closing on `attributes` is what says it is caught up. Read those two, for the kind you actually wrote to, before reporting that indexing is stuck.
 
 → `mcp/docs/api/import`
 
@@ -151,6 +169,7 @@ A large `lagSeconds` is a reason to wait, or to split the job, before writing mo
 - **Reading a new attribute key as unsupported** because the public answer does not carry it. Write a value into it first.
 - **Verifying a bulk import by refreshing a listing.** Sample by id.
 - **Starting a bulk write without checking the backlog.** Read `lagSeconds` first.
+- **Reading unmoving queue counters as indexing being stuck.** They cover one stage. Check `lastIndexedAt` per kind before concluding anything.
 - **Assuming indexing is instant after marking an attribute.** Existing values are picked up progressively.
 - **Reading an empty search by meaning as no match.** Check the coverage for that kind first.
 - **Reading an empty `attributeValues` as "this product has no values".** Look at `isSync` before concluding either way.
