@@ -107,7 +107,7 @@ Inside `schema`, each attribute sits under `attribute` followed by its numeric `
   "position": 1, "isVisible": true, "localizeInfos": { "en_US": { "title": "Page title" } } } }
 ```
 
-A schema keyed by marker is accepted on create, update and schema replace, and answers success. The admin panel then cannot open any attribute of that set: the attribute's page redirects away. Content API reads are unaffected, so only the admin panel shows the damage.
+A schema keyed by marker is accepted on create, update and schema replace, and answers success. The admin panel then cannot open any attribute of that set: the attribute's page lands on the not-found page. Content API reads are unaffected, so only the admin panel shows the damage.
 
 Give every attribute an integer `id` unique within the set, key it `attribute<id>`, and after the write read the set back and confirm each key matches its `id`.
 
