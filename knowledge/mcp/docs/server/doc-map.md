@@ -169,6 +169,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Question | Go to |
 |---|---|
 | Why is what I just wrote missing from a list or a public read | `mcp/docs/api/index-attributes#when-a-written-value-becomes-searchable` |
+| How far behind is indexing right now | `mcp/docs/api/index-attributes#how-far-behind-the-instance-is-right-now` |
+| Do unmoving queue counters mean indexing has stopped | `mcp/docs/api/index-attributes#the-counters-cover-one-stage-and-not-the-whole-of-indexing` |
 | Why does creating this fail as a duplicate | `mcp/docs/api/baseline-data#silent-duplicates-versus-hard-failures` |
 | Why did my write answer 200 and change nothing | `mcp/docs/api/silent-no-ops` |
 | Why did my menu item jump to the top level after an update | `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it` |
