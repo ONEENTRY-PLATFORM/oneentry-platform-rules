@@ -94,8 +94,22 @@ Before you do either:
 - Choose the attribute type from the closed list; there is no way to add a type.
 - Pick a marker that reads well in the admin panel — humans see it.
 - Give every attribute an `identifier`. It is the marker, and nothing enforces it: a definition without one is accepted, and the attribute is then unreachable — its values are stored but never come back in `attributeValues`.
+- Key it `attribute<id>` inside `schema`, never by its marker — next section.
 
 Dry run first, and read the set back to confirm the attribute's id before writing any values against it.
+
+## The schema key is attribute and the id
+
+Inside `schema`, each attribute sits under `attribute` followed by its numeric `id`. The marker goes in `identifier`, never in the key:
+
+```json
+{ "attribute1": { "id": 1, "type": "string", "identifier": "page_title",
+  "position": 1, "isVisible": true, "localizeInfos": { "en_US": { "title": "Page title" } } } }
+```
+
+A schema keyed by marker is accepted on create, update and schema replace, and answers success. The admin panel then cannot open any attribute of that set: the attribute's page redirects away. Content API reads are unaffected, so only the admin panel shows the damage.
+
+Give every attribute an integer `id` unique within the set, key it `attribute<id>`, and after the write read the set back and confirm each key matches its `id`.
 
 ## An attribute definition is locale keyed too
 
