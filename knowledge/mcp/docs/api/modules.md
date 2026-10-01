@@ -99,7 +99,7 @@ The deploy call answers with the identifier of the asynchronous task that create
 
 ## Why a registry password reads back as three stars
 
-A private-registry password lives under `config.docker.pass`, and reads never return it. Both ways of reading a module — the module list and a read by identifier — answer `***` in that field whenever a password is stored. `config.docker.host`, `config.docker.user`, `config.docker.image` and `config.env` come back unchanged.
+A private-registry password lives under `config.docker.pass`, and reads never return it. Every response that hands you a stored module — the module list, a read by identifier, and the module a reorder call answers with — carries `***` in that field whenever a password is stored. `config.docker.host`, `config.docker.user`, `config.docker.image` and `config.env` come back unchanged.
 
 So `***` is a marker, not a value: never carry it into a registry login, and never read it as a wrong password.
 
@@ -109,7 +109,7 @@ Leaving `config.docker.pass` out of a `config.docker` object you send keeps the 
 
 Any other value replaces the password — to change it, send the new one. To clear it, send an empty string. Deploy always uses the real stored password, whatever a read shows.
 
-One asymmetry: the create call echoes the `config` it was just sent, so a password submitted in clear text appears in that one response. The masking is on reads.
+One asymmetry: the create call echoes the `config` it was just sent, so a password submitted in clear text appears in that one response. The masking covers responses that come from storage.
 
 ## What the container status values mean
 
