@@ -129,6 +129,18 @@ The `vectorized` and `total` sitting beside `byTable` count products alone. Read
 
 Importing or updating many entities at once means the queryable side lags by more than seconds. Verify a bulk change by sampling — read a handful of entities by id, then check the listing once, rather than polling the listing repeatedly.
 
+### How far behind the instance is right now
+
+Before a bulk write, ask how much indexing work is already pending. `IndexAttributeController_getQueueStats` — `GET /index-attributes/queue-stats` — answers it, and the same object comes back as `queue` inside `GET /index-attributes/health`:
+
+```json
+{ "waiting": 1495, "active": 2, "lagSeconds": 5400 }
+```
+
+`lagSeconds` is how long the oldest pending item has been waiting. A value you write now becomes searchable and published no sooner than that. `null` means nothing is pending.
+
+A large `lagSeconds` is a reason to wait, or to split the job, before writing more — every write joins the end of the backlog. It is not a reason to repeat writes that have not shown up yet, and the counters staying the same for a minute do not mean nothing is happening: read `lagSeconds` again later and compare.
+
 → `mcp/docs/api/import`
 
 ## Common mistakes
@@ -138,6 +150,7 @@ Importing or updating many entities at once means the queryable side lags by mor
 - **Re-writing after a public read looks stale.** It lags the admin read; wait and read again.
 - **Reading a new attribute key as unsupported** because the public answer does not carry it. Write a value into it first.
 - **Verifying a bulk import by refreshing a listing.** Sample by id.
+- **Starting a bulk write without checking the backlog.** Read `lagSeconds` first.
 - **Assuming indexing is instant after marking an attribute.** Existing values are picked up progressively.
 - **Reading an empty search by meaning as no match.** Check the coverage for that kind first.
 - **Reading an empty `attributeValues` as "this product has no values".** Look at `isSync` before concluding either way.
