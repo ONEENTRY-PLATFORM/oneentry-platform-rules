@@ -105,7 +105,9 @@ So `***` is a marker, not a value: never carry it into a registry login, and nev
 
 Sending it back is how you keep the stored password. On an update, `config.docker.pass` of `***` leaves the stored password as it is rather than overwriting it, so reading a module and writing its whole `config` object back cannot destroy the credential. On a create there is nothing to keep, so the field is dropped and the module ends up with no password.
 
-Any other value replaces the password — to change it, send the new one. Deploy always uses the real stored password, whatever a read shows.
+Leaving `config.docker.pass` out of a `config.docker` object you send keeps the stored password too — the rule is that a field you do not send is a field you do not change. So stripping `***` before a write is as safe as sending it back. The merge covers the `docker` object you send: a `config` that carries no `docker` key at all replaces the whole object, and the registry settings go with it.
+
+Any other value replaces the password — to change it, send the new one. To clear it, send an empty string. Deploy always uses the real stored password, whatever a read shows.
 
 One asymmetry: the create call echoes the `config` it was just sent, so a password submitted in clear text appears in that one response. The masking is on reads.
 
@@ -150,3 +152,4 @@ Two refusals here belong to the read and not to the module. A bound that is not 
 - **Putting the image anywhere but `config.docker.image`.** Other keys are stored and ignored.
 - **Looking for a schedule option.** There is none; the container schedules itself.
 - **Reading `***` as a registry password.** It is a marker for a stored one; send it back to keep it.
+- **Expecting an omitted `config.docker.pass` to clear the password.** It keeps it; an empty string clears it.
