@@ -140,6 +140,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why was my call refused with nothing sent | `mcp/docs/server/allow-levels#a-level-refusal-happens-before-authentication` |
 | Why does every public read answer 401 | `mcp/docs/api/content-api-reads#public-reads-use-the-x-app-token-header` |
 | Why does a public read answer 503 | `mcp/docs/api/content-api-reads#what-a-503-on-a-public-read-is-telling-you` |
+| Why does a public read answer 429 | `mcp/docs/api/content-api-reads#what-a-429-on-a-public-read-is-telling-you` |
 | Why can I not list the submissions of a form | `mcp/docs/api/form-submissions#both-read-routes-need-the-forms-data-read-permission` |
 | Why did an operation that worked start answering 403 | `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it` |
 | Why is my upload or file delete refused with 403 | `mcp/docs/api/files-and-uploads#admin-uploads-and-deletes-need-file-permissions` |
