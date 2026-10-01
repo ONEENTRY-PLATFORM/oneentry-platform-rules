@@ -65,6 +65,36 @@ output and keeps it until the next deploy.
 The health route keeps answering while reads are being shed, so a `503` on content plus a
 healthy instance is the expected combination, not a contradiction.
 
+## What a 429 on a public read is telling you
+
+An instance can also limit how **often** public reads are accepted, which is a different
+limit from the one above: that one counts reads in flight at the same moment, this one
+counts reads over a short window. Over the ceiling a read answers:
+
+```text
+GET /api/content/products/103?langCode=en_US
+  x-app-token: <app token>
+  → 429 Retry-After: 10
+    {"statusCode":429,"message":"Too many requests, retry after the indicated delay"}
+```
+
+The window is counted per application token, so every page a storefront renders from the
+same token shares one ceiling. Reads arriving without that header are counted per client
+address instead. The health route is never subject to the limit.
+
+Wait the number of seconds `Retry-After` names and send the same read again. Do not widen
+your fan-out to catch up afterwards — the next window starts clean and a burst walks
+straight back into the ceiling. An exporter or a prerender should cap its own rate and
+honour the header per read, not per run.
+
+`429` is the answer that means "slow down". A `403` on the same read means the reading
+group is not allowed that content, and no amount of waiting changes it — see the refusal
+section above. Treating one as the other either hides a real permission problem or
+abandons content that was there all along.
+
+Not every instance applies a frequency limit, so a run that never sees `429` does not
+prove your client handles it. Handle the header, do not probe for the ceiling.
+
 ## Why a public list stops at the same number
 
 The rules of the reading group decide how much of a list the public sees, not just whether the call succeeds. Nearly every content route is provisioned as a restricted read, and where that is applied it trims the answer to a fixed count — ten unless the instance says otherwise — and marks it in no way at all.
@@ -98,6 +128,7 @@ So check the work through the public route the site itself will call, with the l
 - **Repeating a write because the public read still shows the old value.** Wait and read again.
 - **Treating a trimmed list as the whole list.** The restricted read says nothing about being cut.
 - **Reading a `503` as missing content.** Respect `Retry-After` and send the read again.
+- **Reading a `429` as a permission refusal.** It is a rate ceiling: wait out `Retry-After`.
 - **Looking for a public address for an external page.** It arrives in the menu.
 - **Verifying only through the admin read.** It is not what the site receives.
 
