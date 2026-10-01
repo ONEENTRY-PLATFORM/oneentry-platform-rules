@@ -131,7 +131,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/settings` | Instance-wide settings, limits and quota |
 | `mcp/docs/api/import` | Bulk-loading content from a file |
 | `mcp/docs/api/ai-gateway` | The platform's own model-calling feature |
-| `mcp/docs/api/ui-component-configs` | Changing how an admin panel table or form looks, or giving an admin a screen template |
+| `mcp/docs/api/ui-component-configs` | Changing how an admin panel table, form or record page looks, or giving an admin a screen template |
 
 ## Answers about permissions and refusals
 
@@ -160,12 +160,17 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why did an AI job complete with an empty result | `mcp/docs/api/ai-gateway#a-completed-job-with-an-empty-result-ran-out-of-budget` |
 | Why can I not delete a screen template | `mcp/docs/api/ui-component-configs#a-template-that-is-still-assigned-cannot-be-deleted` |
 | Why is saving the constructor agent's template refused with 400 | `mcp/docs/api/ui-component-configs#saving-a-template-that-refers-to-an-unsaved-recipe` |
+| Why did assigning a template wipe the rest of the screen | `mcp/docs/api/ui-component-configs#a-record-page-template-covers-one-part-of-the-page` |
+| Why is my field layout for a record page not applied | `mcp/docs/api/ui-component-configs#the-attribute-set-is-fixed-when-the-template-is-saved` |
+| Which key is a record page or a section tab panel saved under | `mcp/docs/api/ui-component-configs#screen-keys-a-record-page-is-saved-under` |
 
 ## Answers about writes that changed nothing
 
 | Question | Go to |
 |---|---|
 | Why is what I just wrote missing from a list or a public read | `mcp/docs/api/index-attributes#when-a-written-value-becomes-searchable` |
+| How far behind is indexing right now | `mcp/docs/api/index-attributes#how-far-behind-the-instance-is-right-now` |
+| Do unmoving queue counters mean indexing has stopped | `mcp/docs/api/index-attributes#the-counters-cover-one-stage-and-not-the-whole-of-indexing` |
 | Why does creating this fail as a duplicate | `mcp/docs/api/baseline-data#silent-duplicates-versus-hard-failures` |
 | Why did my write answer 200 and change nothing | `mcp/docs/api/silent-no-ops` |
 | Why did my menu item jump to the top level after an update | `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it` |
