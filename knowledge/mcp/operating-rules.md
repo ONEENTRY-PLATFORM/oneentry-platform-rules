@@ -39,7 +39,7 @@ Required on a product, effectively required on a page. Never hardcode `en_US`: r
 { "attributesSets": { "en_US": { "string_id42": "SKU-1" } } }
 ```
 
-The inner key is `<attribute type>_id<attribute id>`, from the entity's attribute set. A flat one-level map is accepted, answers 201 and stores nothing — read the entity back by id.
+The inner key is `<attribute type>_id<attribute id>`, from its set. A flat map is accepted, answers 201 and stores nothing — read back by id. The set's own `schema` is keyed `attribute<id>`, never by marker.
 
 → `mcp/docs/api/attribute-sets`
 
