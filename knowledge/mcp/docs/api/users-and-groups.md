@@ -24,7 +24,7 @@ A second group for signed-in customers, with identifier `user`, exists on fully 
 
 ## Permissions are per route and already exist
 
-A permission record is provisioned for every Content API path, each with a section and a set of rules. They cover everything the Content API exposes.
+A permission record is provisioned for nearly every Content API path, each with a section and a set of rules.
 
 So the workflow when a route is refused is:
 
@@ -32,7 +32,9 @@ So the workflow when a route is refused is:
 2. Find the existing permission record for it.
 3. Adjust its rules for the group in question.
 
-A permission path is unique per group, so creating one that exists fails — and a create is never the right move here anyway.
+Step 2 can come up empty. A project does not gain the records for addresses added after it was created until its instance is updated, so a path can have no record anywhere: the refusal names the route, the group list has no row for it, and there is nothing to attach yet. `mcp/docs/api/content-api-permission-rules#give-a-group-a-route-it-does-not-have-yet` covers that case.
+
+A permission path is unique per group, so creating one that already exists fails. A create is the right move only when no record carries the path at all.
 
 ## A group can skip every permission check
 
