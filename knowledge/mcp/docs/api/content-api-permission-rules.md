@@ -108,6 +108,32 @@ A group holds one record per `path`. Attaching a second record whose path a link
 
 Linking and unlinking reach the Content API at once — unlike a rules edit, they need no flush and no wait.
 
+When no record carries the path at all there is nothing to attach, and `?isUnused=1` does not reveal one either. `AdminUserPermissionsController_create` — `POST /api/admin/user-permissions` — makes one, and takes an **array** even for a single record:
+
+```json
+[
+  {
+    "path": "/api/content/discounts/bonus-balance",
+    "section": "discounts",
+    "localizeInfos": { "en_US": { "title": "Bonus balance" } },
+    "rules": {
+      "permissions": {
+        "readAllRule": 0,
+        "readRestrictionRule": 1,
+        "addRule": false,
+        "changeRule": false,
+        "deleteRule": false
+      },
+      "additionalData": {}
+    }
+  }
+]
+```
+
+`path` is matched segment for segment, with `{marker}` standing in for a variable segment, so it must be the address the site calls and nothing near it: a shorter path never covers a longer one, however alike they read. Attach the new record to the group afterwards — the call above — and the route answers `200`.
+
+A record linked to any group cannot be deleted; that answers `405`. Detach it from every group first, which is also how you undo a record created against the wrong path.
+
 ## Why the group permission list is not proof of a grant
 
 `AdminUserGroupsController_findAllPermissionForOneGroup` — `GET /api/admin/user-groups/{id}/permissions` — is the obvious way to confirm a grant, and reading it as "the routes this group has" is wrong. It carries two kinds of record: those linked to the group, and those linked to no group at all, offered so you can pick one to grant.
