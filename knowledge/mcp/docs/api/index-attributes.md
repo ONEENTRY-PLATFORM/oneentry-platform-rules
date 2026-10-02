@@ -105,9 +105,9 @@ There is an operation returning the distinct values an indexed attribute current
 
 Global search and the per-kind `POST /{kind}/vector/search` routes match by meaning, and a kind whose records carry no vector answers them with nothing at all.
 
-For pages, discounts, users, admins, orders and form data the answer itself says which of the two it is: it carries `indexReady` beside `items` and `total`. `true` means that kind and locale are covered and nothing matched the wording. `false` means nothing is covered there yet and no matching was attempted — report it as "this kind is not covered yet", never as "no results", and expect it back at once where a real search takes noticeably longer. The field follows the locale you asked for, so a kind covered in one language can answer `false` in another.
+On a per-kind route the answer itself says which of the two it is: it carries `indexReady` beside `items` and `total`. All seven kinds do this — pages, discounts, users, admins, orders, form data and products. `true` means that kind and locale are covered and nothing matched the wording. `false` means nothing is covered there yet and no matching was attempted — report it as "this kind is not covered yet", never as "no results", and expect it back at once where a real search takes noticeably longer. The field follows the locale you asked for, so a kind covered in one language can answer `false` in another.
 
-Products and global search do not carry the field. For those, the coverage report below is the way to tell an uncovered kind from a genuine miss.
+Global search does not carry the field. For it, the coverage report below is the way to tell an uncovered kind from a genuine miss.
 
 `IndexAttributeController_getHealth` — `GET /index-attributes/health` — reports it per kind under `sinks.vectors.byTable`, with an entry each for pages, discounts, users, admins and orders:
 
