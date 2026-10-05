@@ -89,6 +89,14 @@ A submission body needs `formIdentifier` (the form's marker), `formModuleConfigI
 
 **`formIdentifier` and `formModuleConfigId` must describe the same form.** They are compared, so a mismatch — or a config id matching nothing, which is what an unbound form gives you — answers `400 Incorrect formIdentifier for provided config`. The message names `formIdentifier`; the wrong one is usually the config id.
 
+## Send status only as one of its five values
+
+`status` is optional on a submission and it is not free text. Send it only as one of `sent`, `moderation`, `approved`, `banned`, `deleted`, lowercase. Any other value is refused with a `400` naming `status` and listing the five it accepts.
+
+The value that looks safe and is not is the **empty string**: there is no "no status yet" value to send. Leave the key out instead, and the form's own moderation setting decides what the stored submission starts as. A submission sent through a client library that types the field as a plain string will compile with `""` in it; that is the client's typing being wider than the API, not a value the API takes.
+
+→ `mcp/docs/api/form-submissions#submission-status`
+
 ## An update drops every config you do not send back
 
 `formModuleConfigs` is a full replacement list, not a patch. An update that omits it is read as "this form has no configs": every binding is deleted, **and the submissions recorded against them go too**, and the call answers `200 true`. That makes an ordinary edit — a retitle, a processing-type change — destructive by omission. Read the form first and send its current `formModuleConfigs` back unless changing them is the point.
