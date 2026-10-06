@@ -72,7 +72,7 @@ Creating a form does not create one: the create operation has no field for it, s
 { "formModuleConfigs": [ { "formId": 5,
                            "moduleId": 4,
                            "isGlobal": false,
-                           "entityIdentifiers": [ { "id": "contacts-page", "isNumeric": false, "childrenOn": false } ],
+                           "entityIdentifiers": [ { "id": "contacts-page", "isNested": false } ],
                            "isClosed": false,
                            "isModerate": false,
                            "viewOnlyUserData": true,
@@ -80,7 +80,8 @@ Creating a form does not create one: the create operation has no field for it, s
 ```
 
 - `formId` is the form being updated, `moduleId` the module — read the modules listing for the id.
-- `isGlobal: true` with an empty `entityIdentifiers` binds the form to every entity of the module; otherwise list them, `isNumeric` saying which kind of `id` each is and `childrenOn` including its children.
+- `isGlobal: true` with an empty `entityIdentifiers` binds the form to every entity of the module; otherwise list them. An entry is `{ "id": … }` plus two optional keys: `isNested: true` extends it to the entity's children, and `exceptionIds` lists children left out of that. `id` takes a textual identifier or a numeric one, whichever the module addresses its entities by — nothing else describes the kind.
+- The read returns the entries in exactly this shape, so the list you read is the list you send back. Keys outside those three are stored and never read: an entry that names children through anything but `isNested` binds the parent alone, and nothing reports it.
 - An entry with no `id` is a **new** binding. An existing one is matched by its own `id` and by nothing else — same module, same entities, no `id`, and you have replaced it rather than edited it.
 
 So the path from nothing to a stored submission is four calls: **create** the form wrapped under `newForm` with an explicit `type`; **update** it with `formModuleConfigs`, the step with no operation of its own that people miss; **read it back** and take `formModuleConfigs[].id`, which is the only way to learn the `formModuleConfigId`; **create the submission**, naming both the form and that config.
@@ -112,6 +113,8 @@ read the form      → formModuleConfigs[0].id = 10, count for the marker = 0
 A public read of the entity keeps naming the previous binding while its answer is still current, so the site's own submissions answer `400 Incorrect formIdentifier for provided config` for a while afterwards rather than at the moment of the edit — which is what makes it hard to connect to it.
 
 Keep each entry's `id`, and read back: same ids, same count.
+
+Where a shortened list would take submissions with it, the call answers `409` instead, naming how many submissions and which bindings, and changes nothing. Add `confirmFormDataDeletion: true` to the same body to go through — it is the only way to delete a binding that holds submissions, and an edit that echoes every binding back with its `id` never meets it. Dropping a binding with no submissions still answers `200` either way, and so does every call on an instance without the gate: the status tells you the gate is there, never that the submissions were safe.
 
 → `mcp/docs/api/silent-no-ops` · `mcp/docs/api/content-api-reads#why-a-public-read-still-shows-the-previous-value`
 
@@ -168,6 +171,7 @@ Deleting a form removes its submissions with it — definition and data are one 
 - **Reading a field error as proof the config is optional.** Field checks simply run first.
 - **Updating a form without echoing `formModuleConfigs`.** Bindings and submissions are deleted, answering `200`.
 - **Echoing them back without their `id`.** Same loss, and the form still looks bound.
+- **Reading a `409` on a form update as a failed edit.** Nothing was written: the body asks to delete bindings holding submissions.
 - **A `text` value with more than one of the three keys**, or with `params` beside them.
 - **Deleting a form to "clean up".** The submissions go too.
 - **Building a review form by hand.** Read `mcp/docs/api/rating-forms-and-reviews` first.
