@@ -67,6 +67,26 @@ The value is stored as sent rather than escaped, and the refusals are the same o
 
 → `mcp/docs/api/users-and-groups#the-islogin-field-is-what-a-user-signs-in-with`
 
+## Removing a key from the visitor state object
+
+The profile update also takes `state`, a free-form object the site keeps its own visitor data in — recently viewed items, consent flags, saved addresses. What you send is a **patch over the stored object, not a replacement**, and it is read one key at a time:
+
+| What the patch carries | What the stored object ends up with |
+|---|---|
+| a key with a value | the value replaces whatever that key held |
+| a key with `null` | the key is removed |
+| no such key | the stored value is kept |
+| no `state` at all | the whole object is kept |
+
+```json
+{ "formIdentifier": "visitor-form", "langCode": "en_US",
+  "state": { "consent": null, "recentlyViewed": [] } }
+```
+
+Against a stored `{ "consent": {...}, "profile": {...}, "recentlyViewed": [...] }` that answers `200` and leaves `{ "profile": {...}, "recentlyViewed": [] }`: `consent` is gone, `recentlyViewed` is the new empty list, `profile` was never mentioned and is untouched.
+
+There is no call that replaces the object wholesale, so omitting a key never clears it — list every key you want gone, each with `null`. Only the top level is read this way: a key whose value is an object is replaced entirely, and a `null` nested inside that object is stored as a value like any other.
+
 ## Sign-in needs the x-device-metadata header
 
 `auth` without it answers `400` naming the header and nothing else. The value is a JSON object, the same shape the visitor form route takes:
@@ -172,5 +192,6 @@ Run the cart half **twice** with the same guest id, in two separate requests. On
 - **Omitting `x-device-metadata` at sign-in.** It answers `400` naming the header.
 - **Requesting a fresh code on every click.** Inside the reissue window it answers `429`; the code already sent is the working one.
 - **Putting phone fields into `notificationData`.** Only `email` is accepted.
+- **Expecting a `state` key to clear because you left it out.** Send it as `null`.
 
 → `mcp/docs/api/forms-and-form-data` · `mcp/docs/api/content-api-reads`
