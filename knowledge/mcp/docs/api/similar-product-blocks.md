@@ -61,6 +61,8 @@ Read the source product's attribute values and copy the keys from there.
 
 `autoSimilarMinMatches` is how many of those attributes must match. It filters first — a product matching fewer is not in the block at all — and among those that pass, more matches rank higher. Absent, one match is enough.
 
+Sending the key as an empty list is not the same as leaving it out. An empty list is a requirement naming no attribute, so nothing qualifies and the block answers empty. Leave the key out to turn attribute matching off; the block then selects on its other settings, as it did before you wrote any.
+
 → `mcp/docs/server/payload-conventions` · `mcp/docs/api/attribute-sets`
 
 ## Collapsing variants into one card
@@ -92,6 +94,7 @@ A short block is not a fault. Block length is the merchant's setting, and a sect
 - **Sending `productId` and expecting it to matter.** In `manual` mode it is ignored; the shelf is the same for everybody.
 - **Leaving `mode` at `automatic` for a block a site calls without a product.** Every such call answers 400.
 - **Naming attributes by marker in `autoSimilarAttributes`.** Use the storage key; a wrong one matches nothing, silently.
+- **Clearing `autoSimilarAttributes` to an empty list to switch matching off.** That answers an empty block. Remove the key instead.
 - **Expecting `pageIds` to add to the product's own section.** It replaces it.
 - **Expanding a section's subtree into `pageIds`.** Descendants resolve on their own, and the expanded list goes stale.
 - **Treating a short block as a defect.** Read the diagnostics before concluding anything.
