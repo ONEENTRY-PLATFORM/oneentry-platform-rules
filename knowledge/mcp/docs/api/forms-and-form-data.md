@@ -134,6 +134,19 @@ Two consequences worth planning around:
 - **A typeless form can never accept a submission.** Step 4 rejects anything that is not `data` or `rating`, and a form created without `type` is `null` — the create-schema trap, surfacing as a submission failure.
 - **On the admin API, steps 1–3 do not run.** Field validation belongs to the visitor route, so a missing required field is stored rather than rejected and the config check is the first thing you meet. A `400` there is about the binding, and an accepted submission is no evidence that a visitor's would pass.
 
+## An empty value is not the same as no value
+
+A field that carries no `requiredValidator` can be left out of the submission entirely, and that is accepted. Sending the same marker with `""` is a different thing, and whether it is accepted depends on the format validator the field carries.
+
+| validator on the field | the marker sent as `""` |
+|---|---|
+| none, `emailInspectionValidator`, `checkForNumberValidator` | accepted |
+| `urlInspectionValidator`, `regExpValidator`, `fieldMaskValidator`, `stringInspectionValidator`, `checkForAGivenList` | `400`, naming the marker |
+
+The `400` is worded as "that value is not valid", in the same words an actually wrong value gets, so an optional box a visitor left alone can fail the whole submission and read as a bad address or a bad number.
+
+**Omit the markers you have no value for.** Sending every control a form rendered is the obvious implementation and the one that meets this; drop the empty ones from `formData` before submitting and an optional field behaves as optional. The consequence to expect in the panel: a submission row then shows only the fields the visitor actually filled, as a missing key rather than an empty string.
+
 ## Reading submissions
 
 Submissions are read by the form's marker, with a `POST` whose filter travels in the body. Which filter narrows to one page and which one narrows to a module binding is the part worth reading before you call it.
