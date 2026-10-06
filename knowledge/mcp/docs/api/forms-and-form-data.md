@@ -145,6 +145,10 @@ A field that carries no `requiredValidator` can be left out of the submission en
 
 The `400` is worded as "that value is not valid", in the same words an actually wrong value gets, so an optional box a visitor left alone can fail the whole submission and read as a bad address or a bad number.
 
+A required field reads whitespace as nothing. A marker sent as `"   "` or `"\t\n "` to a field carrying `requiredValidator` is refused in the same words as an omitted one, so a visitor who types a space into a required box meets a `400` instead of leaving a stored record whose value is a space.
+
+`trimValidator` on a field trims its string value before every other validator on that field runs, so the trimmed value is the one the required and format checks see, and the one stored. Paired with `stringInspectionValidator` a padded value is measured after the padding is gone.
+
 **Omit the markers you have no value for.** Sending every control a form rendered is the obvious implementation and the one that meets this; drop the empty ones from `formData` before submitting and an optional field behaves as optional. The consequence to expect in the panel: a submission row then shows only the fields the visitor actually filled, as a missing key rather than an empty string.
 
 ## Reading submissions
