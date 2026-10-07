@@ -161,6 +161,20 @@ The name check follows the locale key. A `validators` map written flat, with no 
 
 A set that already holds an unrecognised name keeps it, and nothing re-checks it until the set is written again. That write is where it surfaces: it answers `400` until the name is corrected, and the field is enforced by nothing up to that point.
 
+## When a required rule is on and when it is off
+
+`requiredValidator` is on as soon as the key is present under the locale, whatever value it carries: `true`, `{}`, `{ "strict": true }` and `{ "customErrorText": "Required field!" }` all make the field required. Submitting the form without that marker, or with an empty value for it, answers `400` and names the marker.
+
+The one value that turns the rule off is `{ "strict": false }`:
+
+```json
+{ "validators": { "en_US": { "requiredValidator": { "strict": false } } } }
+```
+
+It is stored and returned by the public form read exactly like the four above, so seeing the rule in a read is not enough to know the field is enforced — read `strict` as well. Write it only on a field you mean to leave optional: the admin panel and the public read still present the field as required, and a blank value is accepted.
+
+→ `mcp/docs/api/forms-and-form-data#the-order-the-errors-arrive-in`
+
 ## Two reads two answers
 
 An attribute set can be read two ways, and they do not show the same thing:
