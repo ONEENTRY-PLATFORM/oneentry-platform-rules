@@ -72,7 +72,7 @@ Creating a form does not create one: the create operation has no field for it, s
 { "formModuleConfigs": [ { "formId": 5,
                            "moduleId": 4,
                            "isGlobal": false,
-                           "entityIdentifiers": [ { "id": "contacts-page", "isNested": false } ],
+                           "entityIdentifiers": [ { "id": "contacts-page", "isNumeric": false, "childrenOn": false, "isNested": false } ],
                            "isClosed": false,
                            "isModerate": false,
                            "viewOnlyUserData": true,
@@ -148,6 +148,11 @@ A numeric field is no exception, and its configuration does not change the answe
 `null` is not an empty value here. A marker sent with `null` answers `400` whatever the field's type or validator configuration: the submission body is checked against its own shape before any validator runs, and a value there has to be a string or a number. Omit the marker instead of sending it with `null`.
 
 **Omitting the markers you have no value for is still the better shape**, even though sending every control a form rendered is now accepted. The difference shows up in the panel: a submission row then shows only the fields the visitor actually filled, as a missing key rather than an empty string.
+A required field reads whitespace as nothing. A marker sent as `"   "` or `"\t\n "` to a field carrying `requiredValidator` is refused in the same words as an omitted one, so a visitor who types a space into a required box meets a `400` instead of leaving a stored record whose value is a space.
+
+`trimValidator` on a field trims its string value before every other validator on that field runs, so the trimmed value is the one the required and format checks see, and the one stored. Paired with `stringInspectionValidator` a padded value is measured after the padding is gone.
+
+**Omit the markers you have no value for.** Sending every control a form rendered is the obvious implementation and the one that meets this; drop the empty ones from `formData` before submitting and an optional field behaves as optional. The consequence to expect in the panel: a submission row then shows only the fields the visitor actually filled, as a missing key rather than an empty string.
 
 ## Reading submissions
 
