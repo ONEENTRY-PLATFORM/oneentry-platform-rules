@@ -139,11 +139,13 @@ Two consequences worth planning around:
 
 ## An empty value is not the same as no value
 
-A field that carries no `requiredValidator` can be left out of the submission entirely, and that is accepted. Sending the same marker with `""` is treated the same way: the format validator on the field lets an empty value through and the submission is accepted. That holds for `emailInspectionValidator`, `urlInspectionValidator`, `regExpValidator`, `fieldMaskValidator`, `stringInspectionValidator` and `checkForAGivenList`, and `null` behaves as `""` does.
+A field that carries no `requiredValidator` can be left out of the submission entirely, and that is accepted. Sending the same marker with `""` is treated the same way: the format validator on the field lets an empty value through and the submission is accepted. That holds for `emailInspectionValidator`, `urlInspectionValidator`, `regExpValidator`, `fieldMaskValidator`, `stringInspectionValidator`, `checkForAGivenList` and `checkForNumberValidator`.
 
 Only the empty case is treated this way. A marker sent with a non-empty value the validator does not accept still answers `400` naming the marker, and whether a value has to be there at all is decided by `requiredValidator` alone, with its own message.
 
-One combination to know about: a field whose `checkForNumberValidator` is restricted to whole numbers still answers `400` on `""`, and a numeric field answers `400` on `null` whatever its configuration. Leave a numeric marker out rather than sending it empty.
+A numeric field is no exception, and its configuration does not change the answer: `checkForNumberValidator` accepts an empty value with `integerOnly` either way and with `minValue` or `maxValue` set. A non-numeric value still answers `400` naming the marker, whole-number mode still rejects `3.5`, and a range is still enforced on a value that is actually there.
+
+`null` is not an empty value here. A marker sent with `null` answers `400` whatever the field's type or validator configuration: the submission body is checked against its own shape before any validator runs, and a value there has to be a string or a number. Omit the marker instead of sending it with `null`.
 
 **Omitting the markers you have no value for is still the better shape**, even though sending every control a form rendered is now accepted. The difference shows up in the panel: a submission row then shows only the fields the visitor actually filled, as a missing key rather than an empty string.
 
