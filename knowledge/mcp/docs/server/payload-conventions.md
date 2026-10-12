@@ -117,6 +117,12 @@ GET   /products/512          → there it is
 
 That is normal, not a failure.
 
+## What status a POST that only reads answers
+
+Many reads are addressed with `POST` because their filter travels in the body: product and page listings, submission listings, counts, semantic search, a refund preview. A call that only reads answers `200`. `201` is the answer of a call that created something.
+
+Accept any 2xx and judge the call by its body. Some instances still answer `201` to these reads, so code that compares the status with one digit reports a working listing as a failure.
+
 ## An omitted field can mean clear it
 
 Most updates merge: a field you leave out is left as it was. **Some do not**, and on those an omitted field is applied as "set it to nothing". Nothing in the schema distinguishes the two, and both answer `200`.
