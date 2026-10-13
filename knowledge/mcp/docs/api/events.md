@@ -17,9 +17,13 @@ Everything a human reads — the name in the list, the mail subject, the mail bo
 
 ## Which modules an event can watch
 
-Six: catalogue, forms, orders, users, payments, discounts.
+Six, and `moduleId` is numeric, so these are the six numbers it takes: `2` forms, `3` catalogue, `9` users, `10` payments, `12` orders, `15` discounts.
 
 **There is no content module among them.** An event on a page, a block or one of their attributes cannot be built, so "send a mail when this article is published" is not an events task. Say that instead of looking for the right payload — and see the next section for why the API will not say it for you.
+
+It is still buildable, just not here: a flow on a timer reads the listing and acts on what is due. Reach for that before reporting the requirement as unsupported.
+
+→ `mcp/docs/api/workflows#build-a-schedule-no-endpoint-offers`
 
 ## An event on another module is refused
 
@@ -32,7 +36,7 @@ An event created with no `moduleId` at all is a template — see the notificatio
 ## The subject and the body live in localizeInfos
 
 ```json
-{ "moduleId": 1,
+{ "moduleId": 3,
   "localizeInfos": { "en_US": {
     "title": "New product published",
     "subject": "A new product is live",
@@ -51,7 +55,9 @@ An event created with no `moduleId` at all is a template — see the notificatio
                "isWebsocket": false, "isWorkflows": false } }
 ```
 
-`isEmail` and `isPush` are the two a human means by "notify". `isWebsocket` pushes to a connected client and leaves no mail log. `isWorkflows` hands the event to a workflow rather than sending anything itself.
+`isEmail` and `isPush` are the two a human means by "notify". `isWebsocket` pushes to a connected client and leaves no mail log. `isWorkflows` hands the event to a workflow rather than sending anything itself — which is what a flow's `cms-events` node waits for, keyed on this event's `identifier`.
+
+→ `mcp/docs/api/workflow-nodes#configure-the-cms-events-node`
 
 The flags you leave out are off, so an event written with `{"isEmail": true}` alone sends no push — the commonest reason a customer gets a mail and no notification on their phone. Write all four when you mean to be explicit, and read them back before reporting a channel as configured.
 
