@@ -38,9 +38,11 @@ If every route still answers `403` after that, the token is being accepted and t
 
 The public projection catches up with an admin write a few seconds later — the same lag lists and filters have, and it applies to reading one entity by its address too.
 
+A few seconds is what an unloaded instance does, not a bound. On a busy one the same wait has been measured in minutes, and an entity that is new rather than changed can take longer still. No figure the API answers with tells you when it is over, so this read is the one that decides.
+
 So verify with a **paused read**, and never repeat the write.
 
-→ `mcp/docs/api/index-attributes#when-a-written-value-becomes-searchable`
+→ `mcp/docs/api/index-attributes#how-to-tell-when-a-value-is-public`
 
 ## What a 503 on a public read is telling you
 
