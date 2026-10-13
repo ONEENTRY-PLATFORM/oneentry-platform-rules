@@ -128,6 +128,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/modules` | Explaining why an admin section is missing |
 | `mcp/docs/api/journal` | Finding who changed something, or clearing the instance's own record of it |
 | `mcp/docs/api/events` | Sending a mail or a push when something happens |
+| `mcp/docs/api/workflows` | A requirement shaped like a schedule, or a reaction no endpoint offers |
+| `mcp/docs/api/workflow-nodes` | Writing the nodes of a flow, and the configuration the catalogue does not declare |
 | `mcp/docs/api/settings` | Instance-wide settings, limits and quota |
 | `mcp/docs/api/import` | Bulk-loading content from a file |
 | `mcp/docs/api/ai-gateway` | The platform's own model-calling feature |
@@ -145,6 +147,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why did an operation that worked start answering 403 | `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it` |
 | Why is my upload or file delete refused with 403 | `mcp/docs/api/files-and-uploads#admin-uploads-and-deletes-need-file-permissions` |
 | Why is the document search refused with 403 | `mcp/docs/api/file-content-search#two-permissions-nobody-holds-yet` |
+| Why does a flow node refuse every method I send | `mcp/docs/api/workflow-nodes#configure-the-cms-api-node` |
+| Why is a flow's event output example empty | `mcp/docs/api/workflow-nodes#configure-the-cms-events-node` |
 | Why was my admin permission write refused with 400 | `mcp/docs/api/admins-and-permissions#an-unrecognised-permission-key-is-refused-with-400` |
 | Which permission values are not booleans | `mcp/docs/api/admins-and-permissions#a-recognised-key-with-the-wrong-value-is-a-different-400` |
 | Why does creating an admin answer 405 | `mcp/docs/api/admins-and-permissions#creating-an-admin-can-answer-405` |

@@ -130,6 +130,10 @@ There is no schedule, interval or cron option — not in `config`, not on any mo
 
 So recurring work belongs inside the image: the container schedules itself and stays up between runs. Scheduled events are not an alternative — an event's actions send notifications and cannot refresh content.
 
+A flow is, though, and it needs no module at all: the instance's own flow engine ticks on an interval and can call any Admin API operation. Read that before building a container for work a flow of three nodes would do.
+
+→ `mcp/docs/api/workflows#build-a-schedule-no-endpoint-offers`
+
 ## What a container log read returns
 
 A container log read answers with an object, not a bare list: `lines` holds the log rows, `total` is how many rows came back, and `streams` is how many log streams the read covered.
