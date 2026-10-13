@@ -39,7 +39,11 @@ public read by url      → the new value
 
 Both answers are correct. They are two projections, and one of them catches up.
 
+A second or three is the picture on an instance with little else going on. It is not a bound: on a loaded one the same wait has been measured in minutes, and longer again for an entity that is new rather than merely changed.
+
 Check with a **paused read**, and do not repeat the write — a second write is never what a lagging read needs.
+
+→ `mcp/docs/api/index-attributes#how-to-tell-when-a-value-is-public`
 
 ## A new attribute key is absent until it holds a value
 
@@ -138,11 +142,26 @@ Before a bulk write, ask how much indexing work is already pending. `IndexAttrib
   "failed": 184, "delayed": 1, "paused": false, "lagSeconds": 5400 }
 ```
 
-`lagSeconds` is how long the oldest pending item has been waiting. A value you write now becomes searchable and published no sooner than that. `null` means nothing is pending.
+`lagSeconds` is how long the oldest item still pending in this stage has been waiting. `null` means nothing is pending.
+
+It is a measure of the backlog and not a forecast of anything. It does **not** say when a value you write now reaches the public read: on a loaded instance a value written to an entity that was already public has been measured fully public within ten minutes while `lagSeconds` stood above 90,000 — twenty-five hours — and the figure grew over that same interval rather than falling.
 
 `waiting`, `active`, `completed`, `failed` and `delayed` count pending and finished work. `paused` says whether the work is stopped altogether — that is the one field that means indexing is not progressing. `queue` is a label naming which work these numbers cover; treat it as opaque and never parse it.
 
-A large `lagSeconds` is a reason to wait, or to split the job, before writing more — every write joins the end of the backlog. It is not a reason to repeat writes that have not shown up yet.
+A large `lagSeconds` is a reason to add less work — to split a bulk write, or to hold it — because every write joins the end of the backlog. It is never a reason to wait a particular length of time, and never a reason to repeat a write that has not shown up yet.
+
+## How to tell when a value is public
+
+By reading the public endpoint, and by nothing else. No figure this API answers with tells you, and `lagSeconds` is the one most often mistaken for it.
+
+So poll the read a visitor makes, with a pause between attempts and a bounded number of them, and let the answer decide. Two cases behave differently and neither follows the backlog:
+
+- A value written to an entity that is **already public** is typically served long before the backlog drains. It can be in some reads before others while the change spreads, so a single read without it is not evidence that nothing is coming.
+- A **brand-new** entity has to be published before any read of it answers at all, and on a loaded instance that has been measured at tens of minutes, after which its values arrive together. Ten minutes of polling is not grounds to call the write failed.
+
+When the polling runs out, confirm on the admin read by id and report it as written and not yet public — never as a failed write, and never by writing again.
+
+→ `mcp/docs/api/content-api-reads#why-a-public-read-still-shows-the-previous-value`
 
 ## The counters cover one stage and not the whole of indexing
 
@@ -169,6 +188,7 @@ Judge progress by `GET /index-attributes/health` instead, which reports it per k
 - **Reading a new attribute key as unsupported** because the public answer does not carry it. Write a value into it first.
 - **Verifying a bulk import by refreshing a listing.** Sample by id.
 - **Starting a bulk write without checking the backlog.** Read `lagSeconds` first.
+- **Waiting out `lagSeconds` before checking a write.** It measures the backlog, not the time to publication. Read the public endpoint instead.
 - **Reading unmoving queue counters as indexing being stuck.** They cover one stage. Check `lastIndexedAt` per kind before concluding anything.
 - **Assuming indexing is instant after marking an attribute.** Existing values are picked up progressively.
 - **Reading an empty search by meaning as no match.** Check the coverage for that kind first.
