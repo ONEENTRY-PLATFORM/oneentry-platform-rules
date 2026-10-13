@@ -169,6 +169,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Question | Go to |
 |---|---|
 | Why is what I just wrote missing from a list or a public read | `mcp/docs/api/index-attributes#when-a-written-value-becomes-searchable` |
+| How do I know when a value is public | `mcp/docs/api/index-attributes#how-to-tell-when-a-value-is-public` |
 | How far behind is indexing right now | `mcp/docs/api/index-attributes#how-far-behind-the-instance-is-right-now` |
 | Do unmoving queue counters mean indexing has stopped | `mcp/docs/api/index-attributes#the-counters-cover-one-stage-and-not-the-whole-of-indexing` |
 | Why does creating this fail as a duplicate | `mcp/docs/api/baseline-data#silent-duplicates-versus-hard-failures` |
