@@ -26,7 +26,12 @@ On a large instance that one call accepts the whole existing corpus at once. War
     "ownerTables": ["products", "pages", "blocks", "slides", "templates", "discounts", "forms", "events"],
     "ocr": { "enabled": false, "maxPages": 50 },
     "language": { "mode": "auto", "fixed": "english", "allowManualOverride": true },
-    "search": { "queryLanguageMode": "auto", "enableInfixStage": true }
+    "search": {
+      "queryLanguageMode": "auto",
+      "enableInfixStage": true,
+      "enableFuzzyStage": true,
+      "enableSemanticStage": false
+    }
   }
 }
 ```
@@ -37,11 +42,11 @@ Turning it **off** later does not delete anything. Existing documents stay searc
 
 `ownerTables` decides which sections are read. It accepts every section whose records carry an attribute set, because that is where a file attribute can live:
 
-`products`, `pages`, `blocks`, `slides`, `templates`, `discounts`, `forms`, `events`, `user_groups`, `users`, `admins`
+`products`, `pages`, `blocks`, `slides`, `templates`, `discounts`, `forms`, `events`, `orders`, `form_data`, `user_groups`, `users`, `admins`
 
 The first eight are on by default. `users`, `user_groups` and `admins` are **accepted but off**, and stay off through an upgrade: the documents there belong to customers and staff, and reading them into a search index is a decision somebody makes rather than something an upgrade does. Add them only when a human asked for exactly that, and say what it means first — every admin holding `files.contentSearch` and that section can then read the text of those documents.
 
-Files attached to form submissions and to orders are **not** searchable and cannot be enabled. They are not held as attribute values, so no reader ever reaches them. Offer a different route for those rather than an `ownerTables` entry that will be rejected.
+`orders` and `form_data` — documents attached to an order or sent through a form — are **accepted but off** for the same reason, and they carry one extra condition. Their files are not held as attribute values, so the checkbox alone covers nothing that already exists: only orders and submissions written **after** it was added are picked up on their own. To reach the ones already there, send one `{ "scope": "missing" }` rebuild after enabling the section, exactly as after first enabling processing. Without that call the search answers an empty list for a contract attached to last month's order, and nothing in the response says why. Neither section is ever searchable through the public search.
 
 A section left out of `ownerTables` is not read at all: no index entry appears for its files, so an absent entry is the expected answer rather than a sign that processing failed. Turning the section on and then saving the record again is what creates the entry.
 
@@ -138,6 +143,24 @@ Pass `langCode` when the human tells you the language. An unknown value is refus
 - `processing_disabled` — the index is not being kept up to date. Counts may be stale.
 - `query_too_common` — the query was made only of words too common to match on. Ask for a more specific term; do not retry.
 - `query_language_capped` — more candidate languages than the instance will search at once. Pass `langCode` to pick one.
+- `fuzzy_fallback` — nothing matched the words as typed, and these results came from similar words instead. Offer them as "did you mean", never as matches.
+- `semantic_unavailable` — matching by meaning was asked for and could not run. An empty list here does not mean nothing was close in meaning; report it as a service that did not answer.
+
+## Finding a document by meaning or past a typo
+
+Two kinds of matching sit behind the exact-word search, both settings in the `fileContentSearch.search` section.
+
+`enableFuzzyStage` is **on** by default. It runs only when the words as typed matched nothing at all, and then looks for words similar to them — a query with one letter wrong finds the document instead of answering an empty list. It can never shrink or reorder a result that already has matches, which is why it is on. Results it produced carry `fuzzy_fallback`: say that the match is approximate rather than presenting it as exact.
+
+`enableSemanticStage` is **off** by default. It matches on meaning, so a query sharing no words with the document can still find it. Three things gate it, and all three have to hold:
+
+- `capability.embeddingAvailable` has to be true. Where it is false the stage cannot run at all, and the instance is not one where this can be offered.
+- The setting has to be on. `capability.semanticStageEnabled` reports it, and `embeddingAvailable: true` with `semanticStageEnabled: false` means the instance could match by meaning and is not doing it — a different answer from "not available here".
+- Documents indexed before the setting was turned on need one `AdminFileContentController_rebuild` with `{ "scope": "vectors" }`. Until that call finishes, the stage runs and finds nothing on them, which looks exactly like "nothing is close in meaning". Send it once after enabling, and read its answer as the number of fragments it processed.
+
+With the stage on, meaning matches and exact matches come back merged in one list of files. `rank` is then computed differently and must not be compared with a `rank` from a search that ran without it — compare positions within one response, never numbers across two.
+
+Turning either setting on or off is a change to the `fileContentSearch` section like any other: read it, then send it whole.
 
 ## Why a document you attached is not found
 
@@ -201,7 +224,12 @@ Both need `files.contentIndex.manage`. If `language.allowManualOverride` is off,
 
 ```jsonc
 {
-  "capability": { "tariffAllows": true, "extractorAvailable": true, "extractorReason": "ok", "ocrAvailable": true, "ocrLanguages": ["en", "ru"], "embeddingAvailable": false },
+  "capability": {
+    "tariffAllows": true, "extractorAvailable": true, "extractorReason": "ok",
+    "ocrAvailable": true, "ocrLanguages": ["en", "ru"],
+    "formats": ["pdf", "txt", "md", "html", "docx", "odt", "epub", "rtf"],
+    "embeddingAvailable": false, "semanticStageEnabled": false, "fuzzyStageEnabled": true
+  },
   "processing": { "enabled": true, "queuePaused": false, "pending": 0, "rebuild": null },
   "coverage": { "files": 2, "done": 1, "failed": 0, "truncated": 0, "lowConfidence": 0, "noExtractor": 0, "unsupported": 1, "corrupt": 0, "excluded": 0 },
   "storage": { "indexBytes": 311296, "budgetBytes": 536870912, "overBudget": false },
@@ -211,7 +239,9 @@ Both need `files.contentIndex.manage`. If `language.allowManualOverride` is off,
 
 `coverage` counts only files that a record in a section **this admin can reach** references — exactly the rows `GET /files/content-index` lists for the same filter. Two admins can see different coverage, and neither is wrong. `done` means searchable now, so it leaves out manually excluded documents; its listing is `status=done&excluded=false`, where `excluded=false` is a filter and not the absence of one.
 
-`embeddingAvailable` says whether vector search answers on this instance at the moment of the call.
+`embeddingAvailable` says whether matching by meaning can answer on this instance at the moment of the call. `semanticStageEnabled` and `fuzzyStageEnabled` say whether the search is using it and whether typo tolerance is on — available and in use are different answers, and only the second pair tells them apart.
+
+`formats` is what the reader on this instance can actually read, as opposed to `fileContentSearch.formats`, which is what the instance was configured to accept. A format allowed in settings and absent from this list produces entries at `no_extractor` rather than text, so compare the two before promising that a format will be searchable. An empty `formats` means no reader answered, not a reader that reads nothing.
 
 `tariffAllows` and `extractorAvailable` are separate on purpose and must be reported separately to a human: not on your plan and no reader available on this instance need different answers.
 
@@ -248,6 +278,12 @@ Two fields here explain a corpus that has quietly stopped growing while nothing 
   scan with a request outstanding is left alone, so a repeat sent mid-run accepts nothing it
   accepted before. The only scope that recognises anything: the others read a scan again and
   leave it exactly where it was. Needs `capability.ocrAvailable`, and answers `400` without it.
+- `vectors` — fragments of already-read documents that have no meaning data yet. The one scope
+  that reads nothing and queues nothing: it works through the text already held and answers when
+  it is done, so its number is fragments processed rather than documents accepted, and
+  `processing.rebuild` says nothing about it. One call handles a bounded slice; send it again
+  while it keeps answering a non-zero number. Needed once after `enableSemanticStage` is turned
+  on, and pointless where `capability.embeddingAvailable` is false — it answers `0`.
 - `one` — a single document; `storageKey` is then required, and omitting it answers `400`.
 
 The answer is an acceptance, not a result. Follow it in `processing.rebuild` of the status: `total` is how many documents the last rebuild accepted, `remaining` how many still wait, and `startedAt` when it began. `remaining: 0` means that run is finished. `remaining` can include other documents waiting at the same time, so it never exceeds `total`. The field is `null` when no rebuild ran in the last day. A rebuild that accepts nothing does not replace a run whose documents are still waiting, paused processing included: the status keeps that run's `total` and `startedAt`. Once nothing is waiting, the same call shows `total: 0`. Poll every few seconds, not in a tight loop, and do not start another rebuild while `remaining` is above zero.
@@ -260,6 +296,9 @@ The answer is an acceptance, not a result. Follow it in `processing.rebuild` of 
 - **Rendering `snippet.text` as markup.** It is document text with control-character marks.
 - **Hiding `queryLanguage`.** A silent language choice is how a working search gets called broken.
 - **Reading an empty list without reading `warnings`.**
+- **Enabling matching by meaning and searching straight away.** Existing documents need one `vectors` rebuild first, or the stage finds nothing on them.
+- **Presenting a `fuzzy_fallback` result as an exact match.** It came from a similar word, not the one typed.
+- **Enabling the order or form-submission section and expecting older records.** Those need one `missing` rebuild.
 - **Retrying an encrypted, corrupt or unsupported document.** The status is the answer.
 - **Reaching for `all` to recover documents that had no reader.** One `missing` rebuild takes them.
 - **Rebuilding a scan with any scope but `ocr`.** It comes back exactly as it went in.

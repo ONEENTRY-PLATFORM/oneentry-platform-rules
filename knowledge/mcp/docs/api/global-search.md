@@ -63,14 +63,30 @@ Its permission record must be linked to the reading group. It is provisioned lin
 
 ## What global search never finds
 
-- **Files and documents.** Nothing is searched by file name or file content, and the attribute types that hold files, images, groups of images, JSON and captcha values are excluded from matching. A document attached to a page as an attribute value cannot be found this way at all. There is a separate admin search for the text inside attached documents.
+- **File names.** Nothing is matched by the name of a file, and the attribute types that hold files, images, groups of images, JSON and captcha values are excluded from matching.
 - **Fields marked as passwords.** Excluded from every mode.
 - **Content in another language.** It does not translate.
 - **Anything unindexed.** What is searchable follows the same indexing rules as everything else.
 
-For an admin who must find a document by its contents, use the document search instead. For a public site that must do it, the texts still have to reach an index of the project's own — decide that early, because this search will not grow into it.
+For a public site that must find a document by what is written inside it, the texts still have to reach an index of the project's own — decide that early, because the public search will not grow into it.
 
 → `mcp/docs/api/file-content-search#a-result-is-a-whole-file-and-not-a-fragment` · `mcp/docs/api/index-attributes#what-an-index-attribute-is`
+
+## The text inside documents is its own admin group
+
+The admin address does search the **text inside** attached documents, under the kind `files`. The public address never does.
+
+The group is separate from every other kind because its unit of result differs: an item is a **file**, not the record it hangs on. One document can be referenced by several records, and one record can carry several documents, so folding one into the other would lose either the document or the reference. An item carries the file, a title falling back to its storage key, and a fragment of the matching text.
+
+Three conditions decide whether the group appears, and none of them answers an error:
+
+- `files.contentSearch`, the same permission the standalone document search needs. Without it the kind is dropped from `types` like any other unreachable kind.
+- The document-search section being reachable for that admin. Sections the admin cannot reach are left out of the search, so two admins can get different results for the same query.
+- The plan including document search. Outside it the group is simply absent rather than refused — a `403` here would take down the whole search answer.
+
+Everything the standalone search does applies to this group too: the settings that gate matching by meaning and by similar words, the fragment arriving with control-character marks rather than markup, and processing having to be enabled for anything to be there at all. It is a second entrance to one search, not a second search.
+
+→ `mcp/docs/api/file-content-search#finding-a-document-by-meaning-or-past-a-typo`
 
 ## Results tell you what matched
 
