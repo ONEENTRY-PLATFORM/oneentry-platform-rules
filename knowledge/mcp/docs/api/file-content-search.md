@@ -38,6 +38,8 @@ On a large instance that one call accepts the whole existing corpus at once. War
 
 Turning it **off** later does not delete anything. Existing documents stay searchable; only new work stops.
 
+Not every plan includes the feature. Sending `fileContentSearch.enabled: true` on an instance whose plan excludes it answers `403`, and the setting is left unchanged. Read `capability.tariffAllows` from `AdminFileContentController_getStatus` before you offer to turn it on: `false` there means the answer is a plan change, not a setting. Turning the switch off, and changing any other key of the section, is accepted on any plan.
+
 ## Which sections can have their files searched
 
 `ownerTables` decides which sections are read. It accepts every section whose records carry an attribute set, because that is where a file attribute can live:
