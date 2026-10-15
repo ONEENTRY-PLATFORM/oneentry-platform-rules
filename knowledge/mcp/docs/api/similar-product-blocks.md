@@ -55,15 +55,28 @@ The object is checked on create and on update: a malformed one answers `400` ins
 
 ## Matching attributes are named by their storage key
 
-`autoSimilarAttributes` holds the keys attribute values are stored under — the `<type>_id<n>` form, such as `string_id4` — not attribute markers and not attribute set identifiers. A key that does not exist matches no product, the block comes back empty, and nothing reports the mistake.
+`autoSimilarAttributes` holds the keys attribute values are stored under — the `<type>_id<n>` form, such as `string_id4` — not attribute markers and not attribute set identifiers. A key that does not exist matches no product, nothing qualifies, and nothing reports the mistake.
 
 Read the source product's attribute values and copy the keys from there.
 
 `autoSimilarMinMatches` is how many of those attributes must match. It filters first — a product matching fewer is not in the block at all — and among those that pass, more matches rank higher. Absent, one match is enough.
 
-Sending the key as an empty list is not the same as leaving it out. An empty list is a requirement naming no attribute, so nothing qualifies and the block answers empty. Leave the key out to turn attribute matching off; the block then selects on its other settings, as it did before you wrote any.
+Sending the key as an empty list is not the same as leaving it out. An empty list is a requirement naming no attribute, so nothing qualifies. Leave the key out to turn attribute matching off; the block then selects on its other settings, as it did before you wrote any. What the visitor sees once nothing qualifies is not the same on all three types — read the next section before you clear the key.
 
 → `mcp/docs/server/payload-conventions` · `mcp/docs/api/attribute-sets`
+
+## What nothing qualifying returns on each type
+
+Three settings leave nothing qualifying, and they behave alike: an empty `autoSimilarAttributes` list, a storage key no product carries, and a source product with none of the named attributes filled.
+
+What comes back then depends on the block type:
+
+- the product-page type answers an empty list;
+- cart similar and wishlist similar answer **trending** products instead. Those two read `cartDrivenConfig.fallbackToTrending`, and it is on unless you send it as `false`.
+
+So clearing `autoSimilarAttributes` on a cart or wishlist block does not give the visitor an empty block — it gives trending, which no matching setting of yours decided. Send `cartDrivenConfig.fallbackToTrending: false` on those two when nothing qualifying has to read as an empty block.
+
+The same substitution applies whenever their selection comes back with nothing, not only to the matching settings. The diagnostics read below reports, card by card, which signal put a product in the block, which is how you tell a substituted block from a matched one.
 
 ## Collapsing variants into one card
 
@@ -94,7 +107,7 @@ A short block is not a fault. Block length is the merchant's setting, and a sect
 - **Sending `productId` and expecting it to matter.** In `manual` mode it is ignored; the shelf is the same for everybody.
 - **Leaving `mode` at `automatic` for a block a site calls without a product.** Every such call answers 400.
 - **Naming attributes by marker in `autoSimilarAttributes`.** Use the storage key; a wrong one matches nothing, silently.
-- **Clearing `autoSimilarAttributes` to an empty list to switch matching off.** That answers an empty block. Remove the key instead.
+- **Clearing `autoSimilarAttributes` to an empty list to switch matching off.** Nothing then qualifies: the product-page block answers empty, and the cart and wishlist blocks answer trending. Remove the key instead.
 - **Expecting `pageIds` to add to the product's own section.** It replaces it.
 - **Expanding a section's subtree into `pageIds`.** Descendants resolve on their own, and the expanded list goes stale.
 - **Treating a short block as a defect.** Read the diagnostics before concluding anything.
