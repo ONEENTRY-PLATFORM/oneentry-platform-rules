@@ -56,6 +56,35 @@ A successful clear returns the count and nothing else:
 
 `affected` is how many entries were removed. `0` is a complete answer, not a failure: it means the window held nothing, which is what an over-narrow `from`/`to` or a `moduleName` that matched no entry produces. Report the number rather than "done" — it is the only evidence of what the call actually took, and the entries are gone either way.
 
+## Reading the session traffic listing
+
+`AdminJournalTrafficController_getTraffic` — `GET /journal/traffic` — answers `{ "items": [...], "total": <number> }` and is gated on `journal.get`, the same key as the journal listing. It records sign-ins rather than changes: one record per admin sign-in, carrying `sessionId`, `adminId`, `login`, `email`, `loggedInAt`, `loggedOutAt`, `sessionDurationMs`, `closeReason`, `userAgent` and `ip`.
+
+The window is the trap. With no `from` and no `to` the call covers **the last 24 hours only**, not everything on the instance, so a sign-in from last week is absent from the default answer rather than missing from the record. Ask for it:
+
+```text
+GET /journal/traffic?limit=10&offset=0&from=2026-01-01T00:00:00.000Z&to=2026-01-20T00:00:00.000Z
+```
+
+A `from` later than the `to`, or a span wider than 31 days, answers `400`. Narrow further with `adminId`, or with `status` — `active` for sessions still open, `closed` for sessions that have ended. Records come back newest sign-in first.
+
+`loggedOutAt: null` marks a session that is still open, and `sessionDurationMs` for such a record is counted up to the moment of the read, so it grows between two calls that return the same `sessionId`.
+
+## What closes a session record
+
+`closeReason` says how a session ended, and it is the one field that explains an unexpected `401` on a token that worked a minute ago:
+
+| Value | What happened |
+|---|---|
+| `logout` | the admin signed out |
+| `admin_revoked` | sessions were revoked for every admin at once |
+| `reauth` | a newer sign-in by the same admin superseded this session |
+| `null` | the session is still open, or its token expired without being closed |
+
+One admin holds **one** open session. Signing in again supersedes the previous session, closes its record as `reauth` and invalidates the access token that session was issued with — so two clients sharing one admin account take turns rather than working in parallel, and the loser sees `401`. Use a separate admin account per client instead of re-signing-in to recover a token.
+
+Refreshing a token does not add a record. It extends the open session, keeps its `loggedInAt`, and returns a new access token — so the count of records answers "how many times did this admin sign in", not "how often was a token issued".
+
 ## Clearing session traffic is a separate call
 
 `AdminJournalTrafficController_clear` — `DELETE /journal/traffic` — removes session-traffic records, and it is gated on `journal.delete`, the same key as the journal clear. Without the key the call answers `403 Forbidden resource` and the message does not name it; with no token at all it answers `401`.
@@ -98,6 +127,8 @@ A change made in the admin panel is in the journal and not in the audit log. A c
 - **Treating `affected: 0` as an error.** The window was empty.
 - **Widening the window to be safe.** Wider deletes more, and the entries do not come back.
 - **Expecting the traffic clear to reject a missing window.** It accepts one and takes everything closed.
+- **Reading an empty traffic listing as no sign-ins.** With no window it covers the last 24 hours.
+- **Signing in again to recover a token.** It invalidates the one the other client is using.
 - **Looking for a panel change in this server's audit log.** It is in the journal.
 - **Using the journal to recover a deleted entity.** It records that the change happened, not the entity.
 
