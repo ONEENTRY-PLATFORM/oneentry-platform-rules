@@ -184,6 +184,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why did submissions vanish after a form edit | `mcp/docs/api/forms-and-form-data#an-update-drops-every-config-you-do-not-send-back` |
 | How do I delete something safely | `mcp/docs/server/confirm-and-dry-run` |
 | Why does clearing the journal answer 400 | `mcp/docs/api/journal#clearing-the-journal-needs-an-explicit-window` |
+| Why is the session traffic listing empty | `mcp/docs/api/journal#reading-the-session-traffic-listing` |
+| Why did my admin token stop working after another sign-in | `mcp/docs/api/journal#what-closes-a-session-record` |
 
 ## Answers about search and filters
 
