@@ -83,7 +83,7 @@ A `from` later than the `to`, or a span wider than 31 days, answers `400`. Narro
 
 One admin holds **one** open session. Signing in again supersedes the previous session, closes its record as `reauth` and invalidates the access token that session was issued with — so two clients sharing one admin account take turns rather than working in parallel, and the loser sees `401`. Use a separate admin account per client instead of re-signing-in to recover a token.
 
-Refreshing a token does not add a record. It extends the open session, keeps its `loggedInAt`, and returns a new access token — so the count of records answers "how many times did this admin sign in", not "how often was a token issued".
+Refreshing a token does not add a record. It extends the open session, keeps its `loggedInAt`, and returns a new access token — so the count of records answers "how many times did this admin sign in", not "how often was a token issued". The record's `userAgent` and `ip` describe the client that signed in, and a refresh sent from a different client does not replace them: read the pair as sign-in attribution, not as the last client to hold the token.
 
 ## Clearing session traffic is a separate call
 
