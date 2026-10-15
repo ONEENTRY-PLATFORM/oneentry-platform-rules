@@ -67,6 +67,23 @@ output and keeps it until the next deploy.
 The health route keeps answering while reads are being shed, so a `503` on content plus a
 healthy instance is the expected combination, not a contradiction.
 
+The same status also arrives when the instance could not work out what the reading token is
+allowed to see at that moment. The body is what separates the two:
+
+```text
+GET /api/content/pages?langCode=en_US
+  x-app-token: <app token>
+  → 503 Retry-After: 1
+    {"statusCode":503,"message":"Permissions are temporarily unavailable, retry after the indicated delay"}
+```
+
+Treat it exactly like the one above: honour `Retry-After` and send the same read again. In
+particular do not read it as a refusal and do not touch the group's rules — nothing about
+the grant has changed, and the next read answers normally. A refusal is `403`, and that one
+does not clear on a retry, so the two are never confused once you read the status.
+
+→ `mcp/docs/api/content-api-permission-rules#read-the-rules-before-reporting-a-public-answer`
+
 ## What a 429 on a public read is telling you
 
 An instance can also limit how **often** public reads are accepted, which is a different
@@ -130,6 +147,7 @@ So check the work through the public route the site itself will call, with the l
 - **Repeating a write because the public read still shows the old value.** Wait and read again.
 - **Treating a trimmed list as the whole list.** The restricted read says nothing about being cut.
 - **Reading a `503` as missing content.** Respect `Retry-After` and send the read again.
+- **Rewriting group rules after a `503` that mentions permissions.** It clears on a retry.
 - **Reading a `429` as a permission refusal.** It is a rate ceiling: wait out `Retry-After`.
 - **Looking for a public address for an external page.** It arrives in the menu.
 - **Verifying only through the admin read.** It is not what the site receives.
