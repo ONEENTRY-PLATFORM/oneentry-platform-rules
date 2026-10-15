@@ -79,10 +79,12 @@ Attribute values are published a moment after the write that carries them, and t
 
 | `isSync` | What it says about the requested locale |
 |---|---|
-| `false` | Values are declared and not published yet. Read again. |
-| `true` | Nothing is on its way — either the values are published, or the locale declares none at all. |
+| `false` | A newer version of the values is on its way: they have never been published, or the copy you would read is older than the latest write. Read again. |
+| `true` | Nothing is on its way — the published values match the latest write, or the locale declares none at all. |
 
 `true` is therefore conclusive and `false` is the only value that means "wait". Read it on the **admin read by id**, which answers with `attributesSets` — your values exactly as you wrote them, present from the first read whatever the flag says. Values in `attributesSets` beside `isSync: false` is the ordinary picture a second after a create: the write landed, the published copy has not caught up.
+
+An edit counts, not only the first publication. Changing a value on a product that is already published — or adding keys to its attribute set and filling them — turns the flag back to `false` until the new version publishes. So a populated `attributeValues` is not evidence on its own: beside `isSync: false` it is the previous version, and it can be missing keys you have already written successfully. Treat any read carrying `isSync: false` as provisional, whatever is in it, and judge completeness only once the flag is `true`.
 
 A locale you never wrote answers `true` as well, because it declares nothing to publish. So `isSync` is per locale, not per product, and asking about a language the product has no values in is not a way to learn anything about the one it does.
 
