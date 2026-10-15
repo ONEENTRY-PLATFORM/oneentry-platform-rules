@@ -49,7 +49,7 @@ Two answers look alike and mean different things:
 - `value: null` beside a real `attributeType` — the attribute is in the set and holds nothing for that locale.
 - `value: null` beside `attributeType: null` — the record carries **no attribute set at all**. Nothing is missing and nothing is wrong.
 
-A marker the record's set does not carry answers `404`, and so does an id no record has. That `404` is the only thing protecting you from a typo in the marker, and it is absent in the second case above: on a record with no set, *every* marker answers `200` with both fields `null`, invented ones included. Do not read one of those as "this attribute is empty".
+An id no record has answers `404`, and so does a marker that neither the record's current set carries nor any stored value in the record sits under. That `404` is what protects you from a typo in the marker, and it is absent in the second case above: on a record with no set, *every* marker answers `200` with both fields `null`, invented ones included. Do not read one of those as "this attribute is empty".
 
 The value comes back in the shape its type uses, not flattened to a string: a number stays a number, and a date, a list entry and an image are objects here.
 
@@ -58,6 +58,20 @@ The route declares no permission in the catalog, so an authenticated admin reach
 There are marker-addressed **writes** under `/system` as well, one for a single record and one for several. They are the counterpart of this read and not of an ordinary entity update: they name the set explicitly and take values as a locale-keyed list of marker, type and value. Read their shape with `cms_api_describe` before using one, and reach for the entity's own update when you are changing more than an attribute.
 
 Everything else in this document still holds. `attributesSets` on the entity itself is never keyed by marker, and no amount of marker support on these routes changes that.
+
+## A value left from a set the record no longer uses
+
+Pointing an entity at a different `attributeSetId` changes which set it uses and nothing else: values written under the previous set stay in the record, and reads may keep returning them under the previous set's markers. The admin panel shows only the current set, so such a value can be live on a storefront and absent from the panel.
+
+The marker-addressed read reaches it: a marker the current set does not carry answers `200` with the value still stored for it. The counterpart clears it — `AdminSystemController_clearOneAttributeValue`, `DELETE /system/attribute-value/{type}/{id}/{marker}`, answering `true`:
+
+```text
+GET    /system/attribute-value/pages/113/body?langCode=en_US  → 200, the stored value
+DELETE /system/attribute-value/pages/113/body?langCode=en_US  → 200, true
+GET    /system/attribute-value/pages/113/body?langCode=en_US  → 404
+```
+
+Attribute ids restart in every set, so one `<type>_id<id>` key can belong to a live attribute of the current set and to a different marker of a previous one. A key the current set claims is live content: the previous set's marker answers `404` for it and the `DELETE` refuses it. Change that value through the current set's own marker instead, and read the current set before concluding a value is a leftover.
 
 ## Two levels always
 
