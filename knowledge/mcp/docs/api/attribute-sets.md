@@ -53,9 +53,11 @@ An id no record has answers `404`, and so does a marker that neither the record'
 
 The value comes back in the shape its type uses, not flattened to a string: a number stays a number, and a date, a list entry and an image are objects here.
 
-The route declares no permission in the catalog, so an authenticated admin reaches it and the local pre-check has nothing to compare.
+Being authenticated is not enough. Reading a value of `admins` requires `admins.get` and reading a value of `pages` requires `pages.get`; the other sections answer to any authenticated admin. The requirement is not published in the catalog, so the local pre-check has nothing to compare and the call goes out — a `403` here means the key, not the marker.
 
 There are marker-addressed **writes** under `/system` as well, one for a single record and one for several. They are the counterpart of this read and not of an ordinary entity update: they name the set explicitly and take values as a locale-keyed list of marker, type and value. Read their shape with `cms_api_describe` before using one, and reach for the entity's own update when you are changing more than an attribute.
+
+Both writes require the update permission of the section named in `type` — the same key as an ordinary update of that entity: `catalog.products.update`, `pages.update`, `blocks.update`, `forms.update`, `events.update`, `settings.templates.update`, `settings.templatePreview.update`, `admins.update`. The multi-record write carries a `type` per item and is refused whole, changing nothing, when any one of them is not permitted.
 
 Everything else in this document still holds. `attributesSets` on the entity itself is never keyed by marker, and no amount of marker support on these routes changes that.
 
@@ -70,6 +72,8 @@ GET    /system/attribute-value/pages/113/body?langCode=en_US  → 200, the store
 DELETE /system/attribute-value/pages/113/body?langCode=en_US  → 200, true
 GET    /system/attribute-value/pages/113/body?langCode=en_US  → 404
 ```
+
+The `DELETE` is a content change, so it asks for the section's **update** permission — `pages.update` for the example above, `admins.update` on an admin — and never a delete permission: the value goes, the record stays.
 
 Attribute ids restart in every set, so one `<type>_id<id>` key can belong to a live attribute of the current set and to a different marker of a previous one. A key the current set claims is live content: the previous set's marker answers `404` for it and the `DELETE` refuses it. Change that value through the current set's own marker instead, and read the current set before concluding a value is a leftover.
 
