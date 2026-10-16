@@ -92,7 +92,7 @@ So an operation that worked for months can begin answering `403` while every nei
 
 `AdminsController_getAllAvailablePermissionsKeys` returns every key the instance recognises. Compare it against the admin's own map: a key in that list but not in the map is a grant to ask for; a key in neither is one you have misremembered.
 
-→ `mcp/docs/api/form-submissions#both-read-routes-need-the-forms-data-read-permission` · `mcp/docs/api/files-and-uploads#admin-uploads-and-deletes-need-file-permissions`
+→ `mcp/docs/api/form-submissions#both-read-routes-need-the-forms-data-read-permission` · `mcp/docs/api/files-and-uploads#admin-uploads-and-deletes-need-file-permissions` · `mcp/docs/api/attribute-sets#reading-one-value-by-its-attribute-marker`
 
 ## Signing every admin out has its own permission
 
