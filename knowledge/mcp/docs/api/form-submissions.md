@@ -61,6 +61,12 @@ Make a form's submissions readable by a storefront with an ordinary form update,
 
 The operator listing of the same marker is unaffected either way, so an operator read that works is no evidence that a visitor's will. When a storefront shows reviews or comments, check `isPrivate` on that form before looking anywhere else: a form nobody marked public refuses the read, and it refuses it the same way whether it holds two entries or two thousand.
 
+A second cause answers the same route with a different message. The group a public caller belongs to carries include and exclude lists of form identifiers on its `/api/content/forms` permission record, under `additionalData`. With `isExclude` the listed identifiers are refused; with `isInclude` only the listed ones are allowed and every other marker is refused; an entry with neither flag set, or no entry at all, does not narrow anything. A refused marker answers `403 User doesn't have permissions to access the requested url due to identifiers restrictions`, and a group marked to skip permission checks is not subject to it.
+
+So a `403` on the public read means one of two things, and the message tells you which: the wording about public readability is the form's own `isPrivate`, the wording about identifiers restrictions is the reading group's list. Fixing the first does nothing for the second. The operator listing of the same marker is governed by neither.
+
+→ `mcp/docs/api/content-api-permission-rules#the-five-rules-and-what-each-one-opens`
+
 → `mcp/docs/api/forms-and-form-data#an-update-drops-every-config-you-do-not-send-back`
 
 ## Reading the submissions of one page or product
@@ -138,6 +144,7 @@ Some submissions carry a status an operator moves through as they process it, wi
 - **Sending an ISO timestamp as a date bound.** The `T` is refused; use a space.
 - **Reading a `403` as a missing form.** Both read routes need `forms.data.read`.
 - **Reading the public listing of a form nobody marked public.** It answers `403` until the form carries `isPrivate: false`.
+- **Reading an identifiers-restriction `403` as `isPrivate`.** That one is the reading group's form list, not the form.
 - **Comparing the count against a listing.** They have different scopes; pass the same `langCode` to both.
 
 → `mcp/docs/api/forms-and-form-data#a-form-must-be-bound-before-it-accepts-submissions` · `mcp/docs/api/verification-recipes#forms`
