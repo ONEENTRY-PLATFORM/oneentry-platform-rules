@@ -250,6 +250,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why was my second review refused as already rated | `mcp/docs/api/rating-forms-and-reviews#only-a-submission-with-a-score-counts-as-a-rating` |
 | Why is my captcha refusing a token that looks right | `mcp/docs/api/captcha-fields#a-valid-token-can-still-be-refused` |
 | Why does my submission date filter answer 400 | `mcp/docs/api/form-submissions#how-to-write-a-date-bound-the-filter-accepts` |
+| How do I list the submissions of one form | `mcp/docs/api/form-submissions#the-listing-is-a-post-with-the-filter-in-the-body` |
+| Why is formModuleConfigId refused by the filter body | `mcp/docs/api/form-submissions#what-formmoduleconfigid-narrows-and-what-it-cannot` |
 
 ## Answers about events and notifications
 
