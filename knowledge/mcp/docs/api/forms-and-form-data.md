@@ -158,7 +158,7 @@ A required field reads whitespace as nothing. A marker sent as `"   "` or `"\t\n
 
 ## Reading submissions
 
-Submissions are read by the form's marker, with a `POST` whose filter travels in the body. Which filter narrows to one page and which one narrows to a module binding is the part worth reading before you call it.
+Submissions are read by the form's marker, with a `POST` whose filter travels in the body — there is no `GET` of that route. The narrowing to one page or product is a key in that body; the narrowing to one module binding is a query parameter beside it, and sending it in the body answers `400`.
 
 → `mcp/docs/api/form-submissions`
 
