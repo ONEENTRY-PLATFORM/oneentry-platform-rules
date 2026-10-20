@@ -88,7 +88,7 @@ does not clear on a retry, so the two are never confused once you read the statu
 
 An instance can also limit how **often** public reads are accepted, which is a different
 limit from the one above: that one counts reads in flight at the same moment, this one
-counts reads over a short window. Over the ceiling a read answers:
+counts reads over a fixed window. Over the ceiling a read answers:
 
 ```text
 GET /api/content/products/103?langCode=en_US
@@ -99,7 +99,13 @@ GET /api/content/products/103?langCode=en_US
 
 The window is counted per application token, so every page a storefront renders from the
 same token shares one ceiling. Reads arriving without that header are counted per client
-address instead. The health route is never subject to the limit.
+address instead, so everything behind one address shares a counter. The health route is
+never subject to the limit.
+
+Both the ceiling and the length of the window are set per instance, and neither is
+discoverable from the API. The window is not always a second: `Retry-After` is what names
+it, and it can be tens of seconds. Size your own concurrency from the header you get, not
+from an assumed window.
 
 Wait the number of seconds `Retry-After` names and send the same read again. Do not widen
 your fan-out to catch up afterwards — the next window starts clean and a burst walks
@@ -111,8 +117,9 @@ group is not allowed that content, and no amount of waiting changes it — see t
 section above. Treating one as the other either hides a real permission problem or
 abandons content that was there all along.
 
-Not every instance applies a frequency limit, so a run that never sees `429` does not
-prove your client handles it. Handle the header, do not probe for the ceiling.
+Assume the ceiling is there. A run that never sees `429` does not prove your client
+handles it — it may mean this instance is set generously, or that your run was slower than
+the window. Handle the header, do not probe for the ceiling.
 
 ## Why a public list stops at the same number
 
