@@ -61,6 +61,43 @@ Its permission record must be linked to the reading group. It is provisioned lin
 
 → `mcp/docs/api/content-api-permission-rules#the-five-rules-and-what-each-one-opens`
 
+## Which kinds the admin side accepts
+
+`types` is a closed vocabulary, and a name outside it answers `400 each value in types must be a valid enum value` — without naming the ones it would have taken. These are the names:
+
+```text
+pages products blocks forms orders discounts collections filters
+users user_groups users_auth_providers admins
+menus events subscriptions workflows slides templates
+attributes attributes_sets product_relations_templates
+payment_accounts ai_provider_accounts custom_modules files
+```
+
+They are not the names of the entities' own routes, and a near neighbour is not accepted: `modules` and `form_data` are not kinds, and product statuses and order statuses are not searchable at all. A `400` here is a name to correct, never a sign the kind was refused for want of a permission — an unreachable kind is dropped in silence instead.
+
+Drilldown mode is the exception that makes reachability visible. `limit` with a single `types` value answers `400 Drilldown mode (limit/offset) requires exactly one accessible type` when that kind is not reachable for you, and `200` when it is, whether or not anything matched. That is the cheapest way to tell "nothing matched" apart from "you cannot search this".
+
+## Settings records the admin search also finds
+
+Six of those kinds are not content but configuration, and they behave alike:
+
+| Kind | Found when the admin can reach |
+|---|---|
+| `filters` | the filters section |
+| `payment_accounts` | the payments section |
+| `ai_provider_accounts` | the platform settings section |
+| `custom_modules` | the platform settings section |
+| `users_auth_providers` | the users section |
+| `product_relations_templates` | the catalogue section, **and** holds `catalog.products.updateRelationTemplate` |
+
+The section is the whole gate for the first five: an administrator who can reach the payments section finds a payment account by name without holding `payments.accounts.get` or any other key, and an administrator with no sections at all finds nothing anywhere. Relation templates are the one kind that also wants a key, and without it the group is dropped in silence rather than refused.
+
+**Only the title and the identifier are matched.** The stored configuration of an account — its keys, its secrets, its connection settings — is never searched and never returned, so a credential cannot be found through search even by an administrator who could read the record itself. Searching for a value you know is in there answers nothing, and that is the feature working.
+
+`custom_modules` covers the modules an instance had uploaded to it. The built-in sections of the admin panel share those identifiers and are **never** returned, so searching `settings` or `catalog` under that kind answers nothing on every instance.
+
+An item carries `type`, `id`, `identifier`, a `title` where the record has one, `matchedField` saying whether the hit was on the title or the identifier, and `isVisible` for the kinds that can be hidden — which `visibility` then filters on, exactly as it does for content.
+
 ## What global search never finds
 
 - **File names.** Nothing is matched by the name of a file, and the attribute types that hold files, images, groups of images, JSON and captcha values are excluded from matching.
@@ -143,6 +180,9 @@ Match quality follows what has been indexed, so a kind whose content was loaded 
 - **Reporting "the search returns five results"** as a defect. It is the default group size.
 - **Sending `limit` without a single `types` value.** That is the drilldown `400`.
 - **Expecting documents in the results.** File-bearing attribute values are never matched.
+- **Reading a `400` on `types` as a refusal.** It is a name outside the vocabulary; a refused kind is dropped silently.
+- **Expecting a settings record to be found by what is configured in it.** Only its title and identifier are matched.
+- **Looking for an admin panel section under `custom_modules`.** Only uploaded modules come back.
 - **Typing `/vector-search`** and concluding from the `404` that search by meaning does not exist.
 - **Sending a search by meaning to the admin address.** Every kind answers `405` there.
 - **Publishing semantic results unfiltered.** Hidden pages are among them.
