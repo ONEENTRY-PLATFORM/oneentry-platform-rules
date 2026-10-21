@@ -165,6 +165,6 @@ Responses are capped at 24 KB by default and come back with a `_truncated` envel
 
 Use the operation's own parameters: `limit` and `offset` to page, and whatever filters it declares to reduce the set. `cms_api_describe` lists them. Asking for 200 items and receiving 30 is a signal to ask a better question, not to ask again.
 
-One convention is not in the body at all: a request can name which of an instance's data sets it works in, through a header this server does not send.
+One convention is not in the body at all: a request names which of an instance's data sets it works in, through a header the operator points this server at. `cms_whoami` says which one you are in.
 
 → `mcp/docs/server/response-shaping` · `mcp/docs/api/environments#a-request-names-its-environment-in-a-header`
