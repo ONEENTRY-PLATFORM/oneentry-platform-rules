@@ -121,6 +121,16 @@ Read the key names in that order — the entity first, `export` second. `export.
 
 `format` is required and takes `csv` or `xml`; anything else answers `400` before the export begins.
 
+## Managing data environments has its own permission
+
+`environments.manage` governs the registry of an instance's data environments. Reading it is open — the listing and reading one by id answer for any signed-in administrator, with no key at all. Creating one, editing it, deleting it, checking it and copying content between two all require the key, and answer `403 Forbidden resource` without it.
+
+Like the total logout, these operations carry **no permission in the catalog**, so the local pre-check cannot stop the call: the refusal arrives from the instance after the request went out. A `403` on one of them is this key and nothing else.
+
+Holding it does not let you work *inside* an environment from here. That is a request header this server does not send, and no grant changes it.
+
+→ `mcp/docs/api/environments#this-server-always-works-in-the-main-data-set`
+
 ## Never replace an admins permission map
 
 Grant or revoke individual keys. Replacing the whole map is how rights nobody noticed were needed disappear, and reconstructing it afterwards means guessing.
