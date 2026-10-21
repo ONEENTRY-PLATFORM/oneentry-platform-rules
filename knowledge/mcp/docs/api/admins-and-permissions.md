@@ -121,6 +121,27 @@ Read the key names in that order — the entity first, `export` second. `export.
 
 `format` is required and takes `csv` or `xml`; anything else answers `400` before the export begins.
 
+## Managing data environments has its own permission
+
+`environments.manage` governs the registry of an instance's data environments. Reading it is open — the listing and reading one by id answer for any signed-in administrator, with no key at all. Creating one, editing it, deleting it, checking it and copying content between two all require the key, and answer `403 Forbidden resource` without it.
+
+Like the total logout, these operations carry **no permission in the catalog**, so the local pre-check cannot stop the call: the refusal arrives from the instance after the request went out. A `403` on one of them is this key and nothing else.
+
+Holding it does not decide which environment you work *inside*. That is a request header the operator sets when the server starts, and no grant changes it.
+
+→ `mcp/docs/api/environments#which-data-set-your-own-calls-reach`
+
+## Personal settings live on the admin account
+
+An administrator's own preferences are fields on its account, not settings of the instance: `selectedLanguage`, `selectedContentLanguage`, `selectedUITheme`, and `keepNotifications` — a flag that stops the admin panel from hiding its own notifications on a timer. `GET /admins/me` returns all of them, and `keepNotifications` is `false` on an account nobody has changed, including a freshly created one.
+
+There is no self-service route for them. They are saved by the ordinary `AdminsController_update` on the administrator's own id, which means two things:
+
+- The body must be a whole admin body. `{"keepNotifications": true}` on its own answers `400 All fields must be filled!` — send `login` and `email` beside it. Keys you leave out are left alone, `permissions` included, so this is not a write that can cost an account its rights.
+- It needs `admins.update`, the same key as editing anybody else. An administrator without it cannot store its own preference at all and the panel keeps the choice in the browser instead, so the same account can look different on another device.
+
+A non-boolean answers `400` naming the field. Read the account back through `GET /admins/me` to confirm the value landed.
+
 ## Never replace an admins permission map
 
 Grant or revoke individual keys. Replacing the whole map is how rights nobody noticed were needed disappear, and reconstructing it afterwards means guessing.
