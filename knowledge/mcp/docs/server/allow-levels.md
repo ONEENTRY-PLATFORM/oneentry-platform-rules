@@ -58,7 +58,7 @@ DELETE /menus/{id} is a "destructive" operation, but this server runs with
 
 Regardless of the allow level, **mutations** under these paths always require a confirm token:
 
-`immutable-settings` · `admins` · `modules` · `settings-general` · `system/captcha-keys` · `auth` · `users-auth-providers` · `user-permissions` · `user-groups/{groupId}/permissions` · `payments/accounts` · `ai-gateway/routers` · `events/settings` · `import/from-blueprint` · `entity-versions/…/restore` · `workflows` · `index-attributes/reindex-all` · `index-attributes/stop` · `locales/{code}/set-active` · `system/update-attribute-values` · `system/update-multiple-attribute-values` · `system/positions/maintenance`
+`immutable-settings` · `admins` · `modules` · `settings-general` · `system/captcha-keys` · `auth` · `users-auth-providers` · `user-permissions` · `user-groups/{groupId}/permissions` · `payments/accounts` · `ai-gateway/routers` · `events/settings` · `entity-versions/…/restore` · `workflows` · `index-attributes/reindex-all` · `index-attributes/stop` · `locales/{code}/set-active` · `system/update-attribute-values` · `system/update-multiple-attribute-values` · `system/positions/maintenance`
 
 `GET` on those paths is unaffected — reading them is ordinary.
 
