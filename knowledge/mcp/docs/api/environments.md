@@ -84,6 +84,10 @@ Delete answers at once too, and the record then sits at `status: "deleting"` whi
 
 Deleting takes the environment's whole set of data with it, and nothing keeps a copy. Treat it as the most destructive delete on the instance: show the human the environment's name, say what it holds, and wait for them to agree.
 
+Nothing here happens quietly, because every mutation under the path is confirm-gated at every allow level — creating, editing, deleting and copying alike. A dry run gives you the target; show it and wait.
+
+→ `mcp/docs/server/allow-levels#paths-that-are-always-confirm-gated`
+
 → `mcp/docs/api/admins-and-permissions#managing-data-environments-has-its-own-permission`
 
 ## Copying content from one environment to another
