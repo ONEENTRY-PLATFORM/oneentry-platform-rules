@@ -160,7 +160,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Can an export permission be granted | `mcp/docs/api/admins-and-permissions#exporting-data-has-its-own-permissions` |
 | Why is creating or deleting a data environment refused with 403 | `mcp/docs/api/admins-and-permissions#managing-data-environments-has-its-own-permission` |
 | Why does naming an environment answer 400 before my token is checked | `mcp/docs/api/environments#what-a-wrong-environment-name-answers` |
-| Can I create content on a staging environment from here | `mcp/docs/api/environments#this-server-always-works-in-the-main-data-set` |
+| Which data environment do my calls reach | `mcp/docs/api/environments#which-data-set-your-own-calls-reach` |
 | Where does an administrator's theme or notification preference live | `mcp/docs/api/admins-and-permissions#personal-settings-live-on-the-admin-account` |
 | Why does every public list stop at ten | `mcp/docs/api/content-api-permission-rules#a-restricted-read-caps-the-list-at-ten` |
 | Why can a public token upload a file | `mcp/docs/api/content-api-permission-rules#why-a-public-token-can-upload-a-file` |

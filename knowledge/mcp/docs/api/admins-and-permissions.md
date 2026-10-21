@@ -127,9 +127,9 @@ Read the key names in that order — the entity first, `export` second. `export.
 
 Like the total logout, these operations carry **no permission in the catalog**, so the local pre-check cannot stop the call: the refusal arrives from the instance after the request went out. A `403` on one of them is this key and nothing else.
 
-Holding it does not let you work *inside* an environment from here. That is a request header this server does not send, and no grant changes it.
+Holding it does not decide which environment you work *inside*. That is a request header the operator sets when the server starts, and no grant changes it.
 
-→ `mcp/docs/api/environments#this-server-always-works-in-the-main-data-set`
+→ `mcp/docs/api/environments#which-data-set-your-own-calls-reach`
 
 ## Personal settings live on the admin account
 

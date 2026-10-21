@@ -1,8 +1,8 @@
 # Data environments
 
-An instance can hold more than one set of data. One of them is the main set, the one every instance has always had; the others are **environments**, created and named by an administrator. A request chooses which set it works in, and this document covers how it chooses, what the two sets share, and why nothing you write through this server reaches an environment.
+An instance can hold more than one set of data. One of them is the main set, the one every instance has always had; the others are **environments**, created and named by an administrator. A request chooses which set it works in, and this document covers how it chooses, what the two sets share, and how to tell which one your own calls are reaching.
 
-Read it before acting on a sentence like "put this on staging". That phrase usually means an environment, and the answer is not a different address or a different login.
+Read it before acting on a sentence like "put this on staging". That phrase means an environment, and whether you can reach one is a property of how this server was started.
 
 → `mcp/docs/api/admins-and-permissions#managing-data-environments-has-its-own-permission` · `mcp/docs/server/cms-api-call`
 
@@ -12,22 +12,29 @@ Every Admin API and Content API route reads one request header — `x-environmen
 
 The header is the only way to choose. There is no per-environment address, no per-environment subdomain and no token that selects one: the same base URL and the same credentials reach all of them, and the client decides on every single request.
 
-`public` is the name of the main set and is accepted as a header value, so a client that would rather always send the header can name it explicitly instead of leaving it out.
+`public` is the name of the main set, accepted as a header value, so a client may name it explicitly instead of leaving the header out.
 
-## This server always works in the main data set
+## Which data set your own calls reach
 
-`cms_api_call` sends no `x-environment` header, and it has no parameter for one. Every read and every write you make through this server therefore works in the **main** set of data, whatever environments the instance holds.
+**Read this before your first write on any instance that has environments.** You do not choose: the operator does, once, when the server starts. No tool takes an environment argument, and nothing you can pass to `cms_api_call` changes the set your call lands in.
 
-Two consequences worth saying out loud instead of working around:
+`cms_whoami` is the answer, under `environment`:
 
-- **You cannot put content into an environment from here.** A human asking you to create a page "on staging" is asking for something this server does not do. Say so plainly, and leave it to the admin panel, which sends the header.
-- **A write made while believing otherwise is a write to the live data.** Nothing fails and nothing warns: the call succeeds, and the entity exists in the set you did not mean.
+| What it says | What it means |
+|---|---|
+| a name | every call of this session reads and writes **that** environment, and the main set is not reachable from here |
+| `null` | every call works in the main set of data |
+| no such field at all | the server predates environments and sends no header, so every call works in the main set |
 
-What you can still do from here is tell a human which environments exist, read one by id, and — with the permission below — create, check or delete one. Those operations are about the registry of environments, not about the data inside them, so they work from this server like any other call.
+So a human asking you to add a page "on staging" is asking a question about the server's configuration, not about your payload. Check `cms_whoami` first. If it does not name that environment, say so and stop — the work needs a server pointed at it, or a person in the admin panel.
+
+**The failure this prevents has no error to catch.** An instance ignores no header and refuses no missing one: a write meant for an environment, sent without the header, lands in the live data and answers success. Nothing in the response distinguishes the two, which is why reading `cms_whoami` once at the start of the task is the whole defence.
+
+The registry operations are another matter and work from any session: they act on the list of environments, not on the data inside one.
 
 ## What a wrong environment name answers
 
-The two API surfaces refuse differently, and the difference matters when you are reading somebody else's logs.
+The two API surfaces refuse differently, which matters when you are reading somebody else's logs.
 
 | Surface | Answer |
 |---|---|
@@ -50,11 +57,11 @@ So `dev_env` and `stage2` are names; `Dev_env`, `1env`, `dev-env`, `dev__env` an
 
 ## What the two sets share and what they do not
 
-Separate per environment: pages, products, blocks, menus, forms and their submissions, visitors, orders, attribute sets — the content and the operational records. Each environment answers its own listings, and an id means nothing outside the set it came from.
+Separate per environment: pages, products, blocks, menus, forms and their submissions, visitors, orders, attribute sets — content and operational records alike. Each answers its own listings, and an id means nothing outside the set it came from.
 
 Shared across all of them: administrator accounts and their permission maps, the admin sign-in itself, the active locales, and platform settings. One admin login works in every environment with no second sign-in, and granting a key grants it everywhere at once.
 
-The instance's record quota is also shared, and it counts the main set and every ready environment **together**. `records-usage` answers the same totals whichever environment the request names, so an environment filled with test content spends the allowance of the live one.
+The record quota is shared too, counting the main set and every ready environment **together**: `records-usage` answers the same totals whichever environment the request names, so an environment filled with test content spends the live one's allowance.
 
 → `mcp/docs/api/settings#the-record-limit-and-what-it-feels-like`
 
@@ -62,7 +69,7 @@ The instance's record quota is also shared, and it counts the main set and every
 
 The application tokens a storefront reads the Content API with are **not** shared. A token issued in the main set does not appear in an environment's list and does not work there, and a newly created environment starts with none at all.
 
-So standing up a storefront against an environment takes a token issued inside that environment, and the first read before anyone has issued one answers the ordinary token refusal. That is the second reason a Content API `401` follows an environment being named, and it is the one to check after the spelling.
+So a storefront pointed at an environment needs a token issued inside it, and a read before anyone has issued one answers the ordinary token refusal. That is the second reason a Content API `401` follows an environment being named — check it after the spelling.
 
 → `mcp/docs/api/content-api-reads#public-reads-use-the-x-app-token-header`
 
@@ -80,7 +87,7 @@ The name is fixed once the environment exists: the update takes the `description
 
 Neither call waits for the work. Create answers `201` with the record already in hand, `status: "creating"` — and until that status reads `ready`, every request naming the environment answers `400 Environment "<name>" is not ready`. So a create followed immediately by a write to the new environment fails on the second call, and the fix is to re-read the record until it is ready, not to resend anything.
 
-Delete answers at once too, and the record then sits at `status: "deleting"` while its data is removed. That takes a noticeable while on a busy instance, and the record disappears from the listing only when the removal has finished. A name only becomes free to use again at that point.
+Delete answers at once too, and the record then sits at `status: "deleting"` while the data goes. That takes a noticeable while, and the record leaves the listing only when the removal has finished — which is also when the name becomes free again.
 
 Deleting takes the environment's whole set of data with it, and nothing keeps a copy. Treat it as the most destructive delete on the instance: show the human the environment's name, say what it holds, and wait for them to agree.
 
@@ -105,12 +112,10 @@ Orders, visitors and submissions are not among the kinds that travel, and asking
 
 ## Common mistakes
 
-- **Believing a write from here reached an environment.** It reached the main set, and it answered `201` doing so.
+- **Assuming a write reached an environment.** Ask `cms_whoami` which one this session is in; a missing header is never refused.
 - **Reading an Admin API `400` as a credentials problem.** The environment check runs before authentication.
 - **Reading a Content API `401` as a dead token.** A misspelled environment name answers the same message.
 - **Reusing an application token in another environment.** Tokens do not cross; issue one inside it.
 - **Taking the empty `items` of a transfer as a failure.** The run is asynchronous; the plan is in the dry run.
-- **Treating an environment as free space.** The record quota is shared with the live data.
 - **Writing to an environment in the same breath as creating it.** It is not ready yet, and that `400` says so.
 - **Creating a second environment because the first says `failed`.** Read its `error` first.
-- **Reading a name still in the listing as `deleting` as a stuck delete.** The record goes when the data has gone.
