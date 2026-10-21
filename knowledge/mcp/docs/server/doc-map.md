@@ -205,6 +205,9 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | How do I search inside an attached document | `mcp/docs/api/file-content-search#a-result-is-a-whole-file-and-not-a-fragment` |
 | Why does my document search return an empty list | `mcp/docs/api/file-content-search#an-empty-result-that-has-a-reason-says-so` |
 | Where is the public search by meaning | `mcp/docs/api/global-search#semantic-search-over-one-kind-of-entity` |
+| Which kinds may I pass in `types` | `mcp/docs/api/global-search#which-kinds-the-admin-side-accepts` |
+| Can the search find a payment or AI account, a filter or a module | `mcp/docs/api/global-search#settings-records-the-admin-search-also-finds` |
+| Can a stored credential be found through the search | `mcp/docs/api/global-search#settings-records-the-admin-search-also-finds` |
 
 ## Answers about attributes and values
 
