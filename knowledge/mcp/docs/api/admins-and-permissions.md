@@ -125,6 +125,8 @@ Read the key names in that order — the entity first, `export` second. `export.
 
 `environments.manage` governs the registry of an instance's data environments. Reading it is open — the listing and reading one by id answer for any signed-in administrator, with no key at all. Creating one, editing it, deleting it, checking it and copying content between two all require the key, and answer `403 Forbidden resource` without it.
 
+It is an ordinary key, like the export ones: it appears in the vocabulary, and an admin provisioned with the instance holds it. Read your own map in `cms_whoami` before asking anyone for the grant.
+
 Like the total logout, these operations carry **no permission in the catalog**, so the local pre-check cannot stop the call: the refusal arrives from the instance after the request went out. A `403` on one of them is this key and nothing else.
 
 Holding it does not decide which environment you work *inside*. That is a request header the operator sets when the server starts, and no grant changes it.

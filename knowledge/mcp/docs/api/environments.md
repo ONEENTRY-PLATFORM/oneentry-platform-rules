@@ -75,7 +75,7 @@ So a storefront pointed at an environment needs a token issued inside it, and a 
 
 ## Who may create and delete an environment
 
-Reading the registry is open: `AdminEnvironmentsController_findAll` and `AdminEnvironmentsController_findOne` answer for any signed-in administrator, with no key at all. Everything else — creating, editing, deleting, checking one and copying content between two — needs `environments.manage` and answers `403 Forbidden resource` without it.
+Reading the registry is open: `AdminEnvironmentsController_findAll` and `AdminEnvironmentsController_findOne` answer for any signed-in administrator, with no key at all. Everything else — creating, editing, deleting, checking one and copying content between two — needs `environments.manage` and answers `403 Forbidden resource` without it. An admin provisioned with the instance holds that key, so check your own map before treating the refusal as a grant to ask for.
 
 A record carries `name`, `description`, a `status` of `creating`, `ready`, `failed` or `deleting`, and an `error` that holds the cause when creating one did not finish. A failed record **stays** in the registry rather than disappearing, so a listing that holds an environment nobody can use is telling you to read its `error`, not to create it again.
 
