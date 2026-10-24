@@ -211,6 +211,7 @@ Do not assume a link you obtained on one instance works on another, and do not c
 - **Re-uploading to check the first upload worked.** Read the record; uploads cost quota.
 - **Treating a stripped value as data loss.** The metadata is all there.
 - **Expecting the instance to refuse a file type.** It refuses none; the attribute's validators are the project's rule.
+- **Changing folder values or the field name when an upload answers `503`.** The instance's storage is unavailable for a while; nothing was stored and no quota was used. Retry the same call after a pause, and report it to the instance operator if it persists.
 - **Reading a `403` on upload or delete as a problem with the file.** The admin routes need `files.create` and `files.delete`.
 - **Assembling a path inside `type`, `id` or `entity`.** Each is a single folder name; a separator or `..` is a `400`.
 - **Deleting a file without finding its references.** Silent missing images.
