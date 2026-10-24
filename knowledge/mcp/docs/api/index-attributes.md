@@ -125,7 +125,7 @@ Global search does not carry the field. For it, the coverage report below is the
 
 `total` counts the records. `eligible` counts those carrying enough text to produce a vector — a record with no title and no usable attribute cannot. `vectorized` counts those that have one, and `missingSample` lists up to fifty ids that ought to and do not.
 
-`eligible` above `vectorized`, or a non-empty `missingSample`, means the coverage is behind. Say so, name the kind, and stop there: rewriting the entities does not provoke it, and a second search does not either.
+`eligible` above `vectorized`, or a non-empty `missingSample`, means the coverage is behind. Say so and name the kind. Rewriting the entities does not close the gap and a second search does not either; the platform's hourly maintenance pass does — it fills in only the records that have no vector yet. Expect the gap gone within about an hour. If the same ids are still listed after two passes, report that rather than waiting longer.
 
 The `vectorized` and `total` sitting beside `byTable` count products alone. Read the per-kind entries instead — the two outer numbers can look complete while a whole kind is uncovered.
 
