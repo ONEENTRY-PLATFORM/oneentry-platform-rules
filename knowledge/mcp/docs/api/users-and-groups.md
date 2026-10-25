@@ -16,7 +16,7 @@ Confusing the last two is common and consequential: granting an admin permission
 
 ## The guest group
 
-A group with identifier `guest`, normally id 1, is provisioned with the instance. Every Content API permission is attached to it, and what an unauthenticated visitor may do is decided by its rules.
+A group with identifier `guest`, normally id 1, is provisioned with the instance. Nearly every Content API permission is attached to it, and what an unauthenticated visitor may do is decided by its rules. The few left unattached, such as `GET /api/content/system/api-stat`, answer `403` until granted.
 
 Its identifier is **not unique**, so creating a second group called `guest` succeeds and produces a group that nothing points at. Adjust the rules on the existing group; never create one.
 
