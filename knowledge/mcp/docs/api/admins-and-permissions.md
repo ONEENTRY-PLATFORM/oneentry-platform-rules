@@ -135,7 +135,7 @@ Holding it does not decide which environment you work *inside*. That is a reques
 
 ## Personal settings live on the admin account
 
-An administrator's own preferences are fields on its account, not settings of the instance: `selectedLanguage`, `selectedContentLanguage`, `selectedUITheme`, and `keepNotifications` — a flag that stops the admin panel from hiding its own notifications on a timer. `GET /admins/me` returns all of them, and `keepNotifications` is `false` on an account nobody has changed, including a freshly created one.
+An administrator's own preferences are fields on its account, not settings of the instance: `selectedLanguage`, `selectedContentLanguage`, `selectedUITheme`, `keepNotifications` — a flag that stops the admin panel from hiding its own notifications on a timer — and `highContrast` — a flag that switches the admin panel to its high-contrast presentation. `GET /admins/me` returns all of them, and `keepNotifications` and `highContrast` are `false` on an account nobody has changed, including a freshly created one. `selectedUITheme` accepts `DARK`, `LIGHT` or `SYSTEM` (follow the appearance the operating system is set to) and is `SYSTEM` on a freshly created account; any other value answers `400` and leaves the stored theme unchanged.
 
 There is no self-service route for them. They are saved by the ordinary `AdminsController_update` on the administrator's own id, which means two things:
 
