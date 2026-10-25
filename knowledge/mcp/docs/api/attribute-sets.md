@@ -227,6 +227,8 @@ Changing an attribute's **type** after values exist is the one change to treat a
 
 If a human asks for it, say what will happen to the existing values and let them decide. Adding a new attribute and migrating deliberately is almost always the better route.
 
+`inSearchVocabulary: false` on a `string`, `text` or `textWithHeader` attribute keeps its values out of public search query correction — see `mcp/docs/api/search-query-correction#tuning-correction-for-a-project`.
+
 ## Checklist before writing values
 
 1. Read the set and note each attribute's type, id and marker.

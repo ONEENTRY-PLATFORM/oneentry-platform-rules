@@ -94,6 +94,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/index-attributes` | A filter finds nothing, or a new value is missing from a list |
 | `mcp/docs/api/global-search` | Locating an entity by a word a human used, or building a site search on the public one |
 | `mcp/docs/api/file-content-search` | Finding a document by words written inside it, or a document search that returns nothing |
+| `mcp/docs/api/search-query-correction` | Correcting typos in a public search query, or a search that answered with a corrected query |
 
 ## Commerce
 
@@ -204,6 +205,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does the search never find my documents | `mcp/docs/api/global-search#what-global-search-never-finds` |
 | How do I search inside an attached document | `mcp/docs/api/file-content-search#a-result-is-a-whole-file-and-not-a-fragment` |
 | Why does my document search return an empty list | `mcp/docs/api/file-content-search#an-empty-result-that-has-a-reason-says-so` |
+| How do I show "did you mean" on a site search | `mcp/docs/api/search-query-correction#correct-a-query-directly` |
+| Why did the public search answer for different words | `mcp/docs/api/search-query-correction#correction-inside-the-public-searches` |
 | Where is the public search by meaning | `mcp/docs/api/global-search#semantic-search-over-one-kind-of-entity` |
 | Which kinds may I pass in `types` | `mcp/docs/api/global-search#which-kinds-the-admin-side-accepts` |
 | Can the search find a payment or AI account, a filter or a module | `mcp/docs/api/global-search#settings-records-the-admin-search-also-finds` |

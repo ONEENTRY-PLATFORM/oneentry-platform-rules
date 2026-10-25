@@ -75,6 +75,7 @@ Four differences decide whether a call works:
 - **`q` must be at least three characters.** Two are accepted on the admin side and answer `400` here.
 - **Only records a visitor may read contribute their files.** A record hidden from the site contributes nothing, and neither does one its groups may not read. Sections the instance holds for staff and customers are narrowed to the caller: the administrator section is never searched publicly at all, and the user and user-group sections return only the caller's own records, so a guest gets nothing from them.
 - **A result carries fewer fields.** `id`, `storageKey`, `extension`, `title`, `langCode`, `pageCount`, `rank`, `snippet`, `owners`, `ownersTotal` — and nothing describing the state of the index. Do not expect `status`, `isExcluded`, `truncated`, `lowConfidence`, `langSource`, `langConfidence` or `tsConfig` here; read those from the admin index listing.
+- **The query is corrected first.** A typo is replaced by the word it most likely meant, the answer says so with `correctedQuery` and the warning `corrected`, and `correct=false` searches as written — see `mcp/docs/api/search-query-correction#correction-inside-the-public-searches`.
 - **`ownerTables` in settings still decides.** What the instance does not process is not searchable publicly either, and the same request may be filtered further by the permission record's own section restrictions.
 
 The route needs a permission record for its path linked to the caller's group, like every public read. Without it the call answers `403` naming the route rather than an empty list — grant it the same way as any other public route. A new instance links it to the guest group.
@@ -146,6 +147,7 @@ Pass `langCode` when the human tells you the language. An unknown value is refus
 - `query_too_common` — the query was made only of words too common to match on. Ask for a more specific term; do not retry.
 - `query_language_capped` — more candidate languages than the instance will search at once. Pass `langCode` to pick one.
 - `fuzzy_fallback` — nothing matched the words as typed, and these results came from similar words instead. Offer them as "did you mean", never as matches.
+- `corrected` — public search only: the query was corrected and these are the results of `correctedQuery`. Show the corrected query and offer a search as written.
 - `semantic_unavailable` — matching by meaning was asked for and could not run. An empty list here does not mean nothing was close in meaning; report it as a service that did not answer.
 
 ## Finding a document by meaning or past a typo
@@ -254,6 +256,8 @@ Both need `files.contentIndex.manage`. If `language.allowManualOverride` is off,
 - `unauthorized` — the reader answered and refused the call. A shared credential does not match on the two sides; also configuration, but a different field.
 - `unreachable` — nothing answered, or the reader failed. Operational, and nothing a tenant can do.
 
+The answer also carries a `vocabulary` section about the word list behind query correction — see `mcp/docs/api/search-query-correction#is-the-word-list-up-to-date`.
+
 Report the reason you were given rather than "unavailable". An unfamiliar value means a newer instance than you know about: say it verbatim instead of guessing. `languages` is what the documents here are actually written in — use it to offer a language choice that cannot be empty.
 
 `ocrLanguages` is the separate answer for character recognition: the language codes this instance can recognise in a scan. It is not the same list as `languages`, which is what the already-indexed documents are written in, and it is not implied by `ocrAvailable`. A locale the instance serves may still be absent from it.
@@ -286,6 +290,7 @@ Two fields here explain a corpus that has quietly stopped growing while nothing 
   `processing.rebuild` says nothing about it. One call handles a bounded slice; send it again
   while it keeps answering a non-zero number. Needed once after `enableSemanticStage` is turned
   on, and pointless where `capability.embeddingAvailable` is false — it answers `0`.
+- `vocabulary` — rebuilds the word list used to correct public search queries. Reads no document again and answers `enqueued: 1` — see `mcp/docs/api/search-query-correction#is-the-word-list-up-to-date`.
 - `one` — a single document; `storageKey` is then required, and omitting it answers `400`.
 
 The answer is an acceptance, not a result. Follow it in `processing.rebuild` of the status: `total` is how many documents the last rebuild accepted, `remaining` how many still wait, and `startedAt` when it began. `remaining: 0` means that run is finished. `remaining` can include other documents waiting at the same time, so it never exceeds `total`. The field is `null` when no rebuild ran in the last day. A rebuild that accepts nothing does not replace a run whose documents are still waiting, paused processing included: the status keeps that run's `total` and `startedAt`. Once nothing is waiting, the same call shows `total: 0`. Poll every few seconds, not in a tight loop, and do not start another rebuild while `remaining` is above zero.
