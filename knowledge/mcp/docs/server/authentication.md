@@ -50,6 +50,8 @@ Repeated failed sign-ins are limited per instance. Too many failures for one log
 - Until that delay has passed, sign-in for that login or from that address is refused with 429 **even when the login and password are correct**.
 - A successful sign-in clears the failure count for that login.
 
+Admin password recovery is limited the same way. Too many wrong recovery codes for one e-mail address, or from one client address, make the code-verification and password-change calls answer 429 with the same `Retry-After`; a correct code clears the count for that e-mail. The guidance below applies to them too — a recovery code cannot be found by trying values in a loop.
+
 What to do:
 
 - Wait at least `Retry-After` seconds. Never retry sign-in in a loop; every failed attempt counts.
