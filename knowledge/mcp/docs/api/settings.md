@@ -63,6 +63,8 @@ Settings are the area where a well-meaning "tidy up" does the most damage, becau
 
 General settings also carry a `fileContentSearch` section, which decides whether documents attached to records are searchable by their contents. It is off until someone turns it on.
 
+A `searchVocabulary` section tunes how public search queries are corrected — see `mcp/docs/api/search-query-correction#tuning-correction-for-a-project`.
+
 → `mcp/docs/api/file-content-search#nothing-is-indexed-until-someone-turns-it-on`
 
 ## Common mistakes
