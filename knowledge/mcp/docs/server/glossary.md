@@ -56,7 +56,7 @@ Entries are alphabetical within each group.
 
 **general type** — the classification of a page, block, product, form, order or discount. Provisioned, resolved by name, and unique.
 
-**guest group** — the user group with identifier `guest`, normally id 1, that every Content API permission is attached to. Unauthenticated access is decided by its rules.
+**guest group** — the user group with identifier `guest`, normally id 1, that nearly every Content API permission is attached to. Unauthenticated access is decided by its rules. A few are left unattached, among them `GET /api/content/system/api-stat`, and answer `403` until a group is granted them.
 
 **identifier** — a stable string name on templates, menus, order statuses, modules and groups. Interchangeable in practice with *marker*, which is the word used on blocks, forms and general types.
 
