@@ -32,7 +32,7 @@ Treat a failure on the first group as confirmation, not as a problem to route ar
 
 ## User groups and the guest group
 
-A user group `guest` is provisioned with the instance, normally as id 1. Every Content API permission attaches to it, and unauthenticated access is decided by its rules.
+A user group `guest` is provisioned with the instance, normally as id 1. Nearly every Content API permission attaches to it, and unauthenticated access is decided by its rules. A few are left unattached on purpose — the daily request-count route `GET /api/content/system/api-stat` among them — and answer `403` until a group is granted them.
 
 The group identifier is **not unique**. Creating another `guest` succeeds and gives you a group no permission is attached to — which then reads as a permissions problem rather than a duplicate. To open up guest access, adjust the existing group's rules. Never create one.
 
@@ -42,7 +42,7 @@ A second group, `user`, for signed-in customers, exists on fully provisioned ins
 
 ## Content API permissions
 
-A permission record already exists for every Content API path, each carrying a section and a set of rules, all attached to the guest group.
+A permission record already exists for every Content API path, each carrying a section and a set of rules, nearly all attached to the guest group.
 
 A permission path is unique per group, so creating one that already exists **fails**; the operation you want updates the existing record's rules. The section value is a closed vocabulary you cannot extend.
 
