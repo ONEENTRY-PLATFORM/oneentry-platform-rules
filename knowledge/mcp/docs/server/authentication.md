@@ -43,6 +43,19 @@ The Admin API answers 401 for accounts flagged as developer accounts. Those belo
 
 If credentials that work elsewhere are rejected here, that is the first thing to check — the server appends a note to the 401 saying so. Use an ordinary admin account.
 
+## Why sign-in answers 429
+
+Repeated failed sign-ins are limited per instance. Too many failures for one login, or from one client address, within a time window make sign-in answer 429 with a `Retry-After` header giving the wait in seconds.
+
+- Until that delay has passed, sign-in for that login or from that address is refused with 429 **even when the login and password are correct**.
+- A successful sign-in clears the failure count for that login.
+
+What to do:
+
+- Wait at least `Retry-After` seconds. Never retry sign-in in a loop; every failed attempt counts.
+- Check the login and password before the next attempt. A 401 on sign-in is a wrong login or password, not a transient error.
+- A shared admin account can be locked by anyone repeating wrong passwords against it — one more reason to give the server an account of its own.
+
 ## Where the permission list comes from
 
 After authenticating, the server reads the admin's own record and keeps the permissions whose value is true. That list is what the local pre-check compares against the permission an operation declares, and it is what `cms_whoami` reports.
