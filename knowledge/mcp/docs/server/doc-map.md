@@ -146,6 +146,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does a public read answer 503 | `mcp/docs/api/content-api-reads#what-a-503-on-a-public-read-is-telling-you` |
 | Why does a public read answer 429 | `mcp/docs/api/content-api-reads#what-a-429-on-a-public-read-is-telling-you` |
 | Why does sign-in answer 429 | `mcp/docs/server/authentication#why-sign-in-answers-429` |
+| Why does password recovery answer 429 | `mcp/docs/server/authentication#why-sign-in-answers-429` |
 | Why does a read say permissions are temporarily unavailable | `mcp/docs/api/content-api-reads#what-a-503-on-a-public-read-is-telling-you` |
 | Why can I not list the submissions of a form | `mcp/docs/api/form-submissions#both-read-routes-need-the-forms-data-read-permission` |
 | Why did an operation that worked start answering 403 | `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it` |
