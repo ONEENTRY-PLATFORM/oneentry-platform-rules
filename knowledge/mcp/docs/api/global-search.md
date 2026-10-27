@@ -160,7 +160,7 @@ The answer is `{ "items": [...], "total": n }`, and a `POST` that worked answers
 - The search covers **the whole instance**. There is no site, branch or parent parameter, so a project holding several sites gets all of them back and must narrow the results itself.
 - Pages come back whether or not they are visible. Each item carries `isVisible`; a site that shows results unfiltered will publish pages that were deliberately hidden.
 
-One more thing to know: it depends on a capability an instance may not have available, and when it is missing the call answers `503` — a temporary state, not a malformed request, so retry later or fall back to a filtered listing rather than rewriting the body. A `405` is the other answer entirely, and means you sent it to the admin address.
+One more thing to know: it depends on a capability an instance may not have available, and when it is missing the call answers `503` — a temporary state, not a malformed request, so retry later or fall back to a filtered listing rather than rewriting the body. A `405` with a JSON body is the other answer entirely, and means you sent it to the admin address; a `405` with an HTML body on the public address is the instance under load, and the same request succeeds when resent after a pause.
 
 Match quality follows what has been indexed, so a kind whose content was loaded recently can return less than you expect while the rest of the instance behaves normally.
 

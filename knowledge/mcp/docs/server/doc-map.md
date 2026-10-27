@@ -144,6 +144,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why was my call refused with nothing sent | `mcp/docs/server/allow-levels#a-level-refusal-happens-before-authentication` |
 | Why does every public read answer 401 | `mcp/docs/api/content-api-reads#public-reads-use-the-x-app-token-header` |
 | Why does a public read answer 503 | `mcp/docs/api/content-api-reads#what-a-503-on-a-public-read-is-telling-you` |
+| Why does a public call answer 405 with an HTML page | `mcp/docs/api/content-api-reads#a-405-with-an-html-body-means-the-instance-is-overloaded` |
 | Why does a public read answer 429 | `mcp/docs/api/content-api-reads#what-a-429-on-a-public-read-is-telling-you` |
 | Why does sign-in answer 429 | `mcp/docs/server/authentication#why-sign-in-answers-429` |
 | Why does password recovery answer 429 | `mcp/docs/server/authentication#why-sign-in-answers-429` |
