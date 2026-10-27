@@ -80,7 +80,7 @@ So, once per instance, before the first image:
 3. Upload with `template=<that id or identifier>`.
 4. Read the returned record and confirm `previewLink` is present. If it is not, the template id is wrong — do not vary `type` and `entity` hoping for a different outcome, they have nothing to do with it.
 
-Previews are generated for `png`, `jpeg` and `jpg` only. Documents get no preview by design, which is why an upload of a PDF never carries one.
+Previews are generated for `png`, `jpg`, `jpeg` and `webp` images, matched on the file extension in any letter case. Any other file — another image format such as `gif` or `avif`, or a document such as a PDF — is stored and answered `201` with no `previewLink` and no error, so check for `previewLink` in the response, not the status.
 
 A preview is not only a thumbnail — the inline placeholder a site shows while the full image loads comes from it too, so an image without one cannot be rendered progressively. Settle the template id before the first upload, not after the last.
 
