@@ -54,6 +54,14 @@ If a customer-facing subscribe call returns a permission error, the fix is grant
 
 → `mcp/docs/api/users-and-groups`
 
+## Subscribing to a plan with no payment page
+
+Subscribing answers with a payment session: its id, amount, status and a `paymentUrl` to send the customer to.
+
+When the plan's payment account is settled manually rather than through a payment provider, the session comes back with status `waiting` and `paymentUrl` set to `null`. Do not redirect. Tell the customer that payment happens outside the storefront.
+
+The enrolment stays pending and is not listed among the customer's active subscriptions until an operator renews it. Renewing completes the waiting session; cancelling the enrolment cancels it. Subscribing again replaces the waiting session with a new one.
+
 ## Delete a plan
 
 Deleting a plan that has enrolments detaches those enrolments rather than tidying anything up, and the customers involved keep whatever the plan granted them until their record expires.
@@ -67,3 +75,4 @@ Before confirming a delete, count the enrolments and tell the human. Ending a pl
 - **Writing a state to reflect a payment.** The platform reconciles it.
 - **Changing the price of an active plan casually.** Existing subscribers are affected and the provider side has to agree.
 - **Deleting a plan with enrolments.** They are detached, not cleaned up.
+- **Redirecting to a null payment link.** A manually paid plan has no payment page.
