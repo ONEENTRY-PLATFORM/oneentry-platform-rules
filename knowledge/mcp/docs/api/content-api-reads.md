@@ -84,6 +84,28 @@ does not clear on a retry, so the two are never confused once you read the statu
 
 → `mcp/docs/api/content-api-permission-rules#read-the-rules-before-reporting-a-public-answer`
 
+## A 405 with an HTML body means the instance is overloaded
+
+Under load a public call can answer `405` with a short HTML page instead of JSON, on a
+route and method that answer normally moments later. It carries no `Retry-After`:
+
+```text
+POST /api/content/products/vector/search?langCode=en_US
+  x-app-token: <app token>
+  → 405 Content-Type: text/html
+    <html><head><title>405 Not Allowed</title></head>…
+```
+
+The content type is what separates it from a real `405`. Every `405` the API means — a
+wrong address, an instance limit — arrives as JSON with `statusCode` and `message`. An HTML
+one is load being shed: wait a second or two, then send the same request unchanged, backing
+off further on each repeat. Do not change the method or the address, and do not report the
+route as unsupported. The same burst can also leave some calls with no answer until your
+client times out; treat those the same way.
+
+Check the content type before parsing any error body. A client that parses every answer as
+JSON fails on this one before it ever sees the status.
+
 ## What a 429 on a public read is telling you
 
 An instance can also limit how **often** public reads are accepted, which is a different
@@ -155,6 +177,7 @@ So check the work through the public route the site itself will call, with the l
 - **Treating a trimmed list as the whole list.** The restricted read says nothing about being cut.
 - **Reading a `503` as missing content.** Respect `Retry-After` and send the read again.
 - **Rewriting group rules after a `503` that mentions permissions.** It clears on a retry.
+- **Reading an HTML `405` as an unsupported method.** It is overload: back off and resend.
 - **Reading a `429` as a permission refusal.** It is a rate ceiling: wait out `Retry-After`.
 - **Looking for a public address for an external page.** It arrives in the menu.
 - **Verifying only through the admin read.** It is not what the site receives.
