@@ -63,7 +63,7 @@ Its permission record must be linked to the reading group. It is provisioned lin
 
 ## Which kinds the admin side accepts
 
-`types` is a closed vocabulary, and a name outside it answers `400 each value in types must be a valid enum value` — without naming the ones it would have taken. These are the names:
+`types` is a closed vocabulary, and a name outside it answers `400` naming `types`. Whether that message also lists the accepted names depends on the instance version, so read them here:
 
 ```text
 pages products blocks forms orders discounts collections filters

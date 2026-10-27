@@ -115,7 +115,7 @@ An event on the forms module is configured by three fields the create and update
     "push": "A new enquiry" } } }
 ```
 
-- **`formType`** is a closed set: `registration`, `send_code`, `change_password`, `submit_data`. A value outside it answers `400 formType must be a valid enum value` — the message does **not** list what is allowed, so read the four from here or from the operation schema.
+- **`formType`** is a closed set: `registration`, `send_code`, `change_password`, `submit_data`. A value outside it answers `400` naming `formType`. Whether the message also lists what is allowed depends on the instance version, so read the four from here or from the operation schema.
 - **`forms.emails` is what decides where the mail goes.** Each entry is either `{"attr":"<field marker>"}`, taking the address from the submitted field, or `{"plain":"<address>"}`, a fixed recipient. Objects, not strings, even though the schema types the list loosely.
 - **`forms.mode`** is `any_data`, `reply` or `status`; **`forms.status`** applies when the mode is `status`.
 - **`formIdentifier`** binds the event to a form. `formEmailFieldIdentifier` is legacy and is not read — the recipient comes from `forms.emails`.
