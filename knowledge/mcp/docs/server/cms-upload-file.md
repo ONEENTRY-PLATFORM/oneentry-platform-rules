@@ -22,7 +22,7 @@ cms_upload_file { "path": "assets/mug.png", "type": "image", "entity": "product"
 - `path` is absolute or relative to the server's upload root;
 - `type`, `entity` and `id` say what the file is and what it belongs to, and all three are required;
 - `template` is the **id** or the string **identifier** of a preview-template record — see below;
-- `compress` asks the instance to compress an image;
+- `compress` asks the instance to compress an image. A JPEG, PNG or TIFF comes back as WebP: the returned `filename` and `downloadLink` end in `.webp`, `contentType` is `image/webp`, and `size` is the compressed size. Store the returned name, not the one you sent. GIF, SVG and other formats are stored unchanged under their own name and type;
 - `edit: true` keeps the original file name and overwrites a stored file of that name. Without it the instance adds a timestamp suffix, so nothing is overwritten.
 
 Local mode only. In remote mode the filesystem belongs to whoever hosts the server rather than to the caller, so the tool refuses and names the other one.
