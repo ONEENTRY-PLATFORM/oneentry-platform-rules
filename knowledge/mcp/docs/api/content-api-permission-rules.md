@@ -48,10 +48,10 @@ To read the value in force without guessing, `AdminUserPermissionsController_get
 
 Where a read is trimmed, it still honours `limit` and `offset`, but only inside the window:
 
-- `offset` at or past the cap returns an empty array, not the next page;
+- `offset` at or past the cap is refused with `400 Requested offset exceeds the maximum allowed data length…`, which names the cap in force;
 - `limit` is trimmed to what is left of the cap, so `offset: 5, limit: 50` on a cap of ten yields five records.
 
-A site paging such a listing therefore sees the first ten records and then nothing at all, whatever the total. Raising the setting or granting unrestricted read is the only way through — no request shape gets past it.
+A site paging such a listing therefore sees the first ten records and then a `400`, whatever the total. Raising the setting or granting unrestricted read is the only way through — no request shape gets past it.
 
 That is also the cheapest way to tell a trimmed read from an untrimmed one: ask for `offset: 5, limit: 50`. Fifty records back means this route is not being trimmed at all.
 
@@ -168,7 +168,7 @@ The sequence is the same for both: find the record whose `path` matches the addr
 
 - **Working around the ten-record ceiling in the content.** Merging articles into fewer, larger records to fit a cap is content damage in exchange for a setting.
 - **Reading a trimmed list as the whole list.** Nothing marks it as cut.
-- **Paging past the cap** and reporting the empty page as broken.
+- **Paging past the cap** and reporting the `400` as broken.
 - **Assuming a new project ships with public writes closed.** File upload is open by default.
 - **Sending a partial `rules` object.** It replaces the whole of it.
 - **Re-testing a rule change in the same second** and concluding it did not apply.
