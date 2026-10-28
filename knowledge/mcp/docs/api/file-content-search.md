@@ -149,12 +149,16 @@ Pass `langCode` when the human tells you the language. An unknown value is refus
 - `fuzzy_fallback` — nothing matched the words as typed, and these results came from similar words instead. Offer them as "did you mean", never as matches.
 - `corrected` — public search only: the query was corrected and these are the results of `correctedQuery`. Show the corrected query and offer a search as written.
 - `semantic_unavailable` — matching by meaning was asked for and could not run. An empty list here does not mean nothing was close in meaning; report it as a service that did not answer.
+- `fuzzy_timed_out` — matching on similar words was asked for and ran out of the time the search allows. The list is whatever the exact-word matching produced, often nothing. Read it as "approximate matching did not run", never as "no close match exists".
+- `infix_timed_out` — the same, for matching on part of a word.
 
 ## Finding a document by meaning or past a typo
 
 Two kinds of matching sit behind the exact-word search, both settings in the `fileContentSearch.search` section.
 
 `enableFuzzyStage` is **on** by default. It runs only when the words as typed matched nothing at all, and then looks for words similar to them — a query with one letter wrong finds the document instead of answering an empty list. It can never shrink or reorder a result that already has matches, which is why it is on. Results it produced carry `fuzzy_fallback`: say that the match is approximate rather than presenting it as exact.
+
+This matching is the slowest thing a search here does, and the more document text the instance holds the likelier it is to run out of the time it is given. It is allowed to give up: the answer stays `200` and carries `fuzzy_timed_out`. Two things follow for a misspelt query. Searching each word on its own is both faster and likelier to answer, because one wrong word no longer decides the whole query. And on the public search, leave correction on — it replaces the typo before any matching runs, so it costs nothing like this does; `correct=false` gives that up.
 
 `enableSemanticStage` is **off** by default. It matches on meaning, so a query sharing no words with the document can still find it. Three things gate it, and all three have to hold:
 
