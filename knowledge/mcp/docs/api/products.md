@@ -142,6 +142,8 @@ Filters are the body of the list operation, and the body is an **array**: each e
 
 Only attributes that are indexed can be filtered on. A filter over a non-indexed attribute returns nothing rather than erroring, which reads as "no such products".
 
+Filter objects accept only `attributeMarker`, `conditionMarker`, `conditionValue`, `statusMarker`, `pageUrls`, `title`, `isNested` and `ids`. Any other key answers `400` naming it (`property statusMarkr should not exist`) instead of being dropped; fix the spelling and resend. Counts and content listings apply the same check.
+
 → `mcp/docs/api/filters` · `mcp/docs/api/index-attributes#what-issync-tells-you-and-what-attributevalues-does-not`
 
 ## Common mistakes
