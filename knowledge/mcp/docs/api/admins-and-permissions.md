@@ -135,14 +135,20 @@ Holding it does not decide which environment you work *inside*. That is a reques
 
 ## Personal settings live on the admin account
 
-An administrator's own preferences are fields on its account, not settings of the instance: `selectedLanguage`, `selectedContentLanguage`, `selectedUITheme`, `keepNotifications` — a flag that stops the admin panel from hiding its own notifications on a timer — and `highContrast` — a flag that switches the admin panel to its high-contrast presentation. `GET /admins/me` returns all of them, and `keepNotifications` and `highContrast` are `false` on an account nobody has changed, including a freshly created one. `selectedUITheme` accepts `DARK`, `LIGHT` or `SYSTEM` (follow the appearance the operating system is set to) and is `SYSTEM` on a freshly created account; any other value answers `400` and leaves the stored theme unchanged.
+An administrator's own preferences are fields on its account, not settings of the instance: `selectedLanguage`, `selectedContentLanguage`, `selectedUITheme`, `keepNotifications` — a flag that stops the admin panel from hiding its own notifications on a timer — and `highContrast` — a flag that switches the admin panel to its high-contrast presentation. `GET /admins/me` returns all of them. `keepNotifications` is `false` on an account nobody has changed, including a freshly created one. `selectedUITheme` accepts `DARK`, `LIGHT` or `SYSTEM` (follow the appearance the operating system is set to) and is `SYSTEM` on a freshly created account; any other value answers `400` and leaves the stored theme unchanged.
+
+`highContrast` is **nullable**, and the three values mean three different things. `null` — the administrator has not chosen, and the account follows the instance-wide `user.highContrastDefault` general setting. `true` or `false` — the administrator's own choice, which overrides that setting. A freshly created account is `null`, so a read that answers `null` is not a missing value and not an error.
+
+Writing `false` is therefore not a no-op: it turns the high-contrast presentation **off** for an account that was following an instance default of `true`. Write `highContrast` only when a human asked for that mode specifically.
 
 There is no self-service route for them. They are saved by the ordinary `AdminsController_update` on the administrator's own id, which means two things:
 
 - The body must be a whole admin body. `{"keepNotifications": true}` on its own answers `400 All fields must be filled!` — send `login` and `email` beside it. Keys you leave out are left alone, `permissions` included, so this is not a write that can cost an account its rights.
 - It needs `admins.update`, the same key as editing anybody else. An administrator without it cannot store its own preference at all and the panel keeps the choice in the browser instead, so the same account can look different on another device.
 
-A non-boolean answers `400` naming the field. Read the account back through `GET /admins/me` to confirm the value landed.
+A value of the wrong type answers `400` naming the field. `highContrast` accepts `null` beside `true` and `false`, and sending `null` is how an account goes back to following the instance default; a key you leave out keeps whatever is stored. Read the account back through `GET /admins/me` to confirm the value landed.
+
+→ `mcp/docs/api/settings#general-settings`
 
 ## Never replace an admins permission map
 

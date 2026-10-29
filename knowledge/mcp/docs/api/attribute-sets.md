@@ -227,7 +227,7 @@ Changing an attribute's **type** after values exist is the one change to treat a
 
 If a human asks for it, say what will happen to the existing values and let them decide. Adding a new attribute and migrating deliberately is almost always the better route.
 
-`inSearchVocabulary: false` on a `string`, `text` or `textWithHeader` attribute keeps its values out of public search query correction — see `mcp/docs/api/search-query-correction#tuning-correction-for-a-project`.
+`isInSearchVocabulary: false` on a `string`, `text` or `textWithHeader` attribute keeps its values out of public search query correction, and so does `isVisible: false`. Mind the leading `is` — a key spelled `inSearchVocabulary` is stored in the schema like any unknown key and has no effect at all. See `mcp/docs/api/search-query-correction#tuning-correction-for-a-project`.
 
 ## Checklist before writing values
 

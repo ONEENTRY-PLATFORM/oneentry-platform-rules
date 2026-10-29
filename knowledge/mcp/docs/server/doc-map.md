@@ -121,6 +121,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/password-reset` | A visitor cannot sign in and needs a new password |
 | `mcp/docs/api/admins-and-permissions` | An operation was refused for lack of a permission |
 | `mcp/docs/api/admin-page-scope` | Delegating one branch of the page tree, or a page write refused for an admin who holds the key |
+| `mcp/docs/api/admin-sign-in` | Administrator sign-in answered a challenge instead of tokens, or a sign-in code is refused |
 
 ## Instance configuration
 
@@ -148,6 +149,11 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does a public read answer 429 | `mcp/docs/api/content-api-reads#what-a-429-on-a-public-read-is-telling-you` |
 | Why does sign-in answer 429 | `mcp/docs/server/authentication#why-sign-in-answers-429` |
 | Why does password recovery answer 429 | `mcp/docs/server/authentication#why-sign-in-answers-429` |
+| Why did sign-in answer mfaRequired instead of a token | `mcp/docs/api/admin-sign-in#sign-in-answers-a-challenge-instead-of-tokens` |
+| Why is my sign-in code refused | `mcp/docs/api/admin-sign-in#finish-the-sign-in-with-the-e-mailed-code` |
+| Why does the sign-in code call answer 429 | `mcp/docs/api/admin-sign-in#too-many-attempts-answers-429` |
+| Why does sign-in answer 503 with no challenge | `mcp/docs/api/admin-sign-in#when-the-code-cannot-be-sent` |
+| Why is the server unauthenticated with the right login and password | `mcp/docs/server/authentication#an-instance-with-a-second-factor-needs-the-token` |
 | Why does a read say permissions are temporarily unavailable | `mcp/docs/api/content-api-reads#what-a-503-on-a-public-read-is-telling-you` |
 | Why can I not list the submissions of a form | `mcp/docs/api/form-submissions#both-read-routes-need-the-forms-data-read-permission` |
 | Why did an operation that worked start answering 403 | `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it` |
@@ -166,6 +172,9 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does naming an environment answer 400 before my token is checked | `mcp/docs/api/environments#what-a-wrong-environment-name-answers` |
 | Which data environment do my calls reach | `mcp/docs/api/environments#which-data-set-your-own-calls-reach` |
 | Where does an administrator's theme or notification preference live | `mcp/docs/api/admins-and-permissions#personal-settings-live-on-the-admin-account` |
+| Why is highContrast null on an admin account | `mcp/docs/api/admins-and-permissions#personal-settings-live-on-the-admin-account` |
+| How do I set the high-contrast default for every administrator | `mcp/docs/api/settings#general-settings` |
+| Which general setting can be read without a token | `mcp/docs/api/settings#one-general-setting-can-be-read-without-a-token` |
 | Why does every public list stop at ten | `mcp/docs/api/content-api-permission-rules#a-restricted-read-caps-the-list-at-ten` |
 | Why can a public token upload a file | `mcp/docs/api/content-api-permission-rules#why-a-public-token-can-upload-a-file` |
 | Where is the restricted read length set | `mcp/docs/api/content-api-permission-rules#where-the-restricted-length-is-set-and-read` |
@@ -210,6 +219,10 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does my document search return an empty list | `mcp/docs/api/file-content-search#an-empty-result-that-has-a-reason-says-so` |
 | How do I show "did you mean" on a site search | `mcp/docs/api/search-query-correction#correct-a-query-directly` |
 | Why did the public search answer for different words | `mcp/docs/api/search-query-correction#correction-inside-the-public-searches` |
+| Where do I tune or switch off typo correction | `mcp/docs/api/search-query-correction#tuning-correction-for-a-project` |
+| Why did my typo-correction settings write change nothing | `mcp/docs/api/search-query-correction#tuning-correction-for-a-project` |
+| How do I keep one attribute out of typo correction | `mcp/docs/api/attribute-sets#changing-an-attribute-afterwards` |
+| How do I rebuild the word list behind typo correction | `mcp/docs/api/search-query-correction#is-the-word-list-up-to-date` |
 | Where is the public search by meaning | `mcp/docs/api/global-search#semantic-search-over-one-kind-of-entity` |
 | Which kinds may I pass in `types` | `mcp/docs/api/global-search#which-kinds-the-admin-side-accepts` |
 | Can the search find a payment or AI account, a filter or a module | `mcp/docs/api/global-search#settings-records-the-admin-search-also-finds` |

@@ -294,8 +294,9 @@ Two fields here explain a corpus that has quietly stopped growing while nothing 
   `processing.rebuild` says nothing about it. One call handles a bounded slice; send it again
   while it keeps answering a non-zero number. Needed once after `enableSemanticStage` is turned
   on, and pointless where `capability.embeddingAvailable` is false — it answers `0`.
-- `vocabulary` — rebuilds the word list used to correct public search queries. Reads no document again and answers `enqueued: 1` — see `mcp/docs/api/search-query-correction#is-the-word-list-up-to-date`.
 - `one` — a single document; `storageKey` is then required, and omitting it answers `400`.
+
+`vocabulary` is **not** a scope here. Sending it answers `400` listing the scopes above. Rebuilding the word list behind query correction is its own operation, `AdminFileContentController_rebuildVocabulary`, which takes no body — see `mcp/docs/api/search-query-correction#is-the-word-list-up-to-date`.
 
 The answer is an acceptance, not a result. Follow it in `processing.rebuild` of the status: `total` is how many documents the last rebuild accepted, `remaining` how many still wait, and `startedAt` when it began. `remaining: 0` means that run is finished. `remaining` can include other documents waiting at the same time, so it never exceeds `total`. The field is `null` when no rebuild ran in the last day. A rebuild that accepts nothing does not replace a run whose documents are still waiting, paused processing included: the status keeps that run's `total` and `startedAt`. Once nothing is waiting, the same call shows `total: 0`. Poll every few seconds, not in a tight loop, and do not start another rebuild while `remaining` is above zero.
 
