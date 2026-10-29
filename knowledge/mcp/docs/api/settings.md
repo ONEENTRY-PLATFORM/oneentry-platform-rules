@@ -18,6 +18,28 @@ Instance-level presentation and behaviour: date formatting, image handling and s
 
 Read the record, change the one field, dry run, send, read back.
 
+Three keys in the `user` section change what every administrator gets rather than how content looks:
+
+- `user.highContrastDefault` (boolean, `false` when unset) makes the high-contrast presentation the default for every administrator whose own `highContrast` is still `null`. An administrator who has chosen a mode keeps it.
+- `user.adminMfaRequired` (boolean, off when unset) makes administrator sign-in two-step. Turning it on does not end sessions that are already open, but every sign-in after it needs an e-mailed code.
+- `user.dateFormat` and the rest of the section behave like any other setting: send only the keys you are changing, and the keys you leave out keep their stored values.
+
+A boolean key refuses anything but `true` and `false` — `"yes"` answers `400` naming the key, and nothing in the section is written.
+
+→ `mcp/docs/api/admins-and-permissions#personal-settings-live-on-the-admin-account` · `mcp/docs/api/admin-sign-in#turning-the-second-factor-on`
+
+## One general setting can be read without a token
+
+`GET /api/admin/settings-general/public` answers `200` with exactly one field and nothing else:
+
+```http
+GET /api/admin/settings-general/public
+
+{ "highContrastDefault": false }
+```
+
+No `Authorization` header, no permission. It exists so a sign-in screen can present itself correctly before anyone has signed in. Use it to confirm what `user.highContrastDefault` is set to without holding a token; everything else in the general settings still needs one.
+
 ## Plan limits are not yours to set
 
 Limits on requests, storage, record counts, admin seats and upload sizes describe what the instance is entitled to. They are managed by whoever provisions the instance, and this server keeps that whole path permanently confirm-gated.
@@ -63,7 +85,7 @@ Settings are the area where a well-meaning "tidy up" does the most damage, becau
 
 General settings also carry a `fileContentSearch` section, which decides whether documents attached to records are searchable by their contents. It is off until someone turns it on.
 
-A `searchVocabulary` section tunes how public search queries are corrected — see `mcp/docs/api/search-query-correction#tuning-correction-for-a-project`.
+A `vocabulary` block inside that same `fileContentSearch` section tunes how public search queries are corrected — see `mcp/docs/api/search-query-correction#tuning-correction-for-a-project`.
 
 → `mcp/docs/api/file-content-search#nothing-is-indexed-until-someone-turns-it-on`
 

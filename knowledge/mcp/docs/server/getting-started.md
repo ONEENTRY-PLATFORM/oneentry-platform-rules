@@ -86,7 +86,7 @@ A mutating call should always be dry-run first. The dry run returns the resolved
 
 ## If something does not work
 
-- `cms_whoami` reports `authenticated: false` — the credentials are wrong, or the instance is unreachable. Accounts flagged as developer accounts are rejected by the Admin API by design.
+- `cms_whoami` reports `authenticated: false` — the credentials are wrong, or the instance is unreachable. Accounts flagged as developer accounts are rejected by the Admin API by design. An instance that requires a second factor at sign-in looks the same from here even when the login and password are right; it needs `ONEENTRY_CMS_TOKEN` instead.
 - `cms_guide` says the catalog is empty — the instance did not serve its OpenAPI document. Nothing can be searched or called until it is reachable.
 - `cms_guide` says the knowledge is degraded — the documentation repository could not be reached and only the bundled rules are available.
 - A call is refused with "No request was sent" — that is the allow level or a missing permission, decided locally. Nothing changed.

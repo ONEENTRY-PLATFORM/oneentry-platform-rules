@@ -14,6 +14,19 @@ Credentials never travel as tool arguments. In local mode they come from the env
 
 The password is only ever read from the environment; `--password` is refused outright, because command-line arguments are visible in the machine's process list.
 
+## An instance with a second factor needs the token
+
+When the instance requires a second factor for administrator sign-in, the login-and-password mode cannot work. Sign-in answers a challenge and an e-mailed code instead of tokens, and this server has no inbox to read the code from.
+
+What you see is not obviously that:
+
+- `cms_whoami` reports `authenticated: false` with the hint about checking `ONEENTRY_CMS_LOGIN` and `ONEENTRY_CMS_PASSWORD` — the credentials are in fact correct.
+- `cms_guide` and `cms_whoami` carry the catalog warning `The startup login failed, so the API document was requested without a token: Auth response has no accessToken`. That last clause is the tell.
+
+The fix is `ONEENTRY_CMS_TOKEN` with a token obtained by completing both sign-in steps by hand. With it the server authenticates normally on an instance that requires the second factor — at the cost of the 24-hour life above, so the token has to be replaced on a schedule.
+
+→ `mcp/docs/api/admin-sign-in#finish-the-sign-in-with-the-e-mailed-code`
+
 ## What happens when a token expires
 
 Exactly one retry, and only on a 401:

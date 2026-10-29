@@ -48,7 +48,7 @@ A setting present in a higher source wins outright; there is no merging of indiv
 | `ONEENTRY_CMS_BASE_URL` | `--base-url` |
 | `ONEENTRY_CMS_LOGIN` | `--login` |
 | `ONEENTRY_CMS_PASSWORD` | *(environment only)* |
-| `ONEENTRY_CMS_TOKEN` | *(environment only)* — a pre-issued access token instead of login and password |
+| `ONEENTRY_CMS_TOKEN` | *(environment only)* — a pre-issued access token instead of login and password, and the only option when the instance asks for a second factor at sign-in |
 | `ONEENTRY_MCP_ALLOW` | `--allow` |
 | `ONEENTRY_MCP_AUDIT_PATH` | `--audit` |
 | `ONEENTRY_MCP_PORT`, `ONEENTRY_MCP_HOST` | `--port`, `--host` |
