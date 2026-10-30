@@ -210,6 +210,20 @@ So verify a validator through the read the consumer uses — the form by marker,
 
 → `mcp/docs/server/payload-conventions#verify-with-the-read-your-consumer-uses` · `mcp/docs/api/silent-no-ops`
 
+## Which langCode the attribute reads accept
+
+The reads of a set's attributes by marker, one attribute or all of them, take an optional `langCode` query parameter. Omitted, it means `en_US`. Sent, it must be a language that is active on the instance: an unknown code, an inactive one, or an empty `langCode=` answers `400`, and the message lists the active codes. The match is case sensitive.
+
+The read returns that one language and nothing else. An attribute with no translation for it comes back with `localizeInfos: {}`, `validators: {}`, `listTitles: []`, `additionalFields: {}` and `initialValue: null`. No other language is substituted. A list that shows no options in a language needs its options written under that locale key.
+
+The public list of sets and the public read of a set by marker accept `langCode` under the same rule, but the body does not change with it: their schema carries every language as a locale-keyed map.
+
+```text
+GET .../attributes-sets/form/attributes?langCode=xx_XX   → 400, lists the active codes
+GET .../attributes-sets/form/attributes?langCode=de_DE   → 200, listTitles [] where untranslated
+GET .../attributes-sets/form/attributes                  → 200, en_US
+```
+
 ## Values outlive the attribute you removed
 
 Dropping an attribute from a set clears the values entities held under its key, but not at the instant the call returns: the cleanup runs behind the write. For a short window a read can still show the removed key.
