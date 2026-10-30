@@ -30,7 +30,9 @@ Uploads consume instance storage quota, so an upload made by mistake is not free
 
 A storefront does not need an admin session to attach a file. There is a public files route, reached with the site's app token, and it returns the same record the admin one does — a list, one entry per file part sent.
 
-`type`, `entity` and `id` are **folder names and nothing else**. No entity is checked to exist: nonsense values are accepted and simply produce a path nobody will look under. They are for tidiness, not for binding a file to anything.
+`type`, `entity` and `id` are **folder names and nothing else**. No entity is checked to exist: a well-formed address naming a record that was never created is accepted and simply produces a path nobody will look under. They are for tidiness, not for binding a file to anything.
+
+The public route holds those names to a fixed shape, and the admin route does not. On a public upload, `type` and `entity` take Latin letters, digits, `_` and `-` only, and `id` is a positive whole number up to 2147483647 written in plain digits. Anything else — `0`, `-1`, `1.5`, `abc`, a dot, a space, a `%`, a non-Latin letter — answers `400` naming the parameter, and nothing is stored. A public download applies the same rule to `id` alone, answering `400` where a malformed value would otherwise look like a missing file.
 
 A folder name is a *name*, though. Each of the three must be one segment: a value containing `/` or `\`, or equal to `..` or `.`, is answered `400`, and the response names which of the three is at fault. This holds on upload, delete and download alike, and on both the admin and the public route. Send the values you mean — there is nothing to be gained by assembling a path inside them, and a download that answers `400` rather than `404` is telling you the parameters are malformed, not that the file is missing.
 
