@@ -2,24 +2,24 @@
 
 What a site does on its account and cart pages: register a visitor, sign them in, and keep a cart for someone who has not signed in at all. All of it is the Content API, so this server cannot make these calls — you are writing the code that will.
 
-Four requirements below are invisible in the schema, and three of them are met with a success answer that stores nothing.
+Four requirements below are invisible in the schema, and some of them are met with a success answer that stores nothing.
 
 → `mcp/docs/api/users-and-groups` · `mcp/docs/api/content-api-reads`
 
 ## The guest cart needs a UUID in x-guest-id
 
-A cart belonging to nobody is keyed by the `x-guest-id` request header, and the value has to be a **UUID**. Anything else is accepted and kept nowhere:
+A cart belonging to nobody is keyed by the `x-guest-id` request header, and the value has to be a **UUID v4**. Without a signed-in visitor, every cart call refuses anything else:
 
 ```text
+GET  /api/content/users/me/cart         (no x-guest-id)
+  → 400 x-guest-id is required
 POST /api/content/users/me/cart/items   x-guest-id: shop-visitor-0001
-  → 201 { "items": [ { "productId": 1, "qty": 2 } ], "total": 1 }
-GET  /api/content/users/me/cart         x-guest-id: shop-visitor-0001
-  → 200 { "items": [], "total": 0 }     ← and so at 2, 10, 30 and 60 seconds
+  → 400 x-guest-id must be a UUID
 ```
 
-The `201` echoes the cart back, so nothing in the response says the item was not kept. A plain UUID works; a UUID with a prefix such as `guest_<uuid>` does not.
+A prefixed value such as `guest_<uuid>` and other UUID versions are refused the same way. A signed-in visitor does not need the header, and its value is ignored.
 
-Generate one UUID per visitor, store it where the site keeps it between page loads, and send the same value on every cart call.
+Generate one UUID v4 per visitor, store it where the site keeps it between page loads, and send the same value on every cart call.
 
 ## The cart lives under users me cart
 
@@ -189,8 +189,7 @@ Run the cart half **twice** with the same guest id, in two separate requests. On
 
 ## Common mistakes
 
-- **A guest id that is not a UUID.** Every add answers `201` and the cart stays empty.
-- **Treating that `201` as proof.** Read the cart back in a second request.
+- **A guest id that is not a UUID v4, or none at all.** Every cart call answers `400` naming the header.
 - **Looking for the cart under `users/cart`.** It is `users/me/cart`.
 - **Reusing the registration body for sign-in.** Two of its fields are rejected there.
 - **Omitting `x-device-metadata` at sign-in.** It answers `400` naming the header.
