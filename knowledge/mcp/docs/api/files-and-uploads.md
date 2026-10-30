@@ -32,9 +32,15 @@ A storefront does not need an admin session to attach a file. There is a public 
 
 `type`, `entity` and `id` are **folder names and nothing else**. No entity is checked to exist: a well-formed address naming a record that was never created is accepted and simply produces a path nobody will look under. They are for tidiness, not for binding a file to anything.
 
-The public route holds those names to a fixed shape, and the admin route does not. On a public upload, `type` and `entity` take Latin letters, digits, `_` and `-` only, and `id` is a positive whole number up to 2147483647 written in plain digits. Anything else — `0`, `-1`, `1.5`, `abc`, a dot, a space, a `%`, a non-Latin letter — answers `400` naming the parameter, and nothing is stored. A public download applies the same rule to `id` alone, answering `400` where a malformed value would otherwise look like a missing file.
+The *shape* of the three is checked, though, and the public upload checks it more narrowly than the admin one does. There, each of `type` and `entity` must be a single name of Latin letters, digits, `_` and `-`, and `id` must be a positive whole number written in digits:
 
-A folder name is a *name*, though. Each of the three must be one segment: a value containing `/` or `\`, or equal to `..` or `.`, is answered `400`, and the response names which of the three is at fault. This holds on upload, delete and download alike, and on both the admin and the public route. Send the values you mean — there is nothing to be gained by assembling a path inside them, and a download that answers `400` rather than `404` is telling you the parameters are malformed, not that the file is missing.
+- `0`, a negative number, a fraction, a leading zero, a non-numeric string and a number above `2147483647` are each answered `400` for `id`;
+- a separator, a dot, a space, a non-Latin letter or a percent sign in `type` or `entity` is answered `400` as well — so percent-encoding a separator does not get it through either;
+- the response names which parameter is at fault, and nothing is stored.
+
+The public download applies the same rule to `id`. The public delete and every admin file route apply the looser one: each value must still be a single segment, so a `/`, a `\`, or a bare `..` or `.` is `400`, but anything else passes.
+
+Two things follow. An address the admin route accepts is not guaranteed to work on the public one, so do not carry folder values from an admin script into a storefront without checking them; and a download answering `400` rather than `404` is telling you the parameters are malformed, not that the file is missing. Plain Latin names and whole-number ids are accepted everywhere — send the values you mean, and there is nothing to be gained by assembling a path inside them.
 
 Two consequences worth saying out loud when advising on this:
 
@@ -215,7 +221,8 @@ Do not assume a link you obtained on one instance works on another, and do not c
 - **Expecting the instance to refuse a file type.** It refuses none; the attribute's validators are the project's rule.
 - **Changing folder values or the field name when an upload answers `503`.** The instance's storage is unavailable for a while; nothing was stored and no quota was used. Retry the same call after a pause, and report it to the instance operator if it persists.
 - **Reading a `403` on upload or delete as a problem with the file.** The admin routes need `files.create` and `files.delete`.
-- **Assembling a path inside `type`, `id` or `entity`.** Each is a single folder name; a separator or `..` is a `400`.
+- **Assembling a path inside `type`, `id` or `entity`.** Each is a single folder name; a separator or `..` is a `400`, and on the public upload so is any character outside Latin letters, digits, `_` and `-`.
+- **Sending a decorative `id` on a public upload.** `0`, `-1`, `1.5` and `abc` are each a `400` there; it takes a positive whole number.
 - **Deleting a file without finding its references.** Silent missing images.
 - **Copying a file reference between instances.** Upload again instead.
 - **Expecting an `alt` field on the upload record.** Put `alt` and `title` on the attribute slot instead.
