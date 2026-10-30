@@ -212,7 +212,7 @@ So verify a validator through the read the consumer uses — the form by marker,
 
 ## Which langCode the attribute reads accept
 
-The reads of a set's attributes by marker, one attribute or all of them, take an optional `langCode` query parameter. Omitted, it means `en_US`. Sent, it must be a language that is active on the instance: an unknown code, an inactive one, or an empty `langCode=` answers `400`, and the message lists the active codes. The match is case sensitive.
+The reads of a set's attributes by marker, one attribute or all of them, take an optional `langCode` query parameter. Omitted, it means `en_US`. Sent, it must be a language that is active on the instance; anything else answers `400`. An empty `langCode=`, or a value that is not shaped like a language code, fails the format check, and the message reads `langCode must match /^[a-zA-Z_]{2,5}$/ regular expression`. A well-formed code that is unknown or not active on the instance gets a message that lists the active codes. The match is case sensitive.
 
 The read returns that one language and nothing else. An attribute with no translation for it comes back with `localizeInfos: {}`, `validators: {}`, `listTitles: []`, `additionalFields: {}` and `initialValue: null`. No other language is substituted. A list that shows no options in a language needs its options written under that locale key.
 
