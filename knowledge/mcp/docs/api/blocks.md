@@ -68,6 +68,30 @@ Each block type carries its own settings object: how many items to show, which s
 
 The most reliable way to configure an unfamiliar block type is to read a working block of that type on the same instance and change one field at a time.
 
+## Which block settings are keyed by locale
+
+Three keys of the settings object, `customSettings`, are written per locale, the same way as `localizeInfos`: `productConfig`, `condition` and `similarProductRules`.
+
+```json
+{
+  "customSettings": {
+    "productConfig": {
+      "en_US": { "quantity": 4, "countElementsPerRow": 4 },
+      "de_DE": { "quantity": 8, "countElementsPerRow": 4 }
+    },
+    "condition": {
+      "en_US": { "name": "cost", "costFrom": 0, "costTo": 130 }
+    }
+  }
+}
+```
+
+An admin read returns the whole map. A public read returns only the entry for the requested `langCode`, without the locale key.
+
+Nothing is taken from another locale. On a locale with no entry, a public read answers `{}` for `productConfig` and `condition` and `[]` for `similarProductRules`, and the block's product list on that locale has no filter and no item limit. A site in several languages needs these keys set for each of them.
+
+→ `mcp/docs/server/payload-conventions#localizeinfos-is-keyed-by-locale-code`
+
 ## Blocks that fill themselves
 
 The dynamic block types — trending, recently viewed, recommendations, cart and wishlist companions, and the rest — do not hold a product list. They compute their contents when a site asks, from the block's settings and the visitor's context.
@@ -92,6 +116,8 @@ A deleted block leaves those pages without it, silently.
 - **Editing content on a dynamic block.** Its contents come from settings, not from its own body.
 - **Patching a position field.** Use the position operation.
 - **A one-level attribute map.** Accepted, stored empty. Read back.
+- **A `productConfig` with no locale key.** Accepted, then reads empty publicly on every locale.
+- **Settings for one locale only.** The other locales show the unfiltered, unlimited product list.
 - **Creating a block for a single page.** That is what an attribute is for.
 - **Checking only the admin read after attaching.** Read the page publicly too.
 
