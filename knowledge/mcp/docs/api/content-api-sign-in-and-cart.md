@@ -19,6 +19,8 @@ POST /api/content/users/me/cart/items   x-guest-id: shop-visitor-0001
 
 A prefixed value such as `guest_<uuid>` and other UUID versions are refused the same way. A signed-in visitor does not need the header, and its value is ignored.
 
+The wishlist at `/api/content/users/me/wishlist` keeps its guest list under the same header and answers the same two `400`s on all four of its calls.
+
 Generate one UUID v4 per visitor, store it where the site keeps it between page loads, and send the same value on every cart call.
 
 ## The cart lives under users me cart
@@ -136,6 +138,19 @@ What a read with such a token answers depends on the route. One that requires a 
 
 The same applies to every bearer the instance cannot tie to a live session: one whose signature does not check out, one carrying a payload assembled by hand, and one left over from an earlier sign-in on the same device after a later sign-in replaced that session. None of them carries the group membership of the visitor named inside it — group-restricted content answers to a live session or not at all.
 
+## Why a cart call answers 401 for an expired token
+
+The cart and wishlist belong to someone, so these routes do not fall back to guest. On every method under `users/me/cart` and `users/me/wishlist`, a bearer token that does not identify a live session answers `401`, whether or not `x-guest-id` is sent:
+
+```text
+GET /api/content/users/me/cart   Authorization: Bearer <expired token>
+  → 401 Invalid access token
+```
+
+A closed or replaced session answers `401 Your token is expired`. Do not branch on the message: the status is the signal. Exchange the refresh token at `users/refresh` and repeat the call with the new access token, and it sees the visitor's own cart. When the refresh is refused, drop the stored token and carry on as a guest: the request has to arrive with no `Authorization` header at all, and with a UUID v4 in `x-guest-id`.
+
+Sending no token keeps the guest rules above. Everywhere else an expired token follows the rule for any other token without a live session: routes open to anyone answer as for an anonymous caller.
+
 ## Signing in with a one-time code instead of a password
 
 An auth provider created with `isCheckCode` set signs a visitor in by code, and its form does not need a password attribute at all. Two calls, both on the same provider marker:
@@ -189,7 +204,8 @@ Run the cart half **twice** with the same guest id, in two separate requests. On
 
 ## Common mistakes
 
-- **A guest id that is not a UUID v4, or none at all.** Every cart call answers `400` naming the header.
+- **A guest id that is not a UUID v4, or none at all.** Every cart and wishlist call answers `400` naming the header.
+- **Treating a `401` from the cart as a failed visitor.** Refresh the token and repeat the call.
 - **Looking for the cart under `users/cart`.** It is `users/me/cart`.
 - **Reusing the registration body for sign-in.** Two of its fields are rejected there.
 - **Omitting `x-device-metadata` at sign-in.** It answers `400` naming the header.
