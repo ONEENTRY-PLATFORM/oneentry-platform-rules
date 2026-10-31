@@ -59,6 +59,19 @@ One kind of item is only ever seen here: a page whose general type is `external_
 
 → `mcp/docs/api/content-api-reads#a-page-of-type-external-page-has-no-public-address`
 
+## Why a page is missing from a menu in one language
+
+A public menu read takes `langCode`, and a page with no translation in that language is left out of the response. No other language is substituted: such a page has nothing to show there, so its item would be a link without a label. The same menu can therefore be shorter in one language than in another. Add the translation under that locale key and the item appears; the admin reads list the page either way, so compare against them before suspecting the composition.
+
+```text
+GET /api/content/menus/marker/main?langCode=en_US   → pages: [blog, blog1]
+GET /api/content/menus/marker/main?langCode=de_DE   → pages: [blog]          (blog1 has no de_DE)
+```
+
+- A translated child of a left-out page moves to the top level of that language's tree. Its `parentId` still names the left-out page, which is not in the response, so render from `children` rather than rebuilding the tree from `parentId`.
+- A menu with no translated page is still found: `200`, with `pages: []` or only its custom items.
+- Custom items are not left out. One with no title in the language arrives with `localizeInfos: {}`, so give it a translation or expect a blank label.
+
 ## Positions are lexorank here and numbers there
 
 On the admin operations, an item's position is a **lexorank string**. On the public side the same ordering is exposed as a **number**.
