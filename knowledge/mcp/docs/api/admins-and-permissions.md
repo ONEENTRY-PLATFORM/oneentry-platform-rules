@@ -156,6 +156,8 @@ Grant or revoke individual keys. Replacing the whole map is how rights nobody no
 
 If a human asks you to "give this admin the same rights as that one", read both maps, list the differences, and let them confirm each addition.
 
+Changing a map needs `admins.updatePermissions` on top of `admins.update`, whichever operation carries it. `AdminsController_updatePermissions` declares both keys. `AdminsController_update` declares only `admins.update`, so the local pre-check lets the call out, and the instance answers `403` when the body's `permissions` differ from the stored map and you lack `admins.updatePermissions`; nothing in that body is stored. A body that repeats the stored map unchanged is accepted, so a whole-admin update still works without the extra key.
+
 ## Admin mutations are permanently gated
 
 Every mutating operation under the admins area requires a confirm token at every allow level. So does everything under platform settings, modules, user permissions, and group permission changes — the full list is in `mcp/docs/server/allow-levels#paths-that-are-always-confirm-gated`.
