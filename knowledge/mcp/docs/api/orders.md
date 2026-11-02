@@ -73,6 +73,22 @@ Refunds have their own operations, and a customer-initiated refund request is a 
 
 Never issue one without explicit human agreement in the conversation, quoting the order and the amount.
 
+## Why a site gets 404 for an order that exists
+
+On the Content API a visitor sees only their own orders. Two reads take an order id:
+
+```text
+GET /api/content/orders/{id}                  the order itself
+GET /api/content/payments/stages/order/{id}   the payment stages of that order
+```
+
+- With the token of the visitor who placed the order, both answer `200`.
+- With another visitor's token, both answer `404` — the same answer as an id that does not exist.
+- With no sign-in, the order read answers `401` and the stages read answers `404`.
+- An id that is not an integer answers `400` once the caller is past sign-in.
+
+A `404` from either read therefore does not prove the order is missing. Look the order up through the Admin API before reporting that it does not exist, and never create it again.
+
 ## Verifying an order change
 
 Read the order back by id, check the axis you changed, and check that the axes you did not change are untouched. Then check it appears correctly in the listing you would use to find it — allowing a few seconds, because listings lag.
