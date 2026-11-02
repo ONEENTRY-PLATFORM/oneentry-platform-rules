@@ -115,6 +115,16 @@ Create or find the block first, then attach it by its marker. Attaching a block 
 
 → `mcp/docs/api/blocks`
 
+## Why a public page read answers 404 in one language
+
+A public read resolves a page by its translations: the page exists in a language when `localizeInfos` carries that locale key. Ask for a language the page was never translated into and the read answers `404` — by id and by page URL alike — and the page is left out of that language's root listing, paginated listing and children of its parent. The Admin API returns the page whatever language you read it in, so compare against it before concluding the page is gone.
+
+A page created with no `localizeInfos` at all counts as an `en_US` page: it answers on `en_US` and `404` on every other code.
+
+Attribute values do not decide this, and they carry their own locale keys. A page that *is* translated into the language but whose `attributesSets` were written only for another one answers `200`, with `localizeInfos` for the language you asked for, `attributeValues: {}` and `isSync: false`. That is a missing translation of the values, not a missing page: write them under that locale key and read the page back.
+
+→ `mcp/docs/api/menus#why-a-page-is-missing-from-a-menu-in-one-language`
+
 ## Why a page returns fewer blocks than you attached
 
 A public read of a page's blocks is governed by the reading group's rules, and a read restriction caps the answer at a fixed number of records. This read is one the ceiling is applied to, so a page carrying more blocks than the ceiling comes back trimmed — even though other public listings on the same instance answer in full.
@@ -151,6 +161,7 @@ The delete operation may accept flags controlling what happens to dependent cont
 - **Assuming a page URL is a route.** It is an identifier for the API, not a path on a website.
 - **Using an id from another instance.** Page ids are local; the page URL is the portable handle.
 - **Reordering by patching position.** Use the position operation.
+- **Reading a `404` on a public page read as a deleted page.** The page may simply have no translation in the `langCode` you asked for.
 - **Reading a trimmed block list as the whole set.** A read restriction caps it, and the response gives no sign.
 - **Sending `parentId: null` to mean "leave it".** That is the instruction to move the page to the root.
 - **Treating every row of a catalog-filtered listing as a catalogue.** Ancestors of a nested catalog page come back too. Check each row's general type.
