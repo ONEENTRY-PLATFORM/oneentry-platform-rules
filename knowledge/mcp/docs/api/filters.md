@@ -24,12 +24,14 @@ That single behaviour accounts for most "the filter is broken" reports. Before d
 
 ## Comparisons follow the attribute type
 
-The operator has to make sense for the type. Greater-than on a string, or membership on a number, either fails or returns nothing.
+The operator has to make sense for the type. Membership on a number either fails or returns nothing, and a comparison the type cannot make — a greater-than whose value is not a number, a date filter whose value is not a date — matches no entities rather than answering an error. Greater and less than are numeric comparisons wherever both sides are numbers, including a text attribute whose value happens to be one.
 
-Watch two cases in particular:
+Watch these cases in particular:
 
 - **Numbers can be `null`.** An existence check is not the same as comparing to zero.
-- **Choice attributes store option ids.** Filter on the id, not on the label a human sees.
+- **A choice is matched by the option's value, not by its title.** An option titled `Red` whose value is `red` is found by `red` and not by `Red`. The whole value is compared and the comparison is case-sensitive, so membership behaves like equality here and `Re` finds nothing. An entity with several options selected matches when any one of them does.
+- **Dates compare at the granularity of the type.** A date compares by day, so a value stored as `2026-05-07T10:00:00.000Z` is equal to `2026-05-07`; a date-and-time and a time compare to the minute. Send ISO 8601 — anything else is not read as a date and matches nothing — and remember that a date-time with no zone is read as UTC.
+- **An empty value counts as no value.** An empty choice list, an empty media slot, a cleared text: an existence check answers false for them, and its negation answers true.
 
 → `mcp/docs/api/attribute-types`
 
