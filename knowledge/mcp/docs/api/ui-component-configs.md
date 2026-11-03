@@ -42,6 +42,10 @@ Record pages: `admin-page`, `content-page`, `catalog-product-page`, `collection-
 
 Section tab panels: `catalog-navigation`, `orders-navigation`, `payments-navigation`, `users-navigation`.
 
+An interface module's screens use `im:<module identifier>:<base screen>` and are checked as the base screen.
+
+→ `mcp/docs/api/interface-modules#screen-templates-for-a-module`
+
 ## The attribute set is fixed when the template is saved
 
 - `attributeSetId` is optional on `AdminUiComponentConfigsController_createPreset` and is an integer of 1 or more. `0` or a negative value answers `400`.
