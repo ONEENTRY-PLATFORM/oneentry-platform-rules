@@ -4,7 +4,7 @@ An instance can hold more than one set of data. One of them is the main set, the
 
 Read it before acting on a sentence like "put this on staging". That phrase means an environment, and whether you can reach one is a property of how this server was started.
 
-→ `mcp/docs/api/admins-and-permissions#managing-data-environments-has-its-own-permission` · `mcp/docs/server/cms-api-call`
+→ `mcp/docs/api/admins-and-permissions#managing-data-environments-has-its-own-permission` · `mcp/docs/api/environment-markers` · `mcp/docs/server/cms-api-call`
 
 ## A request names its environment in a header
 
@@ -13,6 +13,10 @@ Every Admin API and Content API route reads one request header — `x-environmen
 The header is the only way to choose. There is no per-environment address, no per-environment subdomain and no token that selects one: the same base URL and the same credentials reach all of them, and the client decides on every single request.
 
 `public` is the name of the main set, accepted as a header value, so a client may name it explicitly instead of leaving the header out.
+
+A request may also name an environment by **marker** — a stable name bound to one environment, re-pointable without touching the clients that send it — in `x-environment-marker`.
+
+→ `mcp/docs/api/environment-markers#a-marker-is-a-second-way-to-name-an-environment`
 
 ## Which data set your own calls reach
 
@@ -119,3 +123,4 @@ Orders, visitors and submissions are not among the kinds that travel, and asking
 - **Taking the empty `items` of a transfer as a failure.** The run is asynchronous; the plan is in the dry run.
 - **Writing to an environment in the same breath as creating it.** It is not ready yet, and that `400` says so.
 - **Creating a second environment because the first says `failed`.** Read its `error` first.
+- **Editing a client's configuration to move it between environments.** Bind a marker and re-point that instead — see `mcp/docs/api/environment-markers`.

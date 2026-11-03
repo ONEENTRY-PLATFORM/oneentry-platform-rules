@@ -134,6 +134,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/workflow-nodes` | Writing the nodes of a flow, and the configuration the catalogue does not declare |
 | `mcp/docs/api/settings` | Instance-wide settings, limits and quota |
 | `mcp/docs/api/environments` | A second set of data on the same instance, and why your writes do not reach it |
+| `mcp/docs/api/environment-markers` | Pointing a client at another data environment without editing the client |
 | `mcp/docs/api/import` | Bulk-loading content from a file |
 | `mcp/docs/api/ai-gateway` | The platform's own model-calling feature |
 | `mcp/docs/api/ui-component-configs` | Changing how an admin panel table, form or record page looks, or giving an admin a screen template |
@@ -171,6 +172,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why is creating or deleting a data environment refused with 403 | `mcp/docs/api/admins-and-permissions#managing-data-environments-has-its-own-permission` |
 | Why does naming an environment answer 400 before my token is checked | `mcp/docs/api/environments#what-a-wrong-environment-name-answers` |
 | Which data environment do my calls reach | `mcp/docs/api/environments#which-data-set-your-own-calls-reach` |
+| How do I point a client at a different data environment | `mcp/docs/api/environment-markers#a-marker-is-a-second-way-to-name-an-environment` |
+| Why does renaming an environment marker change nothing | `mcp/docs/api/environment-markers#why-renaming-a-marker-does-nothing` |
 | Where does an administrator's theme or notification preference live | `mcp/docs/api/admins-and-permissions#personal-settings-live-on-the-admin-account` |
 | Why is highContrast null on an admin account | `mcp/docs/api/admins-and-permissions#personal-settings-live-on-the-admin-account` |
 | How do I set the high-contrast default for every administrator | `mcp/docs/api/settings#general-settings` |
