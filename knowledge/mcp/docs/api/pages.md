@@ -109,6 +109,8 @@ What that number does is the trap. A `version` **lower** than the stored one ans
 
 So the only safe shape is read-then-write, and the only proof is a read-back. A `false` body is the signal that someone else wrote the page between your read and your write.
 
+`updatedDate` in the body is ignored — the server owns it — so sending back the object you read is safe.
+
 An update merges: `parentId`, `attributesSets` and `generalTypeId` are all left as they are when the body does not carry them, so an edit to a page's content leaves it where it is in the tree.
 
 `parentId: null` is a different instruction. It means "move this page to the root", and it also decrements the former parent's `childrenCount` and recomputes the position — so never send `null` as a stand-in for "no opinion".
