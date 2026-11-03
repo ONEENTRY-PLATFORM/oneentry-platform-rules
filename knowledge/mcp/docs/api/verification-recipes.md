@@ -102,7 +102,7 @@ The validator assertion is the one to be pedantic about — it separates a real 
 
 Only against a scratch order storage, never a real one.
 
-Assert: the order reads back with every status axis, not just the one you set; changing a status through a transition moves the axis you expected and leaves the others alone; the payment axis is not something your write changed.
+Assert: the order reads back with every status axis, not just the one you set; firing a trigger the storage's map covers moves the axis you expected and leaves the others alone; a `change-status` naming an axis moved **that** axis and not another one — on a `basic` storage it answers `200` either way, so compare both fields before and after.
 
 Never verify refunds against anything real. There is no undo.
 

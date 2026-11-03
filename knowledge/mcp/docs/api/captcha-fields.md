@@ -75,7 +75,9 @@ So a submission you expected to be refused and that came back accepted is the fi
 
 Nothing in the API takes a token and answers valid or invalid. A token is checked while the submission carrying it is accepted, and that submission's own status code is the verdict. Build the client around one call, not two.
 
-Only the visitor-facing routes check it: creating form data, and creating or updating an order through a storage marker. On the operator API the check does not run at all, so a submission you make as an operator is no evidence that a visitor's would pass.
+Only the visitor-facing routes check it: creating form data, creating or updating an order through a storage marker, and creating or updating a row of an integration collection through the collection's marker. Where the collection's form carries a captcha field that is not hidden, a row write with no value for its marker answers `400 formData doesn't have spam attribute`.
+
+On the operator API the check does not run at all. The same row write, sent to the operator route for the same collection and with no entry for the captcha marker, answers `201`. So a submission you make as an operator is no evidence that a visitor's would pass.
 
 ## Produce the token when the form is submitted
 

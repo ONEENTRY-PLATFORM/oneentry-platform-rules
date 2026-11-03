@@ -31,7 +31,16 @@ A `moduleId` outside those six answers `400`, and the message names every module
 
 Take the rejection at face value: it means the notification the human asked for cannot be built as an event, not that the body was malformed. Report that, rather than looking for a payload that gets through.
 
-An event created with no `moduleId` at all is a template — see the notification node of a workflow.
+A template is marked by `isTemplate: true`, and nothing else makes one. An event created with no `moduleId` and no `isTemplate` is an ordinary event that watches nothing: it is stored with `isTemplate: false` and `whom` defaulting to `subs`, and a workflow's notification node will not find it.
+
+A template also has to say who it is for. `whom` must be one of four values, and the refusal names them:
+
+```text
+400 Template event requires "whom" to be one of:
+    all, user_group, users_from_payload, emails_from_payload
+```
+
+`subs` is in the field's own vocabulary and is **not** among them, so the default you get by leaving `whom` out is exactly the value a template may not have — which is why a template created without it is refused rather than stored. With `whom: "user_group"` a `userGroupId` is required too, and omitting it answers `400 Template event with whom=user_group requires "userGroupId"`.
 
 ## The subject and the body live in localizeInfos
 

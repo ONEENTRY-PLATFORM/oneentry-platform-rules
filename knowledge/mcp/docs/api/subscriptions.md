@@ -10,7 +10,18 @@ Plans are configuration. User subscriptions are records of a paying relationship
 
 A **plan** describes what is being sold on a recurring basis: its price, its period, what it grants. It is content you create and edit.
 
-A **user subscription** links one customer to one plan, with a state of its own: pending, active, expired, cancelled, or recovering. It is created when a customer subscribes, not by hand.
+A **user subscription** links one customer to one plan, with a `status` of its own. It is created when a customer subscribes, not by hand.
+
+`status` takes one of seven values, and spelling them from memory is how a comparison silently never matches:
+
+```text
+pending      active       canceled     unpaid
+past_due     incomplete   incomplete_expired
+```
+
+Two traps in that list. It is `canceled` with one `l`, not `cancelled`. And there is no `expired` and no `recovering` — a subscription that has lapsed is `past_due` or `unpaid`, and one being put right stays `active` while the customer fixes their payment method.
+
+A fresh enrolment reads `pending`; it becomes `active` when the first payment completes, or when an operator renews it.
 
 ## Finding the operations
 
@@ -64,9 +75,36 @@ The enrolment stays pending and is not listed among the customer's active subscr
 
 ## Delete a plan
 
-Deleting a plan that has enrolments detaches those enrolments rather than tidying anything up, and the customers involved keep whatever the plan granted them until their record expires.
+A plan any enrolment still points at cannot be deleted. The call answers `400`, names how many subscribers it has and how many of those are active or pending, and changes nothing:
 
-Before confirming a delete, count the enrolments and tell the human. Ending a plan properly is usually a state change plus a communication, not a delete.
+```text
+Cannot delete subscription #41: it has 1 subscriber(s) (0 active/pending).
+Cancel them first to preserve history.
+```
+
+Read that count carefully: the refusal is on **any** enrolment in any status, not just a live one. The example above is a plan whose single enrolment is already `canceled` — cancelling every subscriber does not make the plan deletable. Nothing is ever detached, so there is no state in which customers are left holding a grant from a plan that is gone.
+
+So "remove this plan" is usually not a delete. Report the subscriber count to the human and ask whether the plan should instead be left in place and withdrawn from sale.
+
+## Changing a plan while someone is enrolled
+
+A plan carries `isUsed`, and it is `true` while at least one enrolment on it is **active** — a `pending` one does not set it. While it is `true`, three fields are frozen, each with its own refusal:
+
+| Changing | Answer |
+|---|---|
+| `identifier` | `400 You cannot change marker for active subscriptions` |
+| `periodInDays` | `400 You cannot change period for active subscriptions` |
+| `paymentAccountId` | `400` on the same grounds |
+
+Sending the fields back unchanged answers `200`, so a read-modify-write that touches nothing else still works. Read `isUsed` before promising a human that a plan can be edited.
+
+## Renewing an enrolment by hand
+
+`POST /subscriptions/user/{userId}` with `{ "id": <plan id> }` extends an existing enrolment: it sets `status` to `active`, pushes `dueDate` out by the plan's `periodInDays`, and completes the waiting payment session. The `id` in the body is the **plan's**, not the enrolment's — the enrolment is found from the two together, and a plan the customer is not enrolled in answers `404 Subscription not found`.
+
+It is not a way to create an enrolment. Only subscribing through the Content API does that, so there is no operator route that puts a customer on a plan.
+
+Renewing by hand only works where the plan's payment account is of type `custom`. On a provider-backed plan it answers `400 Only subscriptions with custom payment account can be renewed manually` — the provider owns the billing cycle there.
 
 ## Common mistakes
 
@@ -74,5 +112,8 @@ Before confirming a delete, count the enrolments and tell the human. Ending a pl
 - **Creating a second enrolment as a renewal.** One live record per customer and plan.
 - **Writing a state to reflect a payment.** The platform reconciles it.
 - **Changing the price of an active plan casually.** Existing subscribers are affected and the provider side has to agree.
-- **Deleting a plan with enrolments.** They are detached, not cleaned up.
+- **Expecting a delete to detach enrolments.** It is refused while any enrolment points at the plan.
+- **Reading `cancelled`, `expired` or `recovering` from `status`.** None of the three is a value it takes.
+- **Passing an enrolment id to the renew route.** The body takes the plan id.
+- **Renewing a provider-backed plan by hand.** Only a `custom` payment account allows it.
 - **Redirecting to a null payment link.** A manually paid plan has no payment page.

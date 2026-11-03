@@ -8,7 +8,15 @@ Identifiers here are unique and widely referenced, so renaming is a breaking cha
 
 ## What a template is
 
-A named rendering definition with a type saying what it renders — a page, a block, and so on — plus localized labels so humans can recognise it in the admin panel.
+A named rendering definition with a type saying what it renders — a page, a block, and so on — plus one label so humans can recognise it in the admin panel.
+
+That label is **`title`, a plain string and not localized**. A template has no `localizeInfos` at all, which makes it one of the few entities here whose human-readable name is not keyed by locale. It is required at creation:
+
+```text
+POST /templates   { "identifier": "product-wide", "title": "Wide product page", "generalTypeId": 4 }
+```
+
+Leave `title` out — or send `localizeInfos` in its place, expecting the usual convention — and the create answers `400 title should not be empty`.
 
 Entities reference a template by its identifier. That reference is what makes the identifier a contract: changing it detaches everything pointing at the old name.
 
@@ -33,7 +41,7 @@ When a human wants something to render differently, do not edit a default templa
 
 Instead:
 
-1. Create a **new** template with a new identifier and its own labels.
+1. Create a **new** template with a new identifier and its own `title`.
 2. Point the specific entity at it.
 3. Read the entity back and confirm the reference took.
 

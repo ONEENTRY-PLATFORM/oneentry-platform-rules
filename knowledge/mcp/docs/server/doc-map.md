@@ -101,7 +101,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | docId | Read it when |
 |---|---|
 | `mcp/docs/api/orders` | Reading or changing orders |
-| `mcp/docs/api/order-statuses` | Moving an order between states |
+| `mcp/docs/api/order-statuses` | Defining order statuses, and which axis one belongs to |
+| `mcp/docs/api/order-status-triggers` | Moving an order between states: triggers, status maps, and why there is no transition |
 | `mcp/docs/api/payments` | Payment accounts, sessions or refunds |
 | `mcp/docs/api/discounts` | Discounts, coupons and how they combine |
 | `mcp/docs/api/subscriptions` | Recurring plans and customer enrolments |
@@ -205,6 +206,12 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why did my block disappear from its pages after an edit | `mcp/docs/api/blocks#what-an-update-does-to-the-pages-a-block-is-on` |
 | Why did submissions vanish after a form edit | `mcp/docs/api/forms-and-form-data#an-update-drops-every-config-you-do-not-send-back` |
 | How do I delete something safely | `mcp/docs/server/confirm-and-dry-run` |
+| Why did my page update answer 200 with a body of false | `mcp/docs/api/pages#update-a-page` |
+| Why is my journal time filter being ignored | `mcp/docs/api/journal#reading-the-journal` |
+| Why did deleting a menu item leave its children behind | `mcp/docs/api/menus#delete-a-menu-or-an-item` |
+| Why did deleting a parent page not delete its children | `mcp/docs/api/pages#delete-a-page` |
+| Why did my block attachment by marker fail | `mcp/docs/api/pages#attaching-blocks` |
+| Why is my block still nested after I sent blockPages | `mcp/docs/api/blocks#a-bare-page-id-in-blockpages-keeps-the-nesting` |
 | Why does clearing the journal answer 400 | `mcp/docs/api/journal#clearing-the-journal-needs-an-explicit-window` |
 | Why is the session traffic listing empty | `mcp/docs/api/journal#reading-the-session-traffic-listing` |
 | Why did my admin token stop working after another sign-in | `mcp/docs/api/journal#what-closes-a-session-record` |
@@ -214,6 +221,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Question | Go to |
 |---|---|
 | Why does my filter return nothing | `mcp/docs/api/filters#only-indexed-attributes-can-be-filtered` |
+| How do I pin a value in a facet | `mcp/docs/api/filters#pinning-is-set-on-an-attribute-not-on-a-value` |
+| Why did a new value appear in my pinned facet by itself | `mcp/docs/api/filters#a-pinned-attribute-picks-up-new-values-on-its-own` |
 | Why does a search by meaning return nothing for a kind | `mcp/docs/api/index-attributes#why-a-search-by-meaning-finds-nothing-for-a-kind` |
 | Why does the site search return only five results | `mcp/docs/api/global-search#results-come-back-grouped-in-fives` |
 | Why is limit refused on the search | `mcp/docs/api/global-search#paging-one-kind-needs-limit-and-exactly-one-type` |
@@ -288,6 +297,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Question | Go to |
 |---|---|
 | Why is my event refused on this module | `mcp/docs/api/events#an-event-on-another-module-is-refused` |
+| How do I create a notification template a workflow can call | `mcp/docs/api/events#an-event-on-another-module-is-refused` |
 | Why does my form event send no mail | `mcp/docs/api/events#an-event-with-no-recipient-looks-configured` |
 | Did my event actually send anything | `mcp/docs/api/events#checking-whether-an-event-actually-sent-mail` |
 | Why did my event send a mail but no push | `mcp/docs/api/events#which-channels-an-event-sends-on` |
@@ -311,3 +321,9 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does my similar-products block answer 400 | `mcp/docs/api/similar-product-blocks#manual-or-automatic-decides-what-a-request-returns` |
 | Why is my similar-products block empty or short | `mcp/docs/api/similar-product-blocks#why-a-block-comes-back-short` |
 | Why do two order statuses both say they are the default | `mcp/docs/api/order-statuses#which-axis-a-status-belongs-to` |
+| Why did my new order status land on the payment axis | `mcp/docs/api/order-statuses#which-axis-a-status-belongs-to` |
+| Where is the operation that transitions an order status | `mcp/docs/api/order-status-triggers#there-is-no-such-thing-as-a-transition` |
+| Why did change-status answer 200 without moving the payment status | `mcp/docs/api/order-statuses#the-payment-axis-is-managed-for-you` |
+| How do I add a status trigger of my own | `mcp/docs/api/order-status-triggers#a-storage-can-define-triggers-of-its-own` |
+| Why is my subscription status never equal to cancelled or expired | `mcp/docs/api/subscriptions#plans-and-enrolments` |
+| Why can I not delete a subscription plan | `mcp/docs/api/subscriptions#delete-a-plan` |

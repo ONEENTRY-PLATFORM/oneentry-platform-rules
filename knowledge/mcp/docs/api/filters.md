@@ -43,11 +43,27 @@ cms_api_search { "query": "filters", "mutating": false }
 
 A configured filter carries the attributes it exposes and their arrangement. Some values can be pinned so they always appear, whether or not any current product carries them.
 
-## Pinned values
+## Pinning is set on an attribute not on a value
 
-Pinning keeps a value visible in a facet regardless of the current data. It is how a shop stops a category disappearing from the sidebar because it is temporarily out of stock.
+Pinning is a property of an **attribute inside a filter**, not of the individual values you want kept. There is no operation that pins one value. The record is written through the filter's config:
 
-Two things to know: pinning affects presentation, not matching — a pinned value with no products behind it returns nothing when clicked; and new values arriving in the data do not automatically become pinned.
+```text
+PUT /filters/{id}/config/attribute
+  { "attributeSetId": 12, "attributeIdentifier": "colour", "isPinned": true,
+    "pinAnchorId": 34, "pinAnchorType": "filter-item", "pinPlacement": "before" }
+```
+
+`pinAnchorType` is `filter-item` or `filter-custom-item` and is required whenever `pinAnchorId` is set; leaving the anchor out means the root. `pinPlacement` is `before` or `after`. Omitting `isPinned` registers the attribute without changing the flag, so a config call is not automatically a pin.
+
+The answer carries the record back, `knownValues` among it — the values of that attribute the filter has already seen.
+
+## A pinned attribute picks up new values on its own
+
+That `knownValues` list is the behaviour to plan around. When a new value appears for a pinned attribute, the filter **adds an item for it automatically**, positioned against the anchor, and extends `knownValues` to match. No filter call is involved — adding the value to the attribute is enough.
+
+So a pinned attribute is a standing instruction to surface whatever turns up, not a frozen set. Pin one and the facet grows with the data; a value you did not want shown has to be removed after the fact, and will not come back unless it is new again.
+
+Pinning still affects presentation, not matching: an item with no products behind it returns nothing when clicked.
 
 ## Ordering within a filter
 
@@ -67,6 +83,8 @@ Use it before reporting that a filter returns nothing — often the value simply
 - **Filtering a choice attribute by its label.** Store and filter by option id.
 - **Assuming a truncated result means "no more matches".** The response was capped; page it.
 - **Patching a position field on a filter item.** Use the position operation.
-- **Expecting a pinned value to have products behind it.** Pinning is presentation only.
+- **Expecting a pinned item to have products behind it.** Pinning is presentation only.
+- **Looking for a way to pin one value.** Pinning is set on the attribute.
+- **Assuming a pinned facet is a fixed set.** New values are added to it automatically.
 
 → `mcp/docs/api/products`

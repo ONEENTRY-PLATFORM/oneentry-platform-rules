@@ -37,7 +37,9 @@ A block created with no `localizeInfos` shows as untitled in the admin panel and
 
 Attachment lives with the page, not with the block, and carries a position within that page. So "add this block to the home page" is a page update, not a block update.
 
-Create or locate the block first, then attach it. Attaching a marker that does not exist yet leaves a reference resolving to nothing, and the page renders without it and without an error.
+Create or locate the block first, then attach it **by its numeric id**. The page's `blocks` and `nestedBlocks` arrays hold ids; a marker sent in either answers `5xx` and attaches nothing.
+
+Attachment also works from this side, through `blockPages` — see the next section for what that field does to nesting.
 
 **Then read the page through the public route a site uses.** The admin read of a page and its block can look healthy while the public projection is not what you meant — that read is the one a visitor gets, so it is the one that proves the attachment.
 
@@ -53,6 +55,18 @@ Create or locate the block first, then attach it. Attaching a marker that does n
 So an empty array is a deliberate instruction, not a safe default for a field you had nothing to say about. Leave it out unless you mean it.
 
 Read the block, change what you meant to change, send it back, then read it again and look at `blockPages`. That habit is still what catches the difference between the two.
+
+## A bare page id in blockPages keeps the nesting
+
+Each entry in `blockPages` is either a numeric page id or an object, and the two are not equivalent:
+
+```json
+{ "blockPages": [ 12, { "pageId": 34, "isNested": true } ] }
+```
+
+A bare id attaches the block to that page and **leaves `isNested` as it already was**. It does not mean "not nested": send `12` for a page the block is nested on and it stays nested, which is how an attachment survives an edit that looks like it should have flattened it.
+
+Only `{ "pageId": 12, "isNested": false }` clears nesting. Read `blockPages` back after writing it and check the flag on each entry rather than inferring it from the shape you sent.
 
 → `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it`
 

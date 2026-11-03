@@ -14,7 +14,7 @@ Narrow it with query parameters rather than paging and filtering yourself:
 
 | Parameter | What it takes |
 |---|---|
-| `from`, `to` | ISO 8601; either may be omitted |
+| `createdAt[from]`, `createdAt[to]` | ISO 8601; either may be omitted |
 | `moduleName` | uppercase module name, one value or a comma-separated list |
 | `moduleEntryId` | the id of the entry inside that module |
 | `action` | `CREATE`, `UPDATE` or `DELETE` |
@@ -22,7 +22,15 @@ Narrow it with query parameters rather than paging and filtering yourself:
 | `adminId` | who made the change |
 | `limit`, `offset` | pagination |
 
-`action` is derived from the HTTP method of the original call and `result` from its status, so a refused call is recorded as `FAILURE` rather than left out. An entry carries `id`, `createdAt`, `moduleName`, `moduleEntryId`, `action`, `result` and the admin beside them.
+`action` is derived from the HTTP method of the original call and `result` from its status, so a refused call is recorded as `FAILURE` rather than left out. An entry carries `id`, `createdAt`, `moduleName`, `entityId`, `moduleEntryId`, `action`, `result`, `error` and the admin beside them.
+
+**The time window is the one parameter whose name differs between reading and clearing.** The listing takes it nested; a flat `from` or `to` sent here is accepted and then **ignored**, and the answer is the unfiltered journal, with no error to notice:
+
+```text
+GET /journal?createdAt[from]=2026-11-03T00:00:00.000Z&createdAt[to]=2026-11-04T00:00:00.000Z
+```
+
+So a `total` matching the unfiltered one is the symptom. Ask for a window you know is empty — a range in the future — and confirm `total` is `0` before trusting any window here. The clear takes the flat names instead.
 
 ## Clearing the journal needs an explicit window
 
@@ -33,6 +41,8 @@ DELETE /journal?from=2026-01-01T00:00:00.000Z&to=2026-01-31T23:59:59.999Z
 ```
 
 Omit either one, or send a `from` later than the `to`, and the call answers `400`. Narrow it further with the same `moduleName`, `action` and `result` the listing takes — those are optional, and leaving them off means every entry inside the window.
+
+Here the names are **flat**, the opposite of the listing. Send `createdAt[from]` and `createdAt[to]` to this operation and the required pair counts as absent, so it answers `400` complaining that `from` and `to` must be valid ISO 8601 strings. Carrying a window straight across from a listing call is the usual cause of that `400`, and the fix is the parameter names rather than the dates.
 
 The window is the whole safety mechanism, so widen it deliberately and never by accident. A window opened far enough into the past takes everything before it, and nothing on the instance brings those entries back.
 
@@ -123,6 +133,8 @@ A change made in the admin panel is in the journal and not in the audit log. A c
 ## Common mistakes
 
 - **Expecting a clear with no window to work.** `from` and `to` are required.
+- **Filtering the listing with flat `from`/`to`.** They are ignored; it takes `createdAt[from]` and `createdAt[to]`.
+- **Carrying `createdAt[...]` over to the clear.** It wants the flat names and answers 400.
 - **Reading a `403` on the clear as a bad window.** The permission is checked first.
 - **Treating `affected: 0` as an error.** The window was empty.
 - **Widening the window to be safe.** Wider deletes more, and the entries do not come back.
