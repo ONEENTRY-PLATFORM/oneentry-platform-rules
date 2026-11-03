@@ -81,7 +81,7 @@ An integer value is matched against the entity's internal id as well as against 
 
 ## Which keys the filter body accepts
 
-The body accepts these keys and no others:
+The body accepts these keys, the scope keys below, and no others:
 
 | Key | What it does |
 |---|---|
@@ -93,6 +93,10 @@ The body accepts these keys and no others:
 | `isSentByAdmin` | `true` keeps only what an operator submitted |
 
 Any other key answers `400 property <name> should not exist`, so a misspelled key is refused rather than dropped: a `400` here is telling you the key is wrong, not the value. The narrowing that is not in the body is `formModuleConfigId`, and neither is pagination: `formModuleConfigId`, `limit`, `offset`, `langCode` and the mode flags are query parameters, refused in the body like any other unknown key. A `400` naming one of them is about where you sent it, not about the listing lacking it.
+
+The keys that narrow to a branch of pages, a category or a group of users — `pageIds`, `isNested`, `productFilter`, `pageTypes`, `pageFilter`, `userGroupIds`, `userAuthProviderIds`, `userFilter` — have their own rules.
+
+→ `mcp/docs/api/form-submission-scope-filters#keys-that-narrow-submissions-to-a-module`
 
 A `parentId` that is not an integer answers `400`. A status outside the list answers `400` and the message names the five that are accepted, so send them lowercase.
 

@@ -31,6 +31,7 @@ Watch these cases in particular:
 - **Numbers can be `null`.** An existence check is not the same as comparing to zero.
 - **A choice is matched by the option's value, not by its title.** An option titled `Red` whose value is `red` is found by `red` and not by `Red`. The whole value is compared and the comparison is case-sensitive, so membership behaves like equality here and `Re` finds nothing. An entity with several options selected matches when any one of them does.
 - **Dates compare at the granularity of the type.** A date compares by day, so a value stored as `2026-05-07T10:00:00.000Z` is equal to `2026-05-07`; a date-and-time and a time compare to the minute. Send ISO 8601 — anything else is not read as a date and matches nothing — and remember that a date-time with no zone is read as UTC.
+- **In the admin product and page listings, negation keeps everything else.** On a choice, `neq` and `nin` keep entities without that option selected, including those with an empty selection; on text, `neq` keeps every other value. The same listings match a part of a text value with `in` and `nin`, accept decimal and negative numbers, and never match `0` with a condition value that is not a number.
 - **An empty value counts as no value.** An empty choice list, an empty media slot, a cleared text: an existence check answers false for them, and its negation answers true.
 
 → `mcp/docs/api/attribute-types`

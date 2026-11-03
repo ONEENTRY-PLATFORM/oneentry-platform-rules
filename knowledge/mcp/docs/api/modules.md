@@ -2,13 +2,17 @@
 
 A module is a section of the admin panel — catalogue, orders, forms, users — and the thing general types and attribute set types attach to so entities appear in the right place.
 
-Eighteen are provisioned. Mutating them is permanently confirm-gated, and almost every task that seems to need it does not.
+A fixed set is provisioned. Mutating them is permanently confirm-gated, and almost every task that seems to need it does not.
 
 → `mcp/docs/api/baseline-data#modules` · `mcp/docs/api/general-types`
 
 ## The modules you will find
 
-`settings`, `forms`, `catalog`, `content`, `admins`, `blocks`, `journal`, `menu`, `users`, `payments`, `events`, `orders`, `workflows`, `collections`, `discounts`, `import-data`, `subscriptions`, `filters`, `file-search`
+`settings`, `forms`, `catalog`, `content`, `admins`, `blocks`, `journal`, `menu`, `users`, `payments`, `events`, `orders`, `workflows`, `collections`, `discounts`, `import-data`, `subscriptions`, `filters`, `file-search`, `interface-modules`
+
+`interface-modules` is the section that holds interface modules — saved, simplified copies of other sections. The modules themselves are not in this listing.
+
+→ `mcp/docs/api/interface-modules#what-an-interface-module-is-and-what-it-is-not`
 
 Read them rather than trusting the list:
 
