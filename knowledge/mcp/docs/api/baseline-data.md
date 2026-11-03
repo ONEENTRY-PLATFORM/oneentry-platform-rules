@@ -60,9 +60,9 @@ An admin's rights are a map of dotted keys such as `orders.get`, `blocks.preview
 
 ## Modules
 
-Eighteen admin modules are provisioned, addressed by identifier:
+These admin modules are provisioned, addressed by identifier:
 
-`settings`, `forms`, `catalog`, `content`, `admins`, `blocks`, `journal`, `menu`, `users`, `payments`, `events`, `orders`, `workflows`, `collections`, `discounts`, `import-data`, `subscriptions`, `filters`
+`settings`, `forms`, `catalog`, `content`, `admins`, `blocks`, `journal`, `menu`, `users`, `payments`, `events`, `orders`, `workflows`, `collections`, `discounts`, `import-data`, `subscriptions`, `filters`, `file-search`, `interface-modules`
 
 Module identifiers are **not unique**, so a duplicate create succeeds and produces a shadow module that appears in listings and is wired to nothing. Module mutations are permanently confirm-gated for that reason.
 

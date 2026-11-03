@@ -75,6 +75,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/list-options-and-extra-values` | A field a visitor picks from, or an option that needs an image or a colour |
 | `mcp/docs/api/general-types` | Creating an entity that needs a type |
 | `mcp/docs/api/pages` | Working with the page tree |
+| `mcp/docs/api/page-listing-filters` | Listing chosen pages by id, or narrowing a level of the tree by type or condition |
 | `mcp/docs/api/blocks` | Creating or attaching blocks |
 | `mcp/docs/api/block-types` | A dynamic block is empty, or you are configuring one |
 | `mcp/docs/api/similar-product-blocks` | Configuring a block that shows products similar to another |
@@ -113,6 +114,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 |---|---|
 | `mcp/docs/api/forms-and-form-data` | Defining a form, or binding it so it accepts anything |
 | `mcp/docs/api/form-submissions` | Listing, filtering or reading what visitors submitted |
+| `mcp/docs/api/form-submission-scope-filters` | Submissions about a category, a branch of pages or a group of users |
 | `mcp/docs/api/captcha-fields` | A form has a captcha field and submissions are refused |
 | `mcp/docs/api/rating-forms-and-reviews` | Reviews, star ratings, or importing either |
 | `mcp/docs/api/users-and-groups` | A Content API route returns a permission error |
@@ -138,6 +140,9 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/environment-markers` | Pointing a client at another data environment without editing the client |
 | `mcp/docs/api/import` | Bulk-loading content from a file |
 | `mcp/docs/api/ai-gateway` | The platform's own model-calling feature |
+| `mcp/docs/api/interface-modules` | Creating or changing a simplified copy of an admin section for chosen admins |
+| `mcp/docs/api/interface-module-scopes` | What a module's scope and saved filter accept, per base |
+| `mcp/docs/api/interface-module-data` | Reading or exporting what an interface module shows |
 | `mcp/docs/api/ui-component-configs` | Changing how an admin panel table, form or record page looks, or giving an admin a screen template |
 
 ## Answers about permissions and refusals
@@ -159,6 +164,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does a read say permissions are temporarily unavailable | `mcp/docs/api/content-api-reads#what-a-503-on-a-public-read-is-telling-you` |
 | Why can I not list the submissions of a form | `mcp/docs/api/form-submissions#both-read-routes-need-the-forms-data-read-permission` |
 | Why did an operation that worked start answering 403 | `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it` |
+| Why is an interface modules call refused with 403 | `mcp/docs/api/interface-modules#which-permission-keys-manage-interface-modules` |
 | Why is my upload or file delete refused with 403 | `mcp/docs/api/files-and-uploads#admin-uploads-and-deletes-need-file-permissions` |
 | Why is the document search refused with 403 | `mcp/docs/api/file-content-search#two-permissions-nobody-holds-yet` |
 | Why does a flow node refuse every method I send | `mcp/docs/api/workflow-nodes#configure-the-cms-api-node` |
@@ -221,6 +227,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Question | Go to |
 |---|---|
 | Why does my filter return nothing | `mcp/docs/api/filters#only-indexed-attributes-can-be-filtered` |
+| Why does a page listing by ids return nothing | `mcp/docs/api/page-listing-filters#a-listing-without-parentid-reads-the-top-level-only` |
+| Why does a listing answer 400 for an empty filter | `mcp/docs/api/interface-module-data#an-empty-filter-answers-400` |
 | How do I pin a value in a facet | `mcp/docs/api/filters#pinning-is-set-on-an-attribute-not-on-a-value` |
 | Why did a new value appear in my pinned facet by itself | `mcp/docs/api/filters#a-pinned-attribute-picks-up-new-values-on-its-own` |
 | Why does a search by meaning return nothing for a kind | `mcp/docs/api/index-attributes#why-a-search-by-meaning-finds-nothing-for-a-kind` |
