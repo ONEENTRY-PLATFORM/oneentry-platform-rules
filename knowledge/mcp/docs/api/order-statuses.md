@@ -4,7 +4,7 @@ An order's state is not a single field. It moves along several independent axes,
 
 Get this wrong and you produce orders whose history does not explain itself, which is expensive to unpick.
 
-→ `mcp/docs/api/orders` · `mcp/docs/api/payments`
+→ `mcp/docs/api/order-status-triggers` · `mcp/docs/api/orders` · `mcp/docs/api/payments`
 
 ## Statuses belong to a storage
 
@@ -30,7 +30,12 @@ They move independently. An order can be paid and unfulfilled, or fulfilled and 
 
 ## Which axis a status belongs to
 
-A status names its axis in `axis`, one of `order`, `fulfillment` and `payment`. A status written without the field is an order-axis status — that is the default, which is why an instance can look as though the field does not exist until a payment status turns up in the list.
+A status names its axis in `axis`, one of `order`, `fulfillment` and `payment`. Which axis a status written **without** the field lands on is decided by the storage's `statusMode`, so read the storage before creating one:
+
+- `basic`, the mode a storage starts in, puts it on `payment` — and refuses an explicit `order` or `fulfillment` with `400 In basic mode only payment axis statuses can be created`;
+- `advanced` puts it on `order` and accepts all three.
+
+`axis` is fixed once the status exists. Sending a different one on an update answers `200 true` and leaves the axis as it was, so a status cannot be moved between axes — create one on the axis you want.
 
 The axes share one list and one identifier space, so a storage's statuses come back interleaved and you filter them yourself:
 
@@ -51,6 +56,12 @@ The payment axis reflects what actually happened to the money: a payment session
 
 Do not write it directly. A hand-set payment status that disagrees with the payment record is worse than no status at all, because everything downstream believes it.
 
+The API stops you only part of the way, and what decides it is the order's payment account. `PUT /orders-storage/{id}/orders/{orderId}/change-status` with `axis: "payment"` is **accepted** when that account is of type `custom` — the type for money settled outside any provider — and the write takes effect. For every other account type an `advanced` storage answers `400 Payment status is managed automatically and cannot be changed manually`.
+
+A `basic` storage does not answer that at all: the same call writes the **order** axis instead and answers `200 true`. So the axis you named is not necessarily the axis that moved. Read the order back and compare both before reporting what you did.
+
+With `axis` left out, `change-status` targets the order axis, and a status belonging to another one answers `400 Status '<identifier>' belongs to axis '<axis>', not 'order'`.
+
 A **status map** is what connects an event to a status. There is one per axis, and each is a flat object from a trigger name to a status identifier — nothing nested, and no other keys:
 
 ```json
@@ -62,20 +73,7 @@ A **status map** is what connects an event to a status. There is one per axis, a
 
 Read the map rather than inferring the pairing from the names. The `-payment` suffix above is a habit that keeps identifiers unique across the instance, not a rule the platform applies, and a map may point at any identifier at all.
 
-## The trigger names a map may use
-
-Trigger names are a closed catalogue, and a key outside it is refused:
-
-```text
-order.created            order.products_changed
-payment.link_created     payment.waiting           payment.partially_paid
-payment.paid             payment.expired           payment.canceled
-refund.pending           refund.partial            refund.full
-```
-
-The `order` and `fulfillment` maps may use any of them. The **`payment` map may not**: it takes only the payment and refund triggers other than `payment.link_created`, so `order.created` or `payment.link_created` in a payment map is refused rather than ignored.
-
-Anything outside the catalogue — a despatch scan, a timer, a message from a warehouse — has no trigger, and the merchant's own integration sets the status directly. So "the status did not move" is worth checking against this list before it is treated as a fault: an event with no trigger name was never going to move anything.
+→ `mcp/docs/api/order-status-triggers#where-the-status-maps-live`
 
 ## Statuses carry meaning flags
 
@@ -83,37 +81,32 @@ A status can be marked as a cancellation with `isCancelFinal`, or as a successfu
 
 When creating a status, set them deliberately — an unmarked terminal status leaves orders that never appear to finish. When changing them on an existing status, remember that every historical order carrying it is reinterpreted at once.
 
-## Transitions and triggers
-
-Moving between statuses can be configured as a transition rather than an arbitrary write, and a transition can fire triggers — side effects that happen when an order reaches a state.
-
-Where a transition exists, use it. Writing the target status directly skips whatever the transition was meant to cause, and the omission is invisible until someone notices the side effect never happened.
-
-```text
-cms_api_search { "query": "order status" }
-cms_api_search { "query": "status maps" }
-```
-
 ## Basic and advanced modes
 
-A storage can run with a simple single-axis view or with the full multi-axis model, and it says which in `statusMode` on the storage record. Which one it uses changes what the status operations expect.
+`statusMode` on the storage record takes `basic` or `advanced`, and a storage is created `basic`. Which one it is changes what the status operations expect, so read it before building any status payload.
 
-Read the storage before assuming. A payload built for one mode is rejected or, worse, partially accepted in the other. The same record carries `priceExpiration` — how long a price quoted on an order stays good, written as a duration such as `10m` rather than a number of seconds.
+Under `basic` the storage keeps one status that stands for both the order and its payment: every status it will accept belongs to the `payment` axis, the `order` and `fulfillment` maps are not applied, and a storage trigger of its own has nothing to drive. Under `advanced` the three axes are configured and move independently.
+
+A payload built for one mode is rejected or, worse, partially accepted in the other — see the payment axis above for the case that answers `200` and writes a different field than you named. The same record carries `priceExpiration` — how long a price quoted on an order stays good, written as a duration such as `10m` rather than a number of seconds.
 
 ## Changing the status of an order
 
-1. Read the order and note **every** axis, not just the one you care about.
-2. Read the storage's statuses and find the target by identifier.
-3. Check whether a transition exists for the move you want.
-4. Dry run, and show the human the current and target states.
-5. Send, then read the order back and confirm the other axes are unchanged.
+1. Read the storage and note its `statusMode`.
+2. Read the order and note **every** axis, not just the one you care about.
+3. Read the storage's statuses and find the target by identifier and axis.
+4. Read the map for that axis and see whether a trigger already pairs with the target.
+5. Dry run, and show the human the current and target states.
+6. Send, then read the order back and confirm the axis you named is the one that moved and the others are unchanged.
 
 ## Common mistakes
 
 - **Treating the status as one field.** There are several axes.
-- **Writing the payment axis.** It is derived from the payment record.
-- **Skipping a transition.** Its side effects are skipped with it.
+- **Looking for a transition.** There is no such entity; use a trigger or `change-status`.
+- **Assuming a status with no axis lands on order.** Only on an `advanced` storage.
+- **Trying to move a status between axes.** The update answers `200` and changes nothing.
+- **Reading `200 true` from `change-status` as proof the payment axis moved.** On a `basic` storage it writes the order axis.
+- **Reading `201 true` from a fired trigger as proof a status moved.** An unmapped trigger reports success.
 - **Reusing an identifier from another storage.** They must be unique instance-wide.
 - **Renaming a status to fix a typo.** Everything referencing it follows the identifier.
 
-→ `mcp/docs/api/verification-recipes#orders`
+→ `mcp/docs/api/order-status-triggers` · `mcp/docs/api/verification-recipes#orders`

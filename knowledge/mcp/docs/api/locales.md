@@ -2,7 +2,7 @@
 
 Every piece of human-readable content on this platform is keyed by a locale code, so reading the active codes is the first call of almost any content task.
 
-There is nothing to create here. The full set of codes is provisioned with the instance; what varies is which ones are active.
+A broad set of codes is provisioned with the instance and what usually varies is which of them are active — but a code the instance does not have can be created.
 
 → `mcp/docs/server/payload-conventions#localizeinfos-is-keyed-by-locale-code` · `mcp/docs/api/baseline-data#locales`
 
@@ -10,7 +10,21 @@ There is nothing to create here. The full set of codes is provisioned with the i
 
 A language and a region joined by an underscore: `en_US`, `ru_RU`, `fr_FR`, `de_DE`. That exact string is the key you use in `localizeInfos` and in `attributesSets`, and the value of the `langCode` parameter where an operation accepts one.
 
-Codes are unique across the instance, so a create always fails. The operation you want, when a new language is needed, is an **activation** of a code that already exists.
+Codes are unique across the instance. Almost always the operation you want is an **activation** of a code the instance already holds, because almost every language is already there — check before reaching for a create.
+
+## Creating a locale the instance does not have
+
+Where the code is genuinely absent, `POST /locales` creates it under `settings.locales.create`:
+
+```json
+{ "code": "zu_ZA", "shortCode": "zu", "name": "Zulu", "nativeName": "isiZulu" }
+```
+
+`code` is the one the rest of the API uses; `shortCode` is the language half on its own; `name` is the English name and `nativeName` the language's own. A code already present answers `400 This locale already exists`, and a body with no `code` answers `400 Locale's code is not present`.
+
+Check first with `GET /locales/check-existence/{code}`, and read its polarity the right way round: it answers `true` when the locale **exists**. That is the opposite of the `marker-validation` operations elsewhere in this API, which answer `valid: true` when a marker is **free**.
+
+A locale created this way arrives **inactive** — `isActive` is `false`. Creating it does not make it usable for content; activation is the separate step below, and it is the one with consequences.
 
 ## Read the active codes first
 

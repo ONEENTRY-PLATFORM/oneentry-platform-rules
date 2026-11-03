@@ -25,6 +25,8 @@ A payment session represents one attempt: created, then moving through the provi
 
 You read sessions. You do not advance them by writing statuses — the provider's callbacks do that, and a hand-written status that contradicts the session is worse than none.
 
+The one exception is an order whose payment account is of type `custom`, where there is no provider and no callback to wait for: the payment axis on such an order **is** written by hand, because nothing else will write it. For every other account type the write is refused or lands on a different axis, and the next link covers which.
+
 → `mcp/docs/api/order-statuses#the-payment-axis-is-managed-for-you`
 
 ## Why webhook paths are gated

@@ -34,7 +34,7 @@ Page items and custom items are numbered separately, so the same number is a val
 - `parentType` — `page` or `custom`, `null` at the top level;
 - `itemType` on every item of a public menu tree — `page` or `custom`. This is the value a child of that item must send as its `parentType`.
 
-The position operations accept `newParentType` next to `newParentId`, with those same two values. Do not carry them over to `leftObjectType` and `rightObjectType` of the same body: a neighbour's kind uses the other vocabulary, `menu-page` or `menu-custom-item`. Two dictionaries in one body — ordering, below, spells it out.
+The position operations accept `newParentType` next to `newParentId`, with those same two values. The neighbour fields `leftObjectType` and `rightObjectType` of the same body have a longer vocabulary of their own, `menu-page` and `menu-custom-item`, and they also understand `page` and `custom` as the same two kinds — so carrying the parent words across is accepted rather than silently wrong. Ordering, below, spells out what each field does.
 
 Practical consequences:
 
@@ -149,9 +149,18 @@ An update that attaches pages assigns order in the order you list `pagesIds`. Om
 
 ## Delete a menu or an item
 
-Removing an item removes the branch beneath it. Deleting the menu removes everything.
+Removing a custom item does **not** remove the branch beneath it unless you ask for that. `DELETE /menus/{id}/custom-items/{itemId}` takes a body, and the default is the narrow option:
 
-Both are confirm-gated where they are destructive. Read the tree before confirming, and tell the human how many items are below the one they asked to remove.
+```json
+{ "flag": "self_only" }
+```
+
+- `self_only` — the default, applied when the body is omitted entirely. Only the named item goes. Its children stay in the menu and keep pointing at the id that no longer exists, so they are left out of the rendered tree while still being listed by the admin read. Nothing reports this.
+- `with_children` — the subtree goes with it. Nested custom items are deleted; menu pages beneath it are **detached from the menu**, and the pages themselves are untouched.
+
+So "delete this item and everything under it" is one flag, and getting it wrong leaves orphans rather than an error. Read the tree first, count what sits beneath the target, and name the flag explicitly even when you want the default.
+
+Deleting the menu removes everything in it. Both calls are confirm-gated where they are destructive — tell the human how many items are below the one they asked to remove, and which of the two outcomes they are agreeing to.
 
 ## Common mistakes
 
@@ -164,7 +173,8 @@ Both are confirm-gated where they are destructive. Read the tree before confirmi
 - **Using a page's title as its menu label.** The label is `menuTitle`.
 - **Listing one page twice in `pagesIds`.** Use a custom item for the second place.
 - **Sending `parentId` without `parentType`.** Ambiguous whenever the two kinds share a number.
-- **Writing `page` or `custom` as a neighbour's kind.** That is the `newParentType` vocabulary. A neighbour is `menu-page` or `menu-custom-item`; the wrong word answers 200 and resets the rank.
+- **Naming a neighbour's kind that is not the kind it is.** It answers 400 and the item keeps its rank; `page` and `custom` are accepted spellings, a mismatched kind is not.
+- **Expecting a custom item's children to go with it.** The default flag is `self_only`; pass `with_children`.
 - **Judging a reorder by the order alone.** Read the lexorank: an unresolved neighbour can leave a plausible order behind.
 - **Sending a position body without `position`.** It answers 400; the minimal body is `{ "position": { "leftObjectId": null, "rightObjectId": null } }`.
 - **Reading a menu publicly without the `marker` segment.** That path answers 404.

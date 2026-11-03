@@ -41,13 +41,13 @@ Dry run, and show the human the totals before sending.
 
 ## Order statuses
 
-An order's state is not one field. It moves along axes — the lifecycle of the order itself, its fulfilment, and its payment — and the payment axis is managed by the platform rather than set by hand.
+An order's state is not one field. It moves along axes — the lifecycle of the order itself, its fulfilment, and its payment — and the payment axis is managed by the platform except where the order is settled outside any provider.
 
-Read `mcp/docs/api/order-statuses` before changing any status. Setting one directly when a transition exists for it produces a record whose history does not explain itself.
+Read `mcp/docs/api/order-statuses` before changing any status. There is no transition entity to look for: a status moves either by firing a trigger the storage's map pairs with it, or by writing it with `change-status`. Which of the two is right, and which axis actually moves, depends on the storage's `statusMode`.
 
 ## Attaching a payment
 
-A payment is a separate entity linked to the order, with its own session and lifecycle. The order's payment axis reflects that lifecycle; it is not something you write.
+A payment is a separate entity linked to the order, with its own session and lifecycle. The order's payment axis reflects that lifecycle, and on a provider-backed order it is not something you write — only where the account is of type `custom` is a hand-written payment status the intended mechanism.
 
 → `mcp/docs/api/payments`
 
@@ -97,7 +97,7 @@ Read the order back by id, check the axis you changed, and check that the axes y
 
 ## Common mistakes
 
-- **Writing a status directly when a transition exists.** Use the transition.
+- **Searching for a status transition.** There is none; fire a trigger or use `change-status`.
 - **Recomputing totals.** They are historical values.
 - **Assuming a storage exists.** It is not baseline data.
 - **Requesting a whole order list.** Page it; the response will be capped.

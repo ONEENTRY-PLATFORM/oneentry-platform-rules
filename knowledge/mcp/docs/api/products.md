@@ -115,16 +115,23 @@ Whichever route you take, read the product back by id and look at `statusId`. Th
 
 ## Deleting several products at once
 
-The operation on `DELETE /api/admin/products` declares `ids` as a **path** parameter while its path carries no place for it, so the value cannot reach the API. This server refuses that call rather than sending a bare delete of the collection, and `cms_api_describe` marks it `notExecutable`.
+`DELETE /api/admin/products` takes the ids in the **body** and deletes them:
 
-Delete a chosen set through the category route instead, with the ids in the **body**:
+```text
+DELETE /api/admin/products
+{ "ids": [ 104, 105 ] }
+```
+
+Its published description disagrees with that. It declares `ids` as a **path** parameter while the path carries no place for one, so this server reads the operation as unsendable and `cms_api_describe` marks it `notExecutable`. The description is what is wrong here, not the route — the call works when the ids go in the body. Treat the `notExecutable` mark as a reason to check rather than a statement that the route is unusable, and say so if a human is relying on it.
+
+The category route takes the same body and is the one to use where the products share a page:
 
 ```text
 DELETE /api/admin/products/category/{pageId}
 { "ids": [ 104, 105 ] }
 ```
 
-The same route with the ids in the query string answers `400` instead of deleting anything. For one product, the single-delete operation needs no category.
+The sibling `DELETE /api/admin/products/delete/multi` is the one to avoid: the same body answers `200 false` and deletes nothing, and a bare array or a query string answers `5xx`. For one product, the single-delete operation needs no category.
 
 Whichever you use, this is a destructive call: dry-run it, show the human the target, and count what is about to go.
 

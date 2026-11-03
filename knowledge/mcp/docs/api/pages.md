@@ -97,7 +97,17 @@ The public read of the same page by URL returns that order in the same direction
 
 A page created without `localizeInfos` may be accepted and is unusable — it appears untitled in the admin panel and has nothing to render.
 
+To check a page URL before claiming it, use `GET /pages/validation/{id}/{pageUrl}` — and read the answer the right way round. It answers **`true` when the URL is already taken** by another page, `false` when it is free. The `id` is the page the URL is being considered for, so a page asked about its own current URL answers `false`.
+
+That polarity is the reverse of the `marker-validation` operations used for almost every other entity, which answer `valid: true` when a marker is **free**. Two checks, opposite senses: read whichever you are calling rather than carrying the habit across.
+
 ## Update a page
+
+**`version` is required**, and leaving it out answers `400` saying it must be a number. Read the page and send back the `version` you read.
+
+What that number does is the trap. A `version` **lower** than the stored one answers `200` with a body of exactly `false`, and writes nothing at all. No error, no partial write — a successful-looking call that did nothing, which is why a stale read is worse here than a missing field. A value equal to or higher than the stored one is accepted.
+
+So the only safe shape is read-then-write, and the only proof is a read-back. A `false` body is the signal that someone else wrote the page between your read and your write.
 
 An update merges: `parentId`, `attributesSets` and `generalTypeId` are all left as they are when the body does not carry them, so an edit to a page's content leaves it where it is in the tree.
 
@@ -111,7 +121,14 @@ Read the page, change what you meant to change, send it back, then read it again
 
 Blocks are attached to a page rather than owned by it: the same block can appear on several pages. The page payload carries the attachment, and the block itself lives in the blocks area.
 
-Create or find the block first, then attach it by its marker. Attaching a block that does not exist yet leaves a reference that resolves to nothing.
+`PUT /pages/{id}` carries two arrays, and both hold **numeric block ids** — not markers:
+
+- `blocks` — the blocks shown on the page itself;
+- `nestedBlocks` — the blocks child products inherit automatically.
+
+A marker in either array is not a dangling reference; it is a `5xx` that attaches nothing, because the value is read as a number. So read the block and take its `id`, and treat a marker you were given as something to resolve first.
+
+Both arrays are replace-in-full. Sending `blocks` without `nestedBlocks` leaves the nested set alone, and sending either as `[]` detaches everything in it.
 
 → `mcp/docs/api/blocks`
 
@@ -152,7 +169,20 @@ Before confirming:
 - check whether anything references its page URL;
 - show the human the `target` from the dry run, quoting the page URL and title.
 
-The delete operation may accept flags controlling what happens to dependent content. Read them in `cms_api_describe` and choose deliberately rather than accepting defaults.
+Both `DELETE /pages/{id}` and `DELETE /pages/delete/many` take a `flag` in the body, and the default is the narrowest of the four:
+
+| `flag` | What goes |
+|---|---|
+| `self_only` | the default — the page alone |
+| `with_children` | the page and its descendants |
+| `with_products` | the page and the products on it |
+| `with_children_and_products` | both |
+
+Under the default, children are **promoted to the root**: they survive with `parentId: null` and `depth: 0`, which rearranges the tree rather than leaving a gap. Products on the page survive too. Neither is reported.
+
+So the default is not the safe option, it is the one with the least obvious consequence. Name the flag explicitly, and tell the human which of the four outcomes they are confirming. `DELETE /pages/delete/many` takes `ids` beside the flag and applies it to all of them.
+
+`DELETE /user-groups/{id}` follows the same pattern with two values, `self_only` and `with_children`, and the same default — so child groups lose their parent unless you say otherwise.
 
 ## Common mistakes
 
@@ -164,6 +194,10 @@ The delete operation may accept flags controlling what happens to dependent cont
 - **Reading a `404` on a public page read as a deleted page.** The page may simply have no translation in the `langCode` you asked for.
 - **Reading a trimmed block list as the whole set.** A read restriction caps it, and the response gives no sign.
 - **Sending `parentId: null` to mean "leave it".** That is the instruction to move the page to the root.
+- **Reading `200` from an update as a write.** A stale `version` answers `200 false` and writes nothing.
+- **Attaching a block by its marker.** Both block arrays hold numeric ids.
+- **Deleting a parent page and expecting the children to go.** They are promoted to the root.
+- **Reading the page-URL check as "free".** It answers `true` when the URL is taken.
 - **Treating every row of a catalog-filtered listing as a catalogue.** Ancestors of a nested catalog page come back too. Check each row's general type.
 - **Reading a `403` on a page write as a missing permission.** The account may hold the key and be confined to another branch of the tree.
 
