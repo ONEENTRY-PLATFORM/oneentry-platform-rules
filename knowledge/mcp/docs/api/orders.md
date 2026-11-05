@@ -73,6 +73,50 @@ Refunds have their own operations, and a customer-initiated refund request is a 
 
 Never issue one without explicit human agreement in the conversation, quoting the order and the amount.
 
+Three operations, all on the order's storage and all gated on `payments.refunds`:
+
+```text
+POST /orders-storage/{storageId}/refund/{id}/preview   AdminOrdersStorageController_previewRefund
+POST /orders-storage/{storageId}/refund/{id}           AdminOrdersStorageController_refundOrder
+GET  /orders-storage/{storageId}/refund/{id}           AdminOrdersStorageController_findRefunds
+```
+
+`{id}` is the **order**, not the refund. The preview answers `200` and writes nothing; the history read answers the refunds already issued, each with its amount and note.
+
+## Previewing a refund before issuing one
+
+Both write bodies have the same shape: a `note`, and a `products` map keyed by the **catalog product id** — not by a line number and not by a marker.
+
+```json
+{ "note": "wrong size",
+  "products": { "118": { "quantity": 2 } } }
+```
+
+The preview answers what would be taken and what would remain: `refundAmount`, `remainingProducts` (each `productId`, `quantity`, `originalPrice`), and the before-and-after totals as `oldTotalDue`, `newTotalDue`, `newTotalRaw`, `newTotalSumWithDiscount`, `oldBonusApplied`, `newBonusApplied` and `discountConfig`.
+
+Always preview first and quote `refundAmount` to the human before the real call. The amount is recomputed against the order's discounts, so it is not the product price times the quantity and cannot be worked out by hand.
+
+## What a refund body ignores without saying so
+
+Four parts of that body fail quietly, and all four leave `refundAmount` smaller than you meant:
+
+- a product id the order does not contain contributes **nothing** — no error, no mention;
+- a `quantity` higher than the number ordered is **clamped** to the ordered count, so asking for 11 of 10 refunds 10;
+- `quantity` omitted, or `0`, selects nothing;
+- `stages` is for an order paid in stages; on an order paid in one charge it is ignored.
+
+So a preview answering `refundAmount: 0` means the selection matched nothing — check the ids against the order's products before reading it as "there is nothing to refund". `products` must be present even when empty: a body carrying only `note` answers `5xx`.
+
+## Why a refund answers 400 when its preview worked
+
+The preview works on any order; issuing does not. Three refusals account for nearly all of it:
+
+- `400 Payment session not found` — the order has no completed payment. An order that was never actually paid cannot be refunded however its status axes read, and no body changes that. Confirm a completed payment before promising a refund.
+- `400 Refund amount should be > 0` — the selection matched nothing. Checked before the payment is looked at, so this one hides the first.
+- `404 Order not found` — the `{id}` is wrong. `{storageId}` is not checked against it, so a mismatched pair fails on the order.
+
+→ `mcp/docs/api/payments#split-payments-and-staged-charges`
+
 ## Why a site gets 404 for an order that exists
 
 On the Content API a visitor sees only their own orders. Two reads take an order id:

@@ -74,6 +74,38 @@ Some system settings — captcha keys among them — are permanently confirm-gat
 
 Read them to confirm whether a mechanism is configured. Leave changes to an operator who has the new values in hand.
 
+## Issuing an application token
+
+The token a site sends in `x-app-token` is issued here, and these three operations are **absent from the catalog** — `cms_api_search` finds nothing for them and `cms_api_describe` cannot describe them, so the paths below are the only way to reach them:
+
+```text
+POST   /api/admin/system/tokens/generate     settings.tokens.create
+GET    /api/admin/system/tokens              no key required
+DELETE /api/admin/system/tokens/{id}         settings.tokens.delete
+```
+
+Generating takes a name and an expiry, and answers `201` with a body of `true` — the token value is **not** in that answer:
+
+```json
+{ "name": "storefront", "expiredDate": "2027-01-01T00:00:00.000Z" }
+```
+
+Read the value back from the listing, which carries `id`, `name`, the token itself, `serialNum`, `expiredDate` and `createdDate` for every token not yet deleted. A missing `name` answers `400 name must be a string`; a delete answers `200 true`, and an id nothing matches answers `404`.
+
+## A token asked for inline is never stored
+
+Add `returnValue: true` to the generate body and the behaviour changes completely: the call answers `201` with the token string as the whole body, and **nothing is saved**. That token never appears in the listing, cannot be deleted through the API, and cannot be found again if you lose it.
+
+Use it only for a value you hand over once and will never need to revoke. For anything a site will keep using, generate without the flag and read the value from the listing, so there is a record to delete later.
+
+## Treat the token listing as a secret
+
+`GET /api/admin/system/tokens` requires **no permission key**. Any admin with a valid session reads it, including an account holding no grants at all, and it returns every token's value in full rather than a masked form.
+
+So the listing is the one read in this area whose response must never leave the instance: not into a report, not into a conversation summary, not into a log. Quote a token's `name` and `id` when you need to refer to one, never its value. Tokens are also per set of data — one issued in the main set does not work inside a data environment.
+
+→ `mcp/docs/api/content-api-reads#public-reads-use-the-x-app-token-header` · `mcp/docs/api/environments#application-tokens-belong-to-one-environment`
+
 ## Changing any setting
 
 1. Read the record first, in full.
