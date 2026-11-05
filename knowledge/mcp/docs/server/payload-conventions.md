@@ -16,7 +16,7 @@ Human-readable content sits under `localizeInfos`, keyed by locale:
 
 Required when creating a product, and effectively required on pages — an entity with no localized title is unusable in the admin panel even where the API accepts it.
 
-Write every locale the instance has active. Content written for only one locale appears blank to anyone using another, and there is no fallback.
+Write every locale the instance has active. Content written for only one locale appears blank to anyone using another, bar the reads in `mcp/docs/api/locales#which-content-reads-fall-back-to-another-language`.
 
 ## Get the active locale codes first
 
