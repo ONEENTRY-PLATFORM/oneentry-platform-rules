@@ -112,6 +112,8 @@ Two things the operation's own declaration cannot tell you:
 
 Orders, visitors and submissions are not among the kinds that travel, and asking for one answers `400` — that is a boundary, not a gap to work around.
 
+Nor do project settings: error pages, sign-in providers, events, order storages and statuses, Content API access rules. A dry run lists those the source has filled in, with counts on both sides, in `warnings`; the human sets them up in the target.
+
 → `mcp/docs/server/confirm-and-dry-run`
 
 ## Common mistakes
