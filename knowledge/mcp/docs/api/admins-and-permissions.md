@@ -158,6 +158,24 @@ If a human asks you to "give this admin the same rights as that one", read both 
 
 Changing a map needs `admins.updatePermissions` on top of `admins.update`, whichever operation carries it. `AdminsController_updatePermissions` declares both keys. `AdminsController_update` declares only `admins.update`, so the local pre-check lets the call out, and the instance answers `403` when the body's `permissions` differ from the stored map and you lack `admins.updatePermissions`; nothing in that body is stored. A body that repeats the stored map unchanged is accepted, so a whole-admin update still works without the extra key.
 
+## A permission change signs the target admin out
+
+Writing `permissions` on `AdminsController_update` ends the target admin's session. Their next `POST /api/admin/auth/refresh` answers `401 Refresh token invalid`, and nothing short of a fresh sign-in brings it back. Anything holding that account's tokens — a script, another client, this server configured with that login — stops working at its next renewal, with no warning before it happens.
+
+The access token already in their hands is not cancelled, but from the next request on it is judged against the **new** map: a route whose key you removed answers `403` immediately while the rest keep working. So the revocation is not deferred to the token's expiry, and a `403` arriving seconds after a grant was edited is that edit, not a fault.
+
+The trigger is wider than "the rights changed". A `permissions` body carrying exactly the keys the admin already held, listed in a different order, still ends the session. Treat **any** update that carries the field as ending the target's session, and leave the field out when you are editing something else — an update with no `permissions` key leaves the session alone.
+
+Tell the human before you do it, naming whose session ends.
+
+## An admin update needs login and email beside permissions
+
+`AdminsController_update` refuses a body that carries `permissions` without `login` **and** `email`: it answers `400 All fields must be filled!`, and the message names neither of them. A targeted "just add this one key" payload is the usual way into it.
+
+Read the admin first and echo both values back with the map. The read is needed anyway — the map you send replaces the stored one, so you cannot build it without seeing what is there.
+
+→ `mcp/docs/api/admin-sign-in#renewing-an-administrator-token`
+
 ## Admin mutations are permanently gated
 
 Every mutating operation under the admins area requires a confirm token at every allow level. So does everything under platform settings, modules, user permissions, and group permission changes — the full list is in `mcp/docs/server/allow-levels#paths-that-are-always-confirm-gated`.

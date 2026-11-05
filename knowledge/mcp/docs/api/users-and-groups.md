@@ -140,6 +140,12 @@ The field is a **full replacement**, not an addition. Send every group the user 
 
 The same call also writes `formData` and `notificationData` from whatever the body carries, so omitting them replaces them with empty values. Read the user first and send those fields back unchanged unless you mean to change them.
 
+## A sign-in provider with users cannot be deleted
+
+`AdminUsersAuthProviderController_remove` — `DELETE /users-auth-providers/{id}` — answers `400 Provider has users. It cannot be deleted.` for as long as one user is still attached to it, whatever state that user is in. Nothing is detached and nothing is removed; there is no flag that cascades and no order of calls that gets around it.
+
+So deleting a provider means dealing with its users first, and deleting people to tidy up a configuration is almost never what was wanted. Say that the provider has users and let the human decide. An id no provider has answers `404 Provider not found`.
+
 ## Where social network sign-in is configured
 
 Providers for Google, Apple, VK and the other supported networks are created here as well, with `type: "oauth"`, but their settings, the catalog that lists what each network requires, and the refusals they produce have their own document.
