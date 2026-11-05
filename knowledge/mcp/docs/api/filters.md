@@ -31,10 +31,42 @@ Watch these cases in particular:
 - **Numbers can be `null`.** An existence check is not the same as comparing to zero.
 - **A choice is matched by the option's value, not by its title.** An option titled `Red` whose value is `red` is found by `red` and not by `Red`. The whole value is compared and the comparison is case-sensitive, so membership behaves like equality here and `Re` finds nothing. An entity with several options selected matches when any one of them does.
 - **Dates compare at the granularity of the type.** A date compares by day, so a value stored as `2026-05-07T10:00:00.000Z` is equal to `2026-05-07`; a date-and-time and a time compare to the minute. Send ISO 8601 — anything else is not read as a date and matches nothing — and remember that a date-time with no zone is read as UTC.
-- **In the admin product and page listings, negation keeps everything else.** On a choice, `neq` and `nin` keep entities without that option selected, including those with an empty selection; on text, `neq` keeps every other value. The same listings match a part of a text value with `in` and `nin`, accept decimal and negative numbers, and never match `0` with a condition value that is not a number.
+- **Negation keeps everything else that carries the attribute.** On a choice, `neq` and `nin` keep entities without that option selected, including those with an empty selection; on text, `neq` keeps every other value. Entities that do not define the attribute at all are a separate case — see the next section. Text is matched by part of its value with `in` and `nin`, decimal and negative numbers are accepted, and `0` is never matched by a condition value that is not a number.
 - **An empty value counts as no value.** An empty choice list, an empty media slot, a cleared text: an existence check answers false for them, and its negation answers true.
 
 → `mcp/docs/api/attribute-types`
+
+## Why a negation leaves out entities without the attribute
+
+A negated condition — `neq`, `nin`, or the negated existence check — returns only
+entities that **carry the attribute being filtered on**. An entity built on a
+different attribute set, one that does not define that attribute at all, is left
+out, even though it plainly does not hold the value you excluded.
+
+This is the opposite of what "everything except" suggests, and it is the usual
+reason a negation returns far fewer products than the catalog size:
+
+```text
+# attribute `color` belongs to one attribute set out of several
+{"filter":[{"attributeMarker":"color","conditionMarker":"nexs"}]}
+# → only products whose set defines `color` and whose value is empty,
+#   not every product without a colour
+```
+
+An empty value is **not** the same as a missing attribute. A product whose set
+defines `color` and leaves it blank carries the attribute, so a negation keeps
+it and an existence check rejects it. A product whose set has no `color` at all
+is outside the filter either way: neither `eq` nor `neq` returns it.
+
+Two consequences worth planning for:
+
+- To ask "everything in the catalog except X", filter nothing and exclude the
+  `eq X` result yourself. One negated condition will not express it across
+  mixed attribute sets.
+- The public product listing and the admin product listing answer the same way
+  here, so a count taken from one is comparable with a page taken from the other.
+
+→ `mcp/docs/api/attribute-sets`
 
 ## Filter configuration for a site
 
@@ -83,7 +115,8 @@ Use it before reporting that a filter returns nothing — often the value simply
 ## Common mistakes
 
 - **Filtering on a non-indexed attribute.** Silent empty result.
-- **Filtering a choice attribute by its label.** Store and filter by option id.
+- **Filtering a choice attribute by its label.** Filter by the option's value.
+- **Expecting a negation to cover entities without the attribute.** It does not.
 - **Assuming a truncated result means "no more matches".** The response was capped; page it.
 - **Patching a position field on a filter item.** Use the position operation.
 - **Expecting a pinned item to have products behind it.** Pinning is presentation only.
