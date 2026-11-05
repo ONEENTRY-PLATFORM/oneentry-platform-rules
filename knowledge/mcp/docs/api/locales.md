@@ -86,7 +86,9 @@ These public reads return the language the value was stored in when the requeste
 - a row of an integration collection, including the form data submitted with it
 - the signed-in user's own profile, including the form data submitted with it
 
-The key in the response is always the real language of the value, never the one you asked for. Read the key, not the parameter: `langCode=ru_RU` answering `{ "en_US": … }` means there is no Russian translation and you are looking at the English value.
+The key in the response is the real language of the value, not the one you asked for. Read the key, not the parameter: `langCode=ru_RU` answering `{ "en_US": … }` means there is no Russian translation and you are looking at the English value.
+
+The one case where the key does match the parameter is an entity that holds nothing in any language: there is no real language to name, so the answer carries the code you asked for with an empty value — `langCode=ru_RU` answering `{ "ru_RU": [] }`. So a matching key alone does not prove a translation exists; the value does. The shape stays the same whether anything was found or not, which is what makes the check a safe one to write.
 
 Admin reads are not affected. They return what is stored — for most entities the whole locale map, for a collection row the single language you asked for — which makes them the surface to use when the question is whether a translation exists at all.
 
