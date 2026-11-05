@@ -45,15 +45,17 @@ The two groups of maps are written through different operations, and sending one
 
 `axis: "payment"` on the storage route answers `400 Status map for axis 'payment' is not managed here` — the payment map is not reachable from the storage at all. On the payments route every value has to name a status that exists **and** sits on the payment axis, or the call answers `400` and stores nothing.
 
-Neither map operation declares a required permission, so this server cannot pre-check one and the call goes out. Expect a `403` from the instance rather than a local refusal, and read it as a missing grant rather than a bad body.
+Both map writes are gated, by two different keys: the storage route needs `orders.storage.order-status.update`, the payments route `payments.settings.update`. Without the key the call answers `403 Forbidden resource` and stores nothing. Reading the two is not alike — `GET /orders-storage/{id}/status-maps/{axis}` answers for any signed-in administrator, while `GET /payments/status-maps/{id}` needs `payments.settings.get`.
 
-The operations that move or remove a status do declare theirs:
+The operations that move or remove a status declare theirs too:
 
 | Operation | Permission |
 |---|---|
-| `change-status` on an order | `orders.storage.order.update` |
+| `change-status` on an order | `orders.storage.order-status.update` |
 | firing a trigger on an order | `orders.storage.order-status.update` |
 | deleting a status | `orders.storage.order-status.delete` |
+
+Two keys read almost alike and are not interchangeable. `orders.storage.order.update` gates editing the order record itself, through `PUT /orders-storage/{id}/order/{orderId}`; every operation in the table above wants the `order-status` key instead. The `200` description of `change-status` names the order key, so a grant asked for from that description alone still answers `403` — ask for `orders.storage.order-status.update` when `change-status` is refused, and for `orders.storage.order.update` when editing the order is.
 
 A status an order already carries cannot be deleted: `DELETE` on it answers `400 Status is used on orders and cannot be deleted`. Move the orders off it first.
 
