@@ -36,6 +36,34 @@ Watch these cases in particular:
 
 → `mcp/docs/api/attribute-types`
 
+## What the price marker means in a product filter
+
+In a product filter, `attributeMarker: "price"` is reserved: it compares the
+product's **price**, whichever attribute of its set carries that role. It is not
+matched against an attribute whose identifier happens to be `price`, so a
+product priced through a differently named attribute is still found.
+
+Price takes six operators — equal, not equal, greater than, less than, exists
+and does not exist. Membership and pattern are refused:
+
+```text
+POST /products/all
+{"filter":[{"attributeMarker":"price","conditionMarker":"in","conditionValue":"150"}]}
+# → 400, naming conditionMarker and the price marker
+```
+
+The counts operation for the same listing refuses them the same way, so a facet
+and the number beside it cannot disagree. For "price is one of these values",
+send one condition per value and merge the results yourself, or express the set
+as a greater-than and less-than range.
+
+A filter object carrying `attributeMarker: "price"` with no `conditionMarker` is
+not a price condition: on a listing only its other fields apply, while the
+counts operation answers `400` because it wants the two together. Always send
+both, or neither.
+
+→ `mcp/docs/api/products#prices-and-the-price-attribute`
+
 ## Why a negation leaves out entities without the attribute
 
 A negated condition — `neq`, `nin`, or the negated existence check — returns only
@@ -116,6 +144,7 @@ Use it before reporting that a filter returns nothing — often the value simply
 
 - **Filtering on a non-indexed attribute.** Silent empty result.
 - **Filtering a choice attribute by its label.** Filter by the option's value.
+- **Membership or a pattern on a price.** Refused with `400`; price compares.
 - **Expecting a negation to cover entities without the attribute.** It does not.
 - **Assuming a truncated result means "no more matches".** The response was capped; page it.
 - **Patching a position field on a filter item.** Use the position operation.
