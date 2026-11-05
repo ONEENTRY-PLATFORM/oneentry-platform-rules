@@ -243,6 +243,36 @@ If a human asks for it, say what will happen to the existing values and let them
 
 `isInSearchVocabulary: false` on a `string`, `text` or `textWithHeader` attribute keeps its values out of public search query correction, and so does `isVisible: false`. Mind the leading `is` — a key spelled `inSearchVocabulary` is stored in the schema like any unknown key and has no effect at all. See `mcp/docs/api/search-query-correction#tuning-correction-for-a-project`.
 
+## Copying values from one locale into another
+
+`AdminAttributesSetsController_copyValues` — `POST /attributes-sets/{id}/copy-values` — fills one or more locales from another, for named attributes, across **every record that uses the set**. It needs `settings.attributesSets.update`. Use it instead of walking the records yourself.
+
+```json
+{ "sourceLang": "en_US",
+  "targetLangs": ["de_DE"],
+  "attributeIdentifiers": ["title"],
+  "overwriteMode": "skip_non_empty" }
+```
+
+All four fields are required. `overwriteMode` is `force` — replace whatever is in the target — or `skip_non_empty`, which writes only where the target is empty. `localizeInfoKeys` is optional and narrows which keys of the locale entry travel; omit it, or send an empty array, and all of them do.
+
+`attributeIdentifiers` holds the markers from the set's schema, so read the set first. Every refusal here is a `400` or a `404` that names what was wrong: `sourceLang must not be included in targetLangs`, `Unknown attribute identifiers: <list>`, an empty `targetLangs` or `attributeIdentifiers`, an `overwriteMode` outside the two values, and `Attributes set <id> not found`.
+
+## A copy can finish in the call or carry on after it
+
+The same operation answers in two shapes, and which one you get depends on how many records use the set — never assume the first:
+
+```json
+{ "mode": "sync", "updated": 1 }
+{ "mode": "queued", "jobId": "attributes-sets:copy-values:12:1712945600000" }
+```
+
+`sync` is done: `updated` is how many records were written, and reading one back confirms it immediately. `queued` is **not** done — the answer is only that the work was accepted, and `updated` is not in it.
+
+For a `queued` answer, poll `AdminAttributesSetsController_getCopyValuesStatus` — `GET /attributes-sets/copy-values/status/{jobId}` — under the same key. It answers the job's state and progress, and the count once there is one. A `jobId` it does not recognise answers `404 Job <jobId> not found`, which is also what an id gets once the instance no longer keeps it — so poll from the time you receive it rather than much later.
+
+Report a `queued` copy as started, not as finished, until the status says otherwise.
+
 ## Checklist before writing values
 
 1. Read the set and note each attribute's type, id and marker.

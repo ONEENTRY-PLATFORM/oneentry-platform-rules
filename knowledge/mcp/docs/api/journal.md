@@ -4,7 +4,9 @@ The instance keeps its own record of what changed: which module, which entry, wh
 
 This is **not** the audit file this server writes. Two separate records, kept by two different systems, and only one of them is on the instance.
 
-→ `mcp/docs/server/audit-log` · `mcp/docs/api/admins-and-permissions`
+The traffic of the **public** API — request counts and refused requests — is a third record again, with its own keys and its own window rules.
+
+→ `mcp/docs/server/audit-log` · `mcp/docs/api/content-api-journal` · `mcp/docs/api/admins-and-permissions`
 
 ## Reading the journal
 

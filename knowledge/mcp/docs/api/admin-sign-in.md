@@ -66,6 +66,28 @@ The limit is checked before the code is looked at, so once it trips the call ans
 
 → `mcp/docs/server/authentication#why-sign-in-answers-429`
 
+## Renewing an administrator token
+
+`AuthController_refresh` — `POST /api/admin/auth/refresh` — takes the `refreshToken` from a sign-in and answers `201` with a whole new pair beside the `userId`:
+
+```http
+POST /api/admin/auth/refresh
+{ "refreshToken": "…" }
+
+{ "userId": 7, "accessToken": "…", "refreshToken": "…" }
+```
+
+The refresh token is **single use**. The one you sent stops working the moment the new pair is issued, so store the `refreshToken` out of every answer — keeping the one from the original sign-in means the second renewal fails even though the first succeeded.
+
+Two refusals, and they are not interchangeable:
+
+- `400` naming `refreshToken` — the field is missing or empty. A malformed call; fix the body and send it again.
+- `401 Refresh token invalid` — the token is unknown, already spent, or was invalidated for the account. Terminal for that token. The only way forward is a fresh sign-in; retrying cannot succeed.
+
+Expect the `401` rather than a `400` for a dead token, and never read it as the access token having expired — that is a different call failing for a different reason. A permission change made on the account invalidates its refresh token too.
+
+→ `mcp/docs/api/admins-and-permissions#a-permission-change-signs-the-target-admin-out` · `mcp/docs/api/journal#what-closes-a-session-record`
+
 ## Turning the second factor on
 
 `user.adminMfaRequired` is a boolean in the `user` section of the general settings, written with the ordinary general settings update under `settings.general.update`. It is off unless someone set it.
