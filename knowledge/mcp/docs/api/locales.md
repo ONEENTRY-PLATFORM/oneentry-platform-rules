@@ -38,7 +38,7 @@ Do this once at the start of a content task and keep the result. Everything you 
 
 ## Never hardcode a locale
 
-A fresh instance has exactly one active locale, usually `en_US`, which makes hardcoding look harmless. It is not: the moment an operator activates a second language, every payload written against a fixed key produces content that is blank in the new locale, with no error and no fallback.
+A fresh instance has exactly one active locale, usually `en_US`, which makes hardcoding look harmless. It is not: the moment an operator activates a second language, every payload written against a fixed key produces content that is blank in the new locale, with no error.
 
 ```json
 { "localizeInfos": { "en_US": { "title": "Summer sale" },
@@ -73,12 +73,27 @@ cms_api_search { "query": "locales", "mutating": true }
 
 Many read operations accept a `langCode` query parameter and return content for that language. When it is omitted the instance chooses a default, which may not be the one you meant.
 
-Pass it explicitly when you are checking whether a translation exists. An entity that looks complete without the parameter can be empty in the language you care about.
+Pass it explicitly when you are checking whether a translation exists. An entity that looks complete without the parameter can be empty in the language you care about — and on the public reads listed below it can look complete when the translation is missing.
+
+## Which content reads fall back to another language
+
+Writes never fall back: a locale key you did not write stays empty wherever the entity is read. A handful of **public** reads are the exception, and they matter because either answer can mislead an agent checking for a translation.
+
+These public reads return the language the value was stored in when the requested one holds nothing:
+
+- an order, including the form data submitted with it, and the status names of an order storage
+- a discount: its names and its attribute values
+- a row of an integration collection, including the form data submitted with it
+- the signed-in user's own profile, including the form data submitted with it
+
+The key in the response is always the real language of the value, never the one you asked for. Read the key, not the parameter: `langCode=ru_RU` answering `{ "en_US": … }` means there is no Russian translation and you are looking at the English value.
+
+Admin reads are not affected. They return what is stored — for most entities the whole locale map, for a collection row the single language you asked for — which makes them the surface to use when the question is whether a translation exists at all.
 
 ## What to check when content looks missing
 
 1. Is the locale actually active? An inactive code is not written and not returned.
-2. Did the write include that locale key? Content written for one language does not fall back to another.
+2. Did the write include that locale key? A write for one language does not fill the others, and only the public reads listed above substitute anything.
 3. Are you reading with the right `langCode`?
 4. Was the entity created seconds ago? Lists lag briefly; read by id to confirm.
 
