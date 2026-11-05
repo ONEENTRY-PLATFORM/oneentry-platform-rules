@@ -117,6 +117,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/form-submission-scope-filters` | Submissions about a category, a branch of pages or a group of users |
 | `mcp/docs/api/captcha-fields` | A form has a captcha field and submissions are refused |
 | `mcp/docs/api/rating-forms-and-reviews` | Reviews, star ratings, or importing either |
+| `mcp/docs/api/collections` | Keeping a list of rows outside the page tree, or clearing one |
 | `mcp/docs/api/users-and-groups` | A Content API route returns a permission error |
 | `mcp/docs/api/content-api-permission-rules` | A public list is short, or a public write succeeded that should not have |
 | `mcp/docs/api/content-api-sign-in-and-cart` | Building the account or cart pages of a site |
@@ -132,6 +133,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 |---|---|
 | `mcp/docs/api/modules` | Explaining why an admin section is missing |
 | `mcp/docs/api/journal` | Finding who changed something, or clearing the instance's own record of it |
+| `mcp/docs/api/content-api-journal` | Showing what the public API has been asked for, or chasing an error a site reports |
 | `mcp/docs/api/events` | Sending a mail or a push when something happens |
 | `mcp/docs/api/workflows` | A requirement shaped like a schedule, or a reaction no endpoint offers |
 | `mcp/docs/api/workflow-nodes` | Writing the nodes of a flow, and the configuration the catalogue does not declare |
@@ -195,6 +197,10 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why is saving the constructor agent's template refused with 400 | `mcp/docs/api/ui-component-configs#saving-a-template-that-refers-to-an-unsaved-recipe` |
 | Why did assigning a template wipe the rest of the screen | `mcp/docs/api/ui-component-configs#a-record-page-template-covers-one-part-of-the-page` |
 | Why is my field layout for a record page not applied | `mcp/docs/api/ui-component-configs#the-attribute-set-is-fixed-when-the-template-is-saved` |
+| Which key opens the public API error listing | `mcp/docs/api/content-api-journal#two-listings-and-two-separate-permission-keys` |
+| Why does clearing collection rows answer 403 | `mcp/docs/api/collections#deleting-rows-needs-the-row-key-not-the-collection-key` |
+| Why can an admin with no grants read the application tokens | `mcp/docs/api/settings#treat-the-token-listing-as-a-secret` |
+| Why does updating an admin answer 400 about unfilled fields | `mcp/docs/api/admins-and-permissions#an-admin-update-needs-login-and-email-beside-permissions` |
 | Which key is a record page or a section tab panel saved under | `mcp/docs/api/ui-component-configs#screen-keys-a-record-page-is-saved-under` |
 
 ## Answers about writes that changed nothing
@@ -220,6 +226,9 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why is my block still nested after I sent blockPages | `mcp/docs/api/blocks#a-bare-page-id-in-blockpages-keeps-the-nesting` |
 | Why does clearing the journal answer 400 | `mcp/docs/api/journal#clearing-the-journal-needs-an-explicit-window` |
 | Why is the session traffic listing empty | `mcp/docs/api/journal#reading-the-session-traffic-listing` |
+| Why is my public API error window being ignored | `mcp/docs/api/content-api-journal#this-listing-takes-a-flat-window-not-a-nested-one` |
+| Why did deleting a few collection rows empty the collection | `mcp/docs/api/collections#deleteall-overrides-the-ids-you-send-with-it` |
+| Why does a refund preview answer an amount of zero | `mcp/docs/api/orders#what-a-refund-body-ignores-without-saying-so` |
 | Why did my admin token stop working after another sign-in | `mcp/docs/api/journal#what-closes-a-session-record` |
 
 ## Answers about search and filters
@@ -261,6 +270,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does the panel show one selected option out of four | `mcp/docs/api/list-options-and-extra-values#several-selected-options-need-multiselect` |
 | Where do I put button captions and interface text | `mcp/docs/api/content-modelling#where-interface-labels-belong` |
 | How do I write a list or radioButton value | `mcp/docs/api/attribute-types#the-value-form-of-a-list-and-a-radiobutton` |
+| How do I copy attribute values into another locale | `mcp/docs/api/attribute-sets#copying-values-from-one-locale-into-another` |
+| Why did my value copy answer queued instead of a count | `mcp/docs/api/attribute-sets#a-copy-can-finish-in-the-call-or-carry-on-after-it` |
 | What belongs in a page's config object | `mcp/docs/api/pages#the-config-object-is-a-free-map-of-numbers` |
 
 ## Answers about content structure and ordering
@@ -319,6 +330,10 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why is the password change asking for a code | `mcp/docs/api/password-reset#the-code-is-required-on-every-provider` |
 | Why is my guest cart empty after adding to it | `mcp/docs/api/content-api-sign-in-and-cart#the-guest-cart-needs-a-uuid-in-x-guest-id` |
 | How do I turn a login into a user id | `mcp/docs/api/users-and-groups#find-a-user-by-their-login` |
+| How do I renew an administrator token | `mcp/docs/api/admin-sign-in#renewing-an-administrator-token` |
+| Why did an admin lose its session after a permission edit | `mcp/docs/api/admins-and-permissions#a-permission-change-signs-the-target-admin-out` |
+| Why can a sign-in provider not be deleted | `mcp/docs/api/users-and-groups#a-sign-in-provider-with-users-cannot-be-deleted` |
+| How do I issue an application token | `mcp/docs/api/settings#issuing-an-application-token` |
 | How do I delete a key from a visitor state object | `mcp/docs/api/content-api-sign-in-and-cart#removing-a-key-from-the-visitor-state-object` |
 
 ## Answers about commerce and product blocks
@@ -335,3 +350,5 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | How do I add a status trigger of my own | `mcp/docs/api/order-status-triggers#a-storage-can-define-triggers-of-its-own` |
 | Why is my subscription status never equal to cancelled or expired | `mcp/docs/api/subscriptions#plans-and-enrolments` |
 | Why can I not delete a subscription plan | `mcp/docs/api/subscriptions#delete-a-plan` |
+| How is the body of a refund shaped | `mcp/docs/api/orders#previewing-a-refund-before-issuing-one` |
+| Why does a refund answer 400 when its preview worked | `mcp/docs/api/orders#why-a-refund-answers-400-when-its-preview-worked` |
