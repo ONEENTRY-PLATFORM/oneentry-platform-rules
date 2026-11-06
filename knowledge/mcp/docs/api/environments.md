@@ -10,13 +10,21 @@ Read it before acting on a sentence like "put this on staging". That phrase mean
 
 Every Admin API and Content API route reads one request header — `x-environment` — and works in the environment it names. Send no header and the request works in the main set of data, exactly as it did before environments existed, so an integration that has never heard of them keeps working untouched.
 
-The header is the only way to choose. There is no per-environment address, no per-environment subdomain and no token that selects one: the same base URL and the same credentials reach all of them, and the client decides on every single request.
+The header is the way to choose. There is no per-environment subdomain and no token that selects one: the same base URL and the same credentials reach all of them, and the client decides on every single request. The one exception is the payment-provider callback, described below, because a provider cannot be told to send a header.
 
 `public` is the name of the main set, accepted as a header value, so a client may name it explicitly instead of leaving the header out.
 
 A request may also name an environment by **marker** — a stable name bound to one environment, re-pointable without touching the clients that send it — in `x-environment-marker`.
 
 → `mcp/docs/api/environment-markers#a-marker-is-a-second-way-to-name-an-environment`
+
+## Payment callbacks name the environment in the address
+
+A payment provider calls `POST /api/content/payments/webhook/{marker}` with headers of its own choosing, so it can never send `x-environment`. On that path only, the environment may instead be named in the query string: `?environment=<name>` or `?environmentMarker=<marker>`. Without either, the callback works in the main set, and a payment account that exists only inside an environment answers `404 Payment account not found`.
+
+The query parameters are checked exactly like the headers: an unknown or malformed name answers `401 Invalid or missing app token`, and a header present on the same request takes precedence over the parameter. On every other route these parameters select nothing.
+
+So the callback address registered in a provider's dashboard for an environment is the ordinary webhook address plus `?environment=<name>`. A provider whose callback the platform registers itself receives that address automatically when the registration is made from inside an environment.
 
 ## Which data set your own calls reach
 
