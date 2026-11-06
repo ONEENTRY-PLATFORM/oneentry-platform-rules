@@ -55,7 +55,7 @@ The operations that move or remove a status declare theirs too:
 | firing a trigger on an order | `orders.storage.order-status.update` |
 | deleting a status | `orders.storage.order-status.delete` |
 
-Two keys read almost alike and are not interchangeable. `orders.storage.order.update` gates editing the order record itself, through `PUT /orders-storage/{id}/order/{orderId}`; every operation in the table above wants the `order-status` key instead. The `200` description of `change-status` names the order key, so a grant asked for from that description alone still answers `403` — ask for `orders.storage.order-status.update` when `change-status` is refused, and for `orders.storage.order.update` when editing the order is.
+Two keys read almost alike and are not interchangeable. `orders.storage.order.update` gates editing the order record itself, through `PUT /orders-storage/{id}/order/{orderId}`; every operation in the table above wants the `order-status` key instead. Ask for `orders.storage.order-status.update` when `change-status` or a trigger is refused, and for `orders.storage.order.update` when editing the order is. Each operation's own response text names the key it checks, so reading it is enough.
 
 A status an order already carries cannot be deleted: `DELETE` on it answers `400 Status is used on orders and cannot be deleted`. Move the orders off it first.
 
