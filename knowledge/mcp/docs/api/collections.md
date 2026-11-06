@@ -73,5 +73,6 @@ Two malformed bodies fail differently. Neither a `deleteAll` nor a usable `ids` 
 - **Posting a row to the numeric id.** Row creation is addressed by the collection's marker.
 - **Omitting `ids` from the bulk body.** It answers `5xx`; send both fields.
 - **Expecting a count back from the bulk delete.** It answers a bare `true`.
+- **Deleting the form the collection is built on.** It answers `409` until the collection is re-pointed or gone — `mcp/docs/api/forms-and-form-data#delete-a-form`.
 
 → `mcp/docs/api/content-api-permission-rules` · `mcp/docs/api/silent-no-ops`

@@ -172,6 +172,8 @@ A submission can carry a status an operator moves through as they process it.
 
 Deleting a form removes its submissions with it — definition and data are one chain — and this is a case where the dry run's target understates what is lost. Before confirming, count the submissions and tell the human the number: "delete the old contact form" often means "and keep the enquiries".
 
+A form a collection is built on is a second case the dry run does not show. While a collection still names the form, the delete answers `409` listing the collection identifiers and removes nothing. Either delete those collections first, or point each one at another form by updating its `formId`, and then repeat the delete. The refusal is protecting the rows rather than naming a right you lack: a collection whose form is absent rejects every row write with a `400` saying the collection has no form, and only pointing it back at a form that exists restores writes.
+
 ## Common mistakes
 
 - **Sending the create body unwrapped**, or building it from the schema alone — the form ends up typeless.
@@ -183,6 +185,7 @@ Deleting a form removes its submissions with it — definition and data are one 
 - **Reading a `409` on a form update as a failed edit.** Nothing was written: the body asks to delete bindings holding submissions.
 - **A `text` value with more than one of the three keys**, or with `params` beside them.
 - **Deleting a form to "clean up".** The submissions go too.
+- **Reading a `409` on a form delete as a missing right.** A collection still names the form.
 - **Building a review form by hand.** Read `mcp/docs/api/rating-forms-and-reviews` first.
 
 → `mcp/docs/api/form-submissions` · `mcp/docs/api/verification-recipes#forms`
