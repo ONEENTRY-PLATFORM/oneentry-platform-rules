@@ -80,7 +80,7 @@ The token a site sends in `x-app-token` is issued here, and these three operatio
 
 ```text
 POST   /api/admin/system/tokens/generate     settings.tokens.create
-GET    /api/admin/system/tokens              no key required
+GET    /api/admin/system/tokens              settings.tokens.create
 DELETE /api/admin/system/tokens/{id}         settings.tokens.delete
 ```
 
@@ -100,7 +100,7 @@ Use it only for a value you hand over once and will never need to revoke. For an
 
 ## Treat the token listing as a secret
 
-`GET /api/admin/system/tokens` requires **no permission key**. Any admin with a valid session reads it, including an account holding no grants at all, and it returns every token's value in full rather than a masked form.
+`GET /api/admin/system/tokens` returns every token's value in full rather than a masked form, so reading it needs `settings.tokens.create` — the same key that issues a token. An admin without that key is refused `403 Forbidden resource`, whatever else the account can do; a valid session alone is not enough. Deleting is the separate `settings.tokens.delete`, and there is no key that opens the listing without also allowing a new token to be issued.
 
 So the listing is the one read in this area whose response must never leave the instance: not into a report, not into a conversation summary, not into a log. Quote a token's `name` and `id` when you need to refer to one, never its value. Tokens are also per set of data — one issued in the main set does not work inside a data environment.
 
