@@ -22,7 +22,7 @@ Create the provider first, then set its settings with the update call. Settings 
 
 `oauthAuthUrl` is required for every network, and it is the only setting a Content API reader can see. Secrets you store are never returned there.
 
-Every sign-in provider, social or not, also holds the key its visitor tokens are signed with: `tokenSecretKey` in the settings. A new provider gets its own random key, and an update whose settings leave the key out keeps the current one, so there is no need to send it. A key you do send must be at least 32 characters long; a shorter one answers `400` and nothing is saved. Changing the key ends every visitor session of that provider — tokens signed with the old key are refused and visitors sign in again.
+Every sign-in provider, social or not, also holds the key its visitor tokens are signed with: `tokenSecretKey` in the settings. A new provider gets its own random key, and an update whose settings leave the key out keeps the current one, so there is no need to send it. A key you do send must be at least 12 characters long; a shorter one answers `400` and nothing is saved. Generated keys are 64 characters. Changing the key ends every visitor session of that provider — tokens signed with the old key are refused and visitors sign in again.
 
 ## Which settings each social network needs
 
