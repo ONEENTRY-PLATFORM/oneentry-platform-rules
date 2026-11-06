@@ -110,6 +110,8 @@ A product carries a status resolved by marker, which is what a site uses to deci
 
 Set the status by including `statusId` in the ordinary product update. There is also a bulk `set-status` operation taking `statusId` and a list of product ids; the older field name `id` is accepted for the same value, and a body with neither answers `400`.
 
+A create does not take the status. A product create accepts `statusId` and answers `201` with the instance's default status in that field instead — the one carrying `isDefault` — so a product that must start on any other status needs a second call to set it. The `201` body already shows which status the product is on, so read `statusId` in it rather than assuming the value you sent.
+
 Whichever route you take, read the product back by id and look at `statusId`. The response status is not evidence.
 
 → `mcp/docs/api/product-statuses` · `mcp/docs/api/silent-no-ops`
