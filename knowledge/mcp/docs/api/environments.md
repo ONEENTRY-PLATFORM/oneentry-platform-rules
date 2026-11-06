@@ -67,7 +67,11 @@ Shared across all of them: administrator accounts and their permission maps, the
 
 The record quota is shared too, counting the main set and every ready environment **together**: `records-usage` answers the same totals whichever environment the request names, so an environment filled with test content spends the live one's allowance.
 
+The storage allowance works the same way, and copying content spends it: a file that travels with an entity is stored a second time under the target environment and counts against the one instance-wide total, exactly as an upload does. Over the allowance the file is not stored and the entity does not arrive whole, so make room or raise the allowance before copying a media-heavy set — repeating the call changes nothing. A dry run cannot tell you whether there is room; read the storage figures first.
+
 → `mcp/docs/api/settings#the-record-limit-and-what-it-feels-like`
+
+→ `mcp/docs/api/files-and-uploads#no-file-type-is-refused`
 
 ## Application tokens belong to one environment
 
@@ -126,6 +130,7 @@ Project settings travel only in part. Error pages, sign-in providers and events 
 - **Reading a Content API `401` as a dead token.** A misspelled environment name answers the same message.
 - **Reusing an application token in another environment.** Tokens do not cross; issue one inside it.
 - **Taking the empty `items` of a transfer as a failure.** The run is asynchronous; the plan is in the dry run.
+- **Treating a copy into an environment as free.** Copied files spend the one storage allowance; check it first.
 - **Expecting a copied sign-in provider to let anyone in.** Its secrets stayed behind; fill them in first.
 - **Writing to an environment in the same breath as creating it.** It is not ready yet, and that `400` says so.
 - **Creating a second environment because the first says `failed`.** Read its `error` first.
