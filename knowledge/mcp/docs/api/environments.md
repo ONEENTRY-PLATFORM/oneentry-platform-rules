@@ -107,10 +107,11 @@ Nothing here happens quietly, because every mutation under the path is confirm-g
 
 `AdminEnvironmentTransferController_transfer` carries content between two environments — entity by entity, by id, never as a whole-instance copy. `cms_api_describe` declares the body in full, including which kinds of entity may travel, so build it from there rather than from a guess.
 
-Two things the operation's own declaration cannot tell you:
+Three things the operation's own declaration cannot tell you:
 
 - **A real run is asynchronous.** It answers `201` with a `jobId` and an `items` list that is **empty**. That empty list is not "nothing was transferred" — the plan only ever comes back from a dry run. Read the entities in the target to confirm the outcome.
 - **A dry run returns more than you asked for.** Whatever an entity needs in order to exist is added to the plan and marked `isDependency: true`, so one page can produce several items. Show the human the whole plan, not the ids they named.
+- **Name each plan item by its `identifier`, not its `sourceId`.** `identifier` on a plan item is the key the entity is known by in the source, and which key that is depends on the kind: a page is named by its address (`pageUrl`), an error page by its `code`, every other kind by its own `identifier`. It is `null` only where the source has left that key empty. `sourceId` is a position inside the source environment and means nothing in the target, so a plan read out as a list of numbers tells the human nothing about what is about to be written.
 
 Orders, visitors and submissions are not among the kinds that travel, and asking for one answers `400` — that is a boundary, not a gap to work around.
 
