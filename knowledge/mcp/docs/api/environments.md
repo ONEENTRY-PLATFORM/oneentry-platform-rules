@@ -114,7 +114,7 @@ Two things the operation's own declaration cannot tell you:
 
 Orders, visitors and submissions are not among the kinds that travel, and asking for one answers `400` — that is a boundary, not a gap to work around.
 
-Nor do project settings: error pages, sign-in providers, events, order storages and statuses, Content API access rules. A dry run lists those the source has filled in, with counts on both sides, in `warnings`; the human sets them up in the target.
+Project settings travel only in part. Error pages, sign-in providers and events are kinds you may name, and a sign-in provider arrives with its settings but **without its secrets** — its signing key and OAuth secret stay in the source, and a dry run says so in `warnings`. Fill them in before anyone tries to sign in to the target. Order storages with their statuses, and Content API access rules, do not travel at all: a dry run lists the ones the source has filled in, with counts on both sides, in `warnings`, and the human sets them up by hand.
 
 → `mcp/docs/server/confirm-and-dry-run`
 
@@ -125,6 +125,7 @@ Nor do project settings: error pages, sign-in providers, events, order storages 
 - **Reading a Content API `401` as a dead token.** A misspelled environment name answers the same message.
 - **Reusing an application token in another environment.** Tokens do not cross; issue one inside it.
 - **Taking the empty `items` of a transfer as a failure.** The run is asynchronous; the plan is in the dry run.
+- **Expecting a copied sign-in provider to let anyone in.** Its secrets stayed behind; fill them in first.
 - **Writing to an environment in the same breath as creating it.** It is not ready yet, and that `400` says so.
 - **Creating a second environment because the first says `failed`.** Read its `error` first.
 - **Editing a client's configuration to move it between environments.** Bind a marker and re-point that instead — see `mcp/docs/api/environment-markers`.
