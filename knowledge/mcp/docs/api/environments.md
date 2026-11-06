@@ -83,6 +83,8 @@ Reading the registry is open: `AdminEnvironmentsController_findAll` and `AdminEn
 
 A record carries `name`, `description`, a `status` of `creating`, `ready`, `failed` or `deleting`, and an `error` that holds the cause when creating one did not finish. A failed record **stays** in the registry rather than disappearing, so a listing that holds an environment nobody can use is telling you to read its `error`, not to create it again.
 
+Creating one refuses a few names the header shape would allow: `public` (the main set), `information_schema`, and any name starting with `pg_`. Those answer `400` on create instead of producing a record, so pick another name rather than retrying.
+
 The name is fixed once the environment exists: the update takes the `description` and nothing else. A `name` sent beside it answers `200` and changes nothing, so check the record you read back before telling anyone it was renamed.
 
 → `mcp/docs/api/silent-no-ops#why-a-read-back-is-the-only-detection`
