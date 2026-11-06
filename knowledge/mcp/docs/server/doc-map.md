@@ -199,7 +199,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why is my field layout for a record page not applied | `mcp/docs/api/ui-component-configs#the-attribute-set-is-fixed-when-the-template-is-saved` |
 | Which key opens the public API error listing | `mcp/docs/api/content-api-journal#two-listings-and-two-separate-permission-keys` |
 | Why does clearing collection rows answer 403 | `mcp/docs/api/collections#deleting-rows-needs-the-row-key-not-the-collection-key` |
-| Why can an admin with no grants read the application tokens | `mcp/docs/api/settings#treat-the-token-listing-as-a-secret` |
+| Which key opens the application token listing | `mcp/docs/api/settings#treat-the-token-listing-as-a-secret` |
 | Why does updating an admin answer 400 about unfilled fields | `mcp/docs/api/admins-and-permissions#an-admin-update-needs-login-and-email-beside-permissions` |
 | Which key is a record page or a section tab panel saved under | `mcp/docs/api/ui-component-configs#screen-keys-a-record-page-is-saved-under` |
 
