@@ -24,6 +24,8 @@ Three keys in the `user` section change what every administrator gets rather tha
 - `user.adminMfaRequired` (boolean, off when unset) makes administrator sign-in two-step. Turning it on does not end sessions that are already open, but every sign-in after it needs an e-mailed code.
 - `user.dateFormat` and the rest of the section behave like any other setting: send only the keys you are changing, and the keys you leave out keep their stored values.
 
+`user.ipCheck.apiKey`, the key of the visitor IP check service, reads back as `********` once it is set. Sending `********` back keeps the stored key; only a new value replaces it.
+
 A boolean key refuses anything but `true` and `false` — `"yes"` answers `400` naming the key, and nothing in the section is written.
 
 → `mcp/docs/api/admins-and-permissions#personal-settings-live-on-the-admin-account` · `mcp/docs/api/admin-sign-in#turning-the-second-factor-on`
