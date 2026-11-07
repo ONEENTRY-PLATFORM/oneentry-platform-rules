@@ -129,7 +129,7 @@ Three things the operation's own declaration cannot tell you:
 
 Orders, visitors and submissions are not among the kinds that travel, and asking for one answers `400` — that is a boundary, not a gap to work around.
 
-Project settings travel only in part. Error pages, sign-in providers and events are kinds you may name, and a sign-in provider arrives with its settings but **without its secrets** — its signing key and OAuth secret stay in the source, and a dry run says so in `warnings`. Fill them in before anyone tries to sign in to the target. Order storages with their statuses, and Content API access rules, do not travel at all: a dry run lists the ones the source has filled in, with counts on both sides, in `warnings`, and the human sets them up by hand.
+Project settings travel only in part. Error pages, sign-in providers and events are kinds you may name, and a sign-in provider arrives with its settings but **without its secrets** — its signing key and OAuth secret stay in the source, and a dry run says so in `warnings`. A provider the transfer creates gets a fresh signing key of its own, so tokens issued in one environment are never valid in the other; the OAuth secret stays empty, so fill it in before anyone signs in to the target through that OAuth provider. An update keeps the secrets the target already has. Order storages with their statuses, and Content API access rules, do not travel at all: a dry run lists the ones the source has filled in, with counts on both sides, in `warnings`, and the human sets them up by hand.
 
 → `mcp/docs/server/confirm-and-dry-run`
 
@@ -141,7 +141,7 @@ Project settings travel only in part. Error pages, sign-in providers and events 
 - **Reusing an application token in another environment.** Tokens do not cross; issue one inside it.
 - **Taking the empty `items` of a transfer as a failure.** The run is asynchronous; the plan is in the dry run.
 - **Treating a copy into an environment as free.** Copied files spend the one storage allowance; check it first.
-- **Expecting a copied sign-in provider to let anyone in.** Its secrets stayed behind; fill them in first.
+- **Expecting a copied OAuth sign-in provider to let anyone in.** Its OAuth secret stayed behind; fill it in first.
 - **Writing to an environment in the same breath as creating it.** It is not ready yet, and that `400` says so.
 - **Creating a second environment because the first says `failed`.** Read its `error` first.
 - **Editing a client's configuration to move it between environments.** Bind a marker and re-point that instead — see `mcp/docs/api/environment-markers`.
