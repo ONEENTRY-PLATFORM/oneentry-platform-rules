@@ -19,6 +19,16 @@ An account's configuration contains provider credentials. Two rules:
 - Do not print account configuration into a conversation, a report or a commit. If you must show that an account exists, show its type and its name.
 - Do not create or modify an account on a human's behalf without them supplying the credentials in that moment and asking you to.
 
+## Why a provider key reads back as asterisks
+
+A provider credential that is set — `secretKey`, `signingSecretKey`, `serverKey`, `apiKey`, `callbackToken`, in `settings` or `testSettings` — reads back as `********` from every account call: list, read, create and update. An empty value stays empty, so you can still tell a key that is not set. The `status` of an account is worked out from the real keys, so a masked key still reports `connected`.
+
+On update, `********`, an empty string or a credential left out of the body all keep the stored key. Only a new value replaces it, and `null` removes it.
+
+Through this server a set key may show as the redaction placeholder instead of `********`; both mean the key is set. Leave the field out of the update to keep it.
+
+→ `mcp/docs/server/response-shaping#credentials-are-redacted`
+
 ## Sessions are the lifecycle
 
 A payment session represents one attempt: created, then moving through the provider's flow to a terminal state. The order's payment axis reflects where the session got to.
