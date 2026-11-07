@@ -115,6 +115,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/forms-and-form-data` | Defining a form, or binding it so it accepts anything |
 | `mcp/docs/api/form-submissions` | Listing, filtering or reading what visitors submitted |
 | `mcp/docs/api/form-submission-scope-filters` | Submissions about a category, a branch of pages or a group of users |
+| `mcp/docs/api/sensitive-form-fields` | Marking a form field sensitive, or a submission answering `value: null` for a filled field |
 | `mcp/docs/api/captcha-fields` | A form has a captcha field and submissions are refused |
 | `mcp/docs/api/rating-forms-and-reviews` | Reviews, star ratings, or importing either |
 | `mcp/docs/api/collections` | Keeping a list of rows outside the page tree, or clearing one |
@@ -315,6 +316,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does my submission date filter answer 400 | `mcp/docs/api/form-submissions#how-to-write-a-date-bound-the-filter-accepts` |
 | How do I list the submissions of one form | `mcp/docs/api/form-submissions#the-listing-is-a-post-with-the-filter-in-the-body` |
 | Why is formModuleConfigId refused by the filter body | `mcp/docs/api/form-submissions#what-formmoduleconfigid-narrows-and-what-it-cannot` |
+| Why does a submitted field come back as null | `mcp/docs/api/sensitive-form-fields#why-a-submitted-value-comes-back-as-null` |
+| Who can read a sensitive form field | `mcp/docs/api/sensitive-form-fields#who-can-read-the-value` |
 
 ## Answers about events and notifications
 
