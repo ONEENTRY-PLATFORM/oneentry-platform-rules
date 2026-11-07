@@ -163,6 +163,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why is my sign-in code refused | `mcp/docs/api/admin-sign-in#finish-the-sign-in-with-the-e-mailed-code` |
 | Why does the sign-in code call answer 429 | `mcp/docs/api/admin-sign-in#too-many-attempts-answers-429` |
 | Why does sign-in answer 503 with no challenge | `mcp/docs/api/admin-sign-in#when-the-code-cannot-be-sent` |
+| How do I reset a forgotten admin password | `mcp/docs/api/admin-sign-in#resetting-a-forgotten-admin-password` |
 | Why is the server unauthenticated with the right login and password | `mcp/docs/server/authentication#an-instance-with-a-second-factor-needs-the-token` |
 | Why does a read say permissions are temporarily unavailable | `mcp/docs/api/content-api-reads#what-a-503-on-a-public-read-is-telling-you` |
 | Why can I not list the submissions of a form | `mcp/docs/api/form-submissions#both-read-routes-need-the-forms-data-read-permission` |
