@@ -13,9 +13,9 @@ Read this when you need to show what a storefront has been asking for, when you 
 | `AdminContentApiStatsController_getStats` | `GET /journal/content-api-stats` | `journal.viewContentApiStats` |
 | `AdminContentApiErrorsController_getList` | `GET /journal/content-api-errors` | `journal.viewContentApiErrors` |
 | `AdminContentApiErrorsController_getById` | `GET /journal/content-api-errors/{id}` | `journal.viewContentApiErrors` |
-| `AdminContentApiErrorsController_clearAll` | `DELETE /journal/content-api-errors` | `journal.viewContentApiErrors` |
+| `AdminContentApiErrorsController_clearAll` | `DELETE /journal/content-api-errors` | `journal.delete` |
 
-`journal.get` opens **neither** of them. An admin who reads the change journal without trouble still gets `403 Forbidden resource` here, and the message does not name the key it wanted. The two keys are independent of each other as well: holding the errors key leaves the stats call at `403`.
+`journal.get` opens **neither** of them. An admin who reads the change journal without trouble still gets `403 Forbidden resource` here, and the message does not name the key it wanted. The two keys are independent of each other as well: holding the errors key leaves the stats call at `403`. Clearing the error listing is the one write here, and it takes a third key, `journal.delete` — the same one the change journal clear asks for.
 
 ## Reading the list of refused public requests
 
@@ -61,17 +61,25 @@ That detail is the reason to fetch one by id at all — the listing's `errorMess
 
 Treat the detail as sensitive: `ip`, `userAgent` and `requestBodyPreview` describe a real visitor's request. Report the shape of a problem, never the record.
 
-## Clearing the error journal ignores every window
+## Clearing the error journal takes an optional window
 
-`DELETE /journal/content-api-errors` removes **every** record on the instance. It takes no window: a `from` and `to` in the body or the query are ignored, and the call answers `200` with the count it removed:
+`DELETE /journal/content-api-errors` needs `journal.delete`. The read key `journal.viewContentApiErrors` does not open it: an admin who can only read this listing gets `403 Forbidden resource`, so a read-only grant really is read-only.
+
+The window goes in the query, with the same flat `from` and `to` the listing takes:
+
+```text
+DELETE /journal/content-api-errors?from=2026-11-01T00:00:00.000Z&to=2026-11-02T00:00:00.000Z
+```
+
+The call answers `200` with the number of records it removed:
 
 ```json
 { "deleted": 42 }
 ```
 
-So unlike the change journal — where the window is the whole safety mechanism and is required — there is no narrow form of this call, and nothing on the instance brings the records back. Read what you need first, then clear, and only with explicit agreement in the conversation.
+Send no window and every record on the instance goes; the listing's last-24-hours default does **not** apply here. Send only `from` or only `to` and the open side is unbounded. A window is checked like the listing's: `from` later than `to`, a span wider than 31 days, or a value that is not ISO 8601 answers `400`, and nothing is removed.
 
-Note which key guards it: `journal.viewContentApiErrors`, the same key that merely reads. An admin given a read-only grant on this journal can erase all of it, and there is no separate delete key to withhold. Do not treat the view grant as read-only when you decide what an account may do.
+`statusCodes` and `path` are refused on this call with `400` rather than ignored: the clear narrows by time only. Nothing on the instance brings removed records back, so read what you need first, and confirm a window by sending it to the listing and checking `total` before you clear it.
 
 ## The request count summary and when it answers 503
 
@@ -85,8 +93,8 @@ This is the one call in the area that depends on something outside the instance'
 - **Sending `createdAt[from]` and `createdAt[to]`.** Ignored; this listing takes the flat names.
 - **Reading an empty listing as no errors.** With no window it covers the last 24 hours.
 - **Trusting a `statusCodes` filter without checking `total`.** An unrecognised token is dropped and the filter widens.
-- **Expecting the clear to take a window.** It removes everything, whatever you pass.
-- **Treating the errors view grant as read-only.** The same key clears the journal.
+- **Calling the clear with the view key.** It needs `journal.delete`.
+- **Calling the clear with no window by accident.** Without `from` and `to` it removes every record.
 - **Reading a `503` on the summary as a missing permission.** The grant is fine; the counts are not available.
 - **Putting a request detail into a report.** It contains a visitor's address and body.
 
