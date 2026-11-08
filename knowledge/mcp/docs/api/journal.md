@@ -19,12 +19,12 @@ Narrow it with query parameters rather than paging and filtering yourself:
 | `createdAt[from]`, `createdAt[to]` | ISO 8601; either may be omitted |
 | `moduleName` | uppercase module name, one value or a comma-separated list |
 | `moduleEntryId` | the id of the entry inside that module |
-| `action` | `CREATE`, `UPDATE` or `DELETE` |
+| `action` | `CREATE`, `UPDATE`, `DELETE` or `READ` |
 | `result` | `SUCCESS` or `FAILURE` |
 | `adminId` | who made the change |
 | `limit`, `offset` | pagination |
 
-`action` is derived from the HTTP method of the original call and `result` from its status, so a refused call is recorded as `FAILURE` rather than left out. An entry carries `id`, `createdAt`, `moduleName`, `entityId`, `moduleEntryId`, `action`, `result`, `error` and the admin beside them.
+`action` is derived from the HTTP method of the original call (`READ`: sensitive form values were read) and `result` from its status, so a refused call is recorded as `FAILURE` rather than left out. An entry carries `id`, `createdAt`, `moduleName`, `entityId`, `moduleEntryId`, `action`, `result`, `error` and the admin beside them.
 
 **The time window is the one parameter whose name differs between reading and clearing.** The listing takes it nested; a flat `from` or `to` sent here is accepted and then **ignored**, and the answer is the unfiltered journal, with no error to notice:
 
