@@ -66,6 +66,18 @@ The limit is checked before the code is looked at, so once it trips the call ans
 
 → `mcp/docs/server/authentication#why-sign-in-answers-429`
 
+## Resetting a forgotten admin password
+
+Three calls, all without a session. `POST /api/admin/auth/send-code` with `{"email": "..."}` answers `201` with `true` for any address, whether or not an administrator has it, so the answer never confirms that an account exists. When one does, a code is mailed to it. The code is valid for 15 minutes, and asking again replaces it: only the newest code works.
+
+`POST /api/admin/auth/verify-code` with `email` and `code` checks the code without spending it. `POST /api/admin/auth/change-password` with `email`, `code` and the new `password` sets the password and spends the code; sending the same code again answers `400 Invalid code`, as does an expired or replaced one.
+
+A completed reset signs the administrator out of every session and then answers like `POST /api/admin/auth/login`. With the second factor off the body carries a token pair beside `login` and `userId`. With `user.adminMfaRequired` on it is the challenge described above, with no `accessToken`, and the sign-in finishes through `POST /api/admin/auth/login/mfa`. Branch on `mfaRequired` here too.
+
+Wrong codes count against the recovery attempt limit, which answers `429` with `Retry-After`.
+
+→ `mcp/docs/server/authentication#why-sign-in-answers-429` · `mcp/docs/api/admin-account-ownership#no-operation-sets-another-admin-password`
+
 ## Renewing an administrator token
 
 `AuthController_refresh` — `POST /api/admin/auth/refresh` — takes the `refreshToken` from a sign-in and answers `201` with a whole new pair beside the `userId`:
