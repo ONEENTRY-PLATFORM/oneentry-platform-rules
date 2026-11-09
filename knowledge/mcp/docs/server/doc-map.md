@@ -142,7 +142,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/settings` | Instance-wide settings, limits and quota |
 | `mcp/docs/api/environments` | A second set of data on the same instance, and why your writes do not reach it |
 | `mcp/docs/api/environment-markers` | Pointing a client at another data environment without editing the client |
-| `mcp/docs/api/environment-transfer` | A transfer that carries several kinds, overwrites conflicts, or meets a duplicate in the target |
+| `mcp/docs/api/environment-transfer` | A transfer that carries several kinds, overwrites conflicts, deletes in the target, or meets a duplicate there |
 | `mcp/docs/api/import` | Bulk-loading content from a file |
 | `mcp/docs/api/ai-gateway` | The platform's own model-calling feature |
 | `mcp/docs/api/interface-modules` | Creating or changing a simplified copy of an admin section for chosen admins |
@@ -193,6 +193,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does renaming an environment marker change nothing | `mcp/docs/api/environment-markers#why-renaming-a-marker-does-nothing` |
 | Why did a transfer answer 201 and leave the target page as it was | `mcp/docs/api/environment-transfer#a-duplicate-without-a-resolution-is-not-written` |
 | Why does a transfer answer 400 for a type listed twice | `mcp/docs/api/environment-transfer#each-kind-may-appear-only-once-in-items` |
+| Why did a delete-mode transfer remove more than the ids I named | `mcp/docs/api/environment-transfer#delete-mode-removes-every-target-only-entity-of-a-kind` |
+| Can an overwritten error page be restored after a transfer | `mcp/docs/api/environment-transfer#an-overwrite-keeps-the-old-version-except-on-error-pages` |
 | Where does an administrator's theme or notification preference live | `mcp/docs/api/admins-and-permissions#personal-settings-live-on-the-admin-account` |
 | Why is highContrast null on an admin account | `mcp/docs/api/admins-and-permissions#personal-settings-live-on-the-admin-account` |
 | How do I set the high-contrast default for every administrator | `mcp/docs/api/settings#general-settings` |
