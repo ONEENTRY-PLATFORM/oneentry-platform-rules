@@ -111,6 +111,8 @@ Delete answers at once too, and the record then sits at `status: "deleting"` whi
 
 A transfer that is still running into or out of the environment holds the removal back: the data goes only after that run finishes, so the record can stay at `deleting` for as long as the transfer takes. That is not a stuck delete — keep re-reading the record.
 
+Deleting one that still reads `creating` is accepted the same way. The removal waits until creating it has finished, so the record reads `deleting` for that time too and then leaves the listing; it does not pass through `ready` or `failed` on the way.
+
 Deleting takes the environment's whole set of data with it, and nothing keeps a copy. Treat it as the most destructive delete on the instance: show the human the environment's name, say what it holds, and wait for them to agree.
 
 Nothing here happens quietly, because every mutation under the path is confirm-gated at every allow level — creating, editing, deleting and copying alike. A dry run gives you the target; show it and wait.
