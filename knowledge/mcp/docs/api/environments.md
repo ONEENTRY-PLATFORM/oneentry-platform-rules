@@ -77,6 +77,8 @@ The record quota is shared too, counting the main set and every ready environmen
 
 The storage allowance works the same way, and copying content spends it: a file that travels with an entity is stored a second time under the target environment and counts against the one instance-wide total, exactly as an upload does. Over the allowance the file is not stored and the entity does not arrive whole, so make room or raise the allowance before copying a media-heavy set — repeating the call changes nothing. A dry run cannot tell you whether there is room; read the storage figures first.
 
+Deleting an environment gives that space back. Once the removal finishes, the files stored under it are gone and the instance-wide storage figure drops by what they took, so removing a test environment you no longer need is a real way to make room. Read the figure again after the record has left the listing, not while it still reads `deleting`.
+
 → `mcp/docs/api/settings#the-record-limit-and-what-it-feels-like`
 
 → `mcp/docs/api/files-and-uploads#no-file-type-is-refused`
