@@ -22,7 +22,7 @@ A request may also name an environment by **marker** — a stable name bound to 
 
 A payment provider calls `POST /api/content/payments/webhook/{marker}` with headers of its own choosing, so it can never send `x-environment`. On that path only, the environment may instead be named in the query string: `?environment=<name>` or `?environmentMarker=<marker>`. Without either, the callback works in the main set, and a payment account that exists only inside an environment answers `404 Payment account not found`.
 
-The query parameters are checked exactly like the headers: an unknown or malformed name answers `401 Invalid or missing app token`, and a header present on the same request takes precedence over the parameter. On every other route these parameters select nothing.
+The query parameters are checked exactly like the headers: an unknown or malformed name answers `401 Invalid or missing app token`. A request that carries both a header and its query parameter must give them the same value (`x-environment` with `?environment=`, `x-environment-marker` with `?environmentMarker=`), and each parameter may appear in the address only once; a disagreement or a repeated parameter answers the same `401`. When the two agree, the request works in that environment. On every other route these parameters select nothing.
 
 So the callback address registered in a provider's dashboard for an environment is the ordinary webhook address plus `?environment=<name>`. A provider whose callback the platform registers itself receives that address automatically when the registration is made from inside an environment.
 
