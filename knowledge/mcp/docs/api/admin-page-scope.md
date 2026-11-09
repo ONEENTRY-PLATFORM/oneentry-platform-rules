@@ -125,6 +125,20 @@ That has a consequence worth knowing before you send it: the account can no long
 
 Several page operations are not governed by the scope at all — `AdminPagesController_updatePagePosition`, `AdminPagesController_moveMany`, `AdminPagesController_copy` and `AdminPagesController_setVisibility`. Do not assume a scoped account is confined to its branches for everything it can do to a page; assume it for the four operations in the table above and check the rest.
 
+## The scope inside an environment
+
+Admin accounts and their permission maps are shared by every environment, so the ids in `pages.scope` are ids of pages in the **main** data set. Pages in an environment are numbered on their own, and the same number there is usually a different page.
+
+In a request that names an environment, each root stands for the environment's copy of that page: the page that arrived there by copying it from the main set. The copy and everything below it are in scope, whatever id the copy has.
+
+- An environment page that merely shares a root's id is **out of scope** and answers `403`.
+- A root that has no copy in that environment grants nothing there.
+- A page created directly in the environment is in scope only when it sits under such a copy.
+
+So to let a scoped editor work in an environment, copy their branch into it first; editing the scope list with environment ids does not help and widens the account in the main set instead.
+
+→ `mcp/docs/api/environments#copying-content-from-one-environment-to-another`
+
 ## Common mistakes
 
 - **Sending `[]` to lift the restriction.** It is a `400`. Omit the key or send `false`.
