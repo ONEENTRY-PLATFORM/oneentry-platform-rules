@@ -71,6 +71,8 @@ So `dev_env` and `stage2` are names; `Dev_env`, `1env`, `dev-env`, `dev__env` an
 
 Separate per environment: pages, products, blocks, menus, forms and their submissions, visitors, orders, attribute sets — content and operational records alike. Each answers its own listings, and an id means nothing outside the set it came from.
 
+The sender address of event e-mails is separate too. A write that names an environment changes the sender for that environment only; the main set and the other environments keep theirs. Read it back in the environment that will send the mail.
+
 Shared across all of them: administrator accounts and their permission maps, the admin sign-in itself, the active locales, and platform settings. One admin login works in every environment with no second sign-in, and granting a key grants it everywhere at once.
 
 The record quota is shared too, counting the main set and every ready environment **together**: `records-usage` answers the same totals whichever environment the request names, so an environment filled with test content spends the live one's allowance.
