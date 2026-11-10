@@ -1,6 +1,6 @@
 # Environment transfer requests with several kinds and duplicates
 
-How to build an environment transfer request that carries more than one kind of entity, what `overwrite` reaches, and what to do when the target already holds a **different** entity under the same key — a duplicate. The basics of the operation, the empty `items` of a real run and the kinds that never travel are in the environments document; read that first.
+How to build an environment transfer request that carries more than one kind of entity, what `overwrite` reaches, what delete mode removes, and what to do when the target already holds a **different** entity under the same key — a duplicate. The basics of the operation, the empty `items` of a real run and the kinds that never travel are in the environments document; read that first.
 
 Read this before you send a transfer whose dry run shows `status: "duplicate"` or `status: "conflict"`, or before you group several kinds into one run.
 
@@ -87,6 +87,22 @@ A dry run sent with resolutions still marks each of those entities `duplicate`, 
 
 A resolution whose `syncUid` no longer points at a duplicate — the collision was resolved in the meantime, or the id was mistyped — is ignored, and the response adds a line to `warnings` naming the type and the `syncUid`. Read `warnings` before the real run: a mistyped `syncUid` is reported there, and the real duplicate it was meant for is then passed over without being written.
 
+## An overwrite keeps the old version except on error pages
+
+When a run writes over an entity that already exists in the target, the target's previous state is kept in that entity's version history first, so a deliberate overwrite can still be rolled back from there. That holds for every kind that travels except error pages: an error page is written over with nothing kept, and its version history stays empty afterwards.
+
+So before you overwrite error pages, read the error page in the target and show the human its current values. There is no copy to restore them from later.
+
+## Delete mode removes every target-only entity of a kind
+
+`mode: "delete"` does not delete the ids you name. For each kind in `items` it compares the whole kind in both environments and removes every target entity that has no counterpart in the source. `ids` is accepted and ignored in this mode, so naming one entity does not narrow the run to it.
+
+- A real run needs `confirm: true`. Without it, and without `dryRun: true`, the call answers `400` and nothing is planned or deleted. It does not fall back to returning the plan.
+- A dry run with `dryRun: true` lists each entity that would go, with `status: "delete"`, or `status: "blocked"` and a `reason` when an ordinary delete of it would be refused too.
+- Nothing deleted this way is kept in version history. There is no rollback.
+
+Always send the dry run first, show the human the whole list per kind, and send the real run only after they agree to every entity on it.
+
 ## Common mistakes in a transfer request
 
 - **Repeating a kind in `items`.** `400`; one element per kind, all its ids in one list.
@@ -94,5 +110,6 @@ A resolution whose `syncUid` no longer points at a duplicate — the collision w
 - **Reading `duplicate` with a `strategy` as "not resolved".** The dry run always shows duplicates; `strategy` says what will happen.
 - **Setting `overwrite: true` after reading only the ids you named.** Dependencies take the flag too; read their conflicts first.
 - **Using `combine` on a plain value.** It fails that entity without a word; check `isCombinable`.
+- **Naming ids in delete mode to narrow it.** They are ignored; the whole kind is compared and every target-only entity goes.
 
 → `mcp/docs/api/environments#copying-content-from-one-environment-to-another` · `mcp/docs/server/confirm-and-dry-run`
