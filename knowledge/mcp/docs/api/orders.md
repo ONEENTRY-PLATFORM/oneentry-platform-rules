@@ -131,7 +131,9 @@ GET /api/content/payments/stages/order/{id}   the payment stages of that order
 - With no sign-in, the order read answers `401` and the stages read answers `404`.
 - An id that is not an integer answers `400` once the caller is past sign-in.
 
-A `404` from either read therefore does not prove the order is missing. Look the order up through the Admin API before reporting that it does not exist, and never create it again.
+Starting a payment follows the same rule. `POST /api/content/payments/sessions` with the `orderId` of a signed-in visitor's order answers `201` only with that visitor's token. Another visitor's token, or no sign-in, gets `404 Order not found`, and the visitor's open payment session stays usable. An order placed without sign-in accepts the call without a token.
+
+A `404` from any of these calls therefore does not prove the order is missing. Look the order up through the Admin API before reporting that it does not exist, and never create it again.
 
 ## Verifying an order change
 
