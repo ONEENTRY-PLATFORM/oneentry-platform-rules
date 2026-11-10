@@ -70,7 +70,7 @@ The limit is checked before the code is looked at, so once it trips the call ans
 
 Three calls, all without a session. `POST /api/admin/auth/send-code` with `{"email": "..."}` answers `201` with `true` for any address, whether or not an administrator has it, so the answer never confirms that an account exists. When one does, a code is mailed to it. The code is valid for 15 minutes, and asking again replaces it: only the newest code works.
 
-`POST /api/admin/auth/verify-code` with `email` and `code` checks the code without spending it. `POST /api/admin/auth/change-password` with `email`, `code` and the new `password` sets the password and spends the code; sending the same code again answers `400 Invalid code`, as does an expired or replaced one.
+`POST /api/admin/auth/verify-code` with `email` and `code` checks the code without spending it. `POST /api/admin/auth/change-password` with `email`, `code` and the new `password` sets the password and spends the code; sending the same code again answers `400 Invalid code`, as does an expired or replaced one. An address no administrator has gets the same `400 Invalid code` from both calls, so neither of them confirms that an account exists either.
 
 A completed reset signs the administrator out of every session and then answers like `POST /api/admin/auth/login`. With the second factor off the body carries a token pair beside `login` and `userId`. With `user.adminMfaRequired` on it is the challenge described above, with no `accessToken`, and the sign-in finishes through `POST /api/admin/auth/login/mfa`. Branch on `mfaRequired` here too.
 
