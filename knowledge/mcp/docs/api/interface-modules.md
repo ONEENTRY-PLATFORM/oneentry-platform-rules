@@ -28,10 +28,11 @@ Interface modules are not rows of the module listing. That listing carries one s
 
 ## Rules for the identifier and the title
 
-- `identifier` matches `^[A-Za-z0-9-]+$`. An underscore answers `400`.
+- `identifier` matches `^[A-Za-z0-9-]+$` and is at most 64 characters long. An underscore or a longer value answers `400`.
 - It must not collide, ignoring case, with another module or with an admin section identifier such as `catalog`, `content` or `orders`. A collision answers `400` saying a module or section with that identifier exists.
+- The panel's own top-level paths are taken too: `accessibility`, `authentication`, `errors` and `health` answer the same `400`, because the identifier becomes the first segment of the module's address in the panel.
 - It cannot change: sending a different `identifier` to the update answers `400`. To rename, create a new module and delete the old one.
-- `localizeInfos` needs a non-empty `title` in at least one language, or the create answers `400`.
+- `localizeInfos` needs a non-empty `title` in at least one language, or the create answers `400`. `null` answers `400` as well.
 
 ```json
 { "identifier": "warehouse", "localizeInfos": { "en_US": { "title": "Warehouse" } },
@@ -45,6 +46,7 @@ Interface modules are not rows of the module listing. That listing carries one s
 `config` is checked strictly:
 
 - `base` is one of `catalog`, `pages`, `orders`, `payments`, `users`; anything else answers `400` listing them.
+- `base` cannot change: an update whose `config.base` differs from the stored one answers `400` saying `config.base cannot be changed`. Screen settings and screen templates belong to the base, so a module for another base is a new module.
 - An unknown key answers `400` naming it, and so does a key that belongs to another base — `pageDefaults` on a catalogue module, for instance.
 - The whole `config` is limited to 256 KB.
 - `screens` is optional on every base: an object of objects that the panel owns. Leave it as you read it.
@@ -80,6 +82,7 @@ Whether a module with that identifier exists is not checked. A template saved fo
 - **Treating a module as an access boundary.** It hides nothing from the API; use permissions.
 - **Sending a partial `config` to the update.** Everything you leave out is removed.
 - **Trying to rename through the update.** `identifier` is fixed; the update answers `400`.
+- **Switching a module to another base.** `config.base` is fixed; create a new module instead.
 - **Expecting `productDefaults` or `newUserGroupIds` to apply to an API write.** Only the panel reads them.
 - **Looking for interface modules in the module listing.** Only the `interface-modules` section is there.
 - **Reading `/my` as the full list.** It returns only the caller's modules.
