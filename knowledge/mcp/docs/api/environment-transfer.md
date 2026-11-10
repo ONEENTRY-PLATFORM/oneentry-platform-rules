@@ -103,6 +103,14 @@ So before you overwrite error pages, read the error page in the target and show 
 
 Always send the dry run first, show the human the whole list per kind, and send the real run only after they agree to every entity on it.
 
+## Real runs into one target run one at a time
+
+Real runs that name the same `to` are carried out one after another, in the order they were accepted, whatever environment each one copies from. Each run plans against the target as the run before it left it. Runs into different targets do not wait for each other.
+
+So sending the same real run twice, by a repeated click or by two people at once, writes each entity once: the later run finds the copy the earlier one made and treats it as an `update`. There is no need to guard against a repeat on your side.
+
+A queued run builds its plan only when it starts. If another run into the same target was accepted before yours, the dry run you showed the human may describe a target that run is about to change. Let the earlier run finish, read the target, and dry-run again before you ask for approval.
+
 ## Common mistakes in a transfer request
 
 - **Repeating a kind in `items`.** `400`; one element per kind, all its ids in one list.
@@ -111,5 +119,6 @@ Always send the dry run first, show the human the whole list per kind, and send 
 - **Setting `overwrite: true` after reading only the ids you named.** Dependencies take the flag too; read their conflicts first.
 - **Using `combine` on a plain value.** It fails that entity without a word; check `isCombinable`.
 - **Naming ids in delete mode to narrow it.** They are ignored; the whole kind is compared and every target-only entity goes.
+- **Approving a dry run while another run into the same target is pending.** Runs into one target go one at a time; dry-run again after the earlier one finishes.
 
 → `mcp/docs/api/environments#copying-content-from-one-environment-to-another` · `mcp/docs/server/confirm-and-dry-run`
