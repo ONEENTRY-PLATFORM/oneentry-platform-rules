@@ -15,7 +15,7 @@ Set `isSensitive: true` on the attribute in the schema of an attribute set whose
   "position": 1, "isSensitive": true } }
 ```
 
-The flag applies to submissions saved **after** it is set. A submission saved before keeps returning its value in every read. Switching the flag off later does not reveal submissions saved while it was on: they keep answering `value: null` as described below.
+The flag also covers submissions saved **before** it was set. The schema update that switches it on hides that field in every stored submission of the forms built on the set, and answers only once they are all hidden. Switching the flag off later does not reveal anything: submissions saved while it was on keep answering `value: null` as described below.
 
 → `mcp/docs/api/attribute-sets#the-schema-key-is-attribute-and-the-id`
 
@@ -64,4 +64,4 @@ The value of a sensitive field is not used by semantic search over submissions. 
 - Marking the field on a set of a type other than `forForms` and expecting values to be hidden.
 - Treating `value: null` as an empty answer and asking the visitor to submit again.
 - Granting `forms.data.readSensitive` to every admin because a listing showed `null`.
-- Expecting submissions saved before the flag was set to be hidden too.
+- Switching the flag off to read a value back. Use the permission below instead.
