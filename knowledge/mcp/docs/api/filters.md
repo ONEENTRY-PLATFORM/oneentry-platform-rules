@@ -134,6 +134,10 @@ Filters and their items are ordered, and as everywhere in this API that ordering
 
 → `mcp/docs/server/payload-conventions#position-is-a-lexorank-string-or-a-number`
 
+## Nesting an item under another item
+
+Items and custom items of a filter are numbered separately, so one id can name one of each. A parent is the pair `newParentId` + `newParentType` (`filter-item` or `filter-custom-item`), on `PUT /filters/{id}/items/reparent` and on both item position operations. Send the type every time: without it the id is taken as a filter item first. Read back, every item and custom item reports its parent as `parentId` + `parentType`; the site tree follows the same pair.
+
 ## Reading available values
 
 There is an operation returning the distinct values an indexed attribute currently holds. It is what a facet is built from, and it is also the fastest way to check whether a filter value you are about to send exists at all.
@@ -148,6 +152,7 @@ Use it before reporting that a filter returns nothing — often the value simply
 - **Expecting a negation to cover entities without the attribute.** It does not.
 - **Assuming a truncated result means "no more matches".** The response was capped; page it.
 - **Patching a position field on a filter item.** Use the position operation.
+- **Nesting by parent id alone.** Send `newParentType` too; ids overlap.
 - **Expecting a pinned item to have products behind it.** Pinning is presentation only.
 - **Looking for a way to pin one value.** Pinning is set on the attribute.
 - **Assuming a pinned facet is a fixed set.** New values are added to it automatically.
