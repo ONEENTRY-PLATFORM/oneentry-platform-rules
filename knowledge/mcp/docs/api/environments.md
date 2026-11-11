@@ -131,7 +131,7 @@ Nothing here happens quietly, because every mutation under the path is confirm-g
 
 Three things the operation's own declaration cannot tell you:
 
-- **A real run is asynchronous.** It answers `201` with a `jobId` and an `items` list that is **empty**. That empty list is not "nothing was transferred" — the plan only ever comes back from a dry run. Read the entities in the target to confirm the outcome.
+- **A real run is asynchronous.** It answers `201` with a `jobId` and an `items` list that is **empty**. That empty list is not "nothing was transferred" — the plan only ever comes back from a dry run. When the run finishes, the **target** environment's journal gets one entry for it, module `ENVIRONMENT_TRANSFER`: read the journal with the target selected, whichever environment sent the request. Its `delta.items` lists every entity with its `status` and `targetId`; `result` is `FAILURE` when the run stopped or any entity failed. A dry run leaves no entry.
 - **A dry run returns more than you asked for.** Whatever an entity needs in order to exist is added to the plan and marked `isDependency: true`, so one page can produce several items. Show the human the whole plan, not the ids they named.
 - **Name each plan item by its `identifier`, not its `sourceId`.** `identifier` on a plan item is the key the entity is known by in the source, and which key that is depends on the kind: a page is named by its address (`pageUrl`), an error page by its `code`, every other kind by its own `identifier`. It is `null` only where the source has left that key empty. `sourceId` is a position inside the source environment and means nothing in the target, so a plan read out as a list of numbers tells the human nothing about what is about to be written.
 
@@ -156,7 +156,7 @@ Project settings travel only in part. Error pages, sign-in providers and events 
 - **Reading an Admin API `400` as a credentials problem.** The environment check runs before authentication.
 - **Reading a Content API `401` as a dead token.** A misspelled environment name answers the same message.
 - **Reusing an application token in another environment.** Tokens do not cross; issue one inside it.
-- **Taking the empty `items` of a transfer as a failure.** The run is asynchronous; the plan is in the dry run.
+- **Taking the empty `items` of a transfer as a failure.** The run is asynchronous; the outcome is in the target's journal.
 - **Treating a copy into an environment as free.** Copied files spend the one storage allowance; check it first.
 - **Expecting a copied OAuth sign-in provider to let anyone in.** Its OAuth secret stayed behind; fill it in first.
 - **Writing to an environment in the same breath as creating it.** It is not ready yet, and that `400` says so.
