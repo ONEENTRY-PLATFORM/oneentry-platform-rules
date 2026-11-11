@@ -135,6 +135,13 @@ Three things the operation's own declaration cannot tell you:
 
 A dry run item at `status: "duplicate"` is not written by a real run until you resolve it, and `overwrite` reaches the dependencies an element pulls in — both are covered with grouping several kinds into one run in `mcp/docs/api/environment-transfer`.
 
+Copying **into the main set** (`to: "public"`) is guarded more tightly than copying between environments, because it writes the live site:
+
+- It needs `environments.transferToPublic` on top of `environments.manage`, and answers `403` without it, dry run included.
+- It also needs the write key of every item the plan would write, dependencies included: the kind's `create` key for an item at `create`, its `update` key for `update` or a duplicate resolved with `replace` or `merge`, its `delete` key in delete mode. A `403` names the missing keys. On a real run the same check happens when the run starts, so a key withdrawn in between fails the run before anything is written.
+- `overwrite: true` on a real run needs `confirm: true` as well; without it the call answers `400` and nothing is queued.
+- A dry run adds a line to `warnings`: entities are written one at a time, so visitors see a partly updated site while the run lasts, with a rough duration. Show it to the human before a large run.
+
 Orders, visitors and submissions are not among the kinds that travel, and asking for one answers `400` — that is a boundary, not a gap to work around.
 
 Project settings travel only in part. Error pages, sign-in providers and events are kinds you may name, and a sign-in provider arrives with its settings but **without its secrets** — its signing key and OAuth secret stay in the source, and a dry run says so in `warnings`. A provider the transfer creates gets a fresh signing key of its own, so tokens issued in one environment are never valid in the other; the OAuth secret stays empty, so fill it in before anyone signs in to the target through that OAuth provider. An update keeps the secrets the target already has. Order storages with their statuses, and Content API access rules, do not travel at all: a dry run lists the ones the source has filled in, with counts on both sides, in `warnings`, and the human sets them up by hand.

@@ -129,6 +129,8 @@ It is an ordinary key, like the export ones: it appears in the vocabulary, and a
 
 Like the total logout, these operations carry **no permission in the catalog**, so the local pre-check cannot stop the call: the refusal arrives from the instance after the request went out. A `403` on one of them is this key and nothing else.
 
+Copying into the main set is a separate key, `environments.transferToPublic`, held by an admin provisioned with the instance but not implied by `environments.manage`. Such a copy also checks the write keys of every kind it would write — see `mcp/docs/api/environments#copying-content-from-one-environment-to-another`.
+
 Holding it does not decide which environment you work *inside*. That is a request header the operator sets when the server starts, and no grant changes it.
 
 → `mcp/docs/api/environments#which-data-set-your-own-calls-reach`
