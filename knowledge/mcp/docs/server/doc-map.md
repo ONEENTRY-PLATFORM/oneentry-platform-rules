@@ -325,6 +325,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why is my captcha refusing a token that looks right | `mcp/docs/api/captcha-fields#a-valid-token-can-still-be-refused` |
 | Why does my submission date filter answer 400 | `mcp/docs/api/form-submissions#how-to-write-a-date-bound-the-filter-accepts` |
 | How do I list the submissions of one form | `mcp/docs/api/form-submissions#the-listing-is-a-post-with-the-filter-in-the-body` |
+| Why does creating or editing a submission answer 403 | `mcp/docs/api/form-submissions#creating-or-editing-a-submission-needs-a-write-key` |
 | Why is formModuleConfigId refused by the filter body | `mcp/docs/api/form-submissions#what-formmoduleconfigid-narrows-and-what-it-cannot` |
 | Why does a submitted field come back as null | `mcp/docs/api/sensitive-form-fields#why-a-submitted-value-comes-back-as-null` |
 | Who can read a sensitive form field | `mcp/docs/api/sensitive-form-fields#who-can-read-the-value` |
