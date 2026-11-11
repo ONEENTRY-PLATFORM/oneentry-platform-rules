@@ -110,8 +110,11 @@ Before you do either:
 
 - Check whether a suitable set already exists. Entities of one kind usually share one set, and a second set fragments the content model in a way that is awkward to undo.
 - Choose the attribute type from the closed list; there is no way to add a type.
-- Pick a marker that reads well in the admin panel — humans see it.
-- Give every attribute an `identifier`. It is the marker; a definition without one answers `400` and names the attribute.
+- Pick a marker that reads well in the admin panel — humans see it. The set's `identifier` is required, starts with a letter and holds only letters, digits, `_`, `.` and `-`; anything else answers `400`, and a marker another set already has answers `409`.
+- Send `typeId` as the integer id of an existing set type. Any other value answers `400`.
+- Give every attribute an `identifier`. It is the marker; a definition without one answers `400` and names the attribute. It starts with a letter and holds only letters, digits, `_` and `-` (no dot), and no two attributes of one set may share it. A malformed or repeated attribute marker answers `400`.
+
+Updating a set re-checks only the markers the update changes or adds. A set stored with markers outside these rules can still be saved with those markers left as they are.
 - Key it `attribute<id>` inside `schema`, never by its marker — next section.
 
 Dry run first, and read the set back to confirm the attribute's id before writing any values against it.
