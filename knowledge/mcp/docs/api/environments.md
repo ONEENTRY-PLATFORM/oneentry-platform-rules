@@ -101,6 +101,8 @@ A record carries `name`, `description`, a `status` of `creating`, `ready`, `fail
 
 Creating one refuses a few names the header shape would allow: `public` (the main set), `information_schema`, and any name starting with `pg_`. Those answer `400` on create instead of producing a record, so pick another name rather than retrying.
 
+An instance also caps how many environments can be live at once. Records reading `creating` or `ready` count against the cap; `failed` and `deleting` ones do not, so a slot frees as soon as a delete is accepted. At the cap, create answers `403` with a message saying the environment limit has been reached, and no record is made. That is not the missing-permission refusal above, so do not ask for a grant and do not retry: show the human the listing and let them choose one to delete.
+
 The name is fixed once the environment exists: the update takes the `description` and nothing else. A `name` sent beside it answers `200` and changes nothing, so check the record you read back before telling anyone it was renamed.
 
 → `mcp/docs/api/silent-no-ops#why-a-read-back-is-the-only-detection`
