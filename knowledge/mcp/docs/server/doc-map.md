@@ -128,6 +128,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/password-reset` | A visitor cannot sign in and needs a new password |
 | `mcp/docs/api/admins-and-permissions` | An operation was refused for lack of a permission |
 | `mcp/docs/api/admin-page-scope` | Delegating one branch of the page tree, or a page write refused for an admin who holds the key |
+| `mcp/docs/api/catalog-area-page-reads` | Setting up a catalogue editor without `pages.get`, or a catalogue page read refused with 403 |
 | `mcp/docs/api/admin-account-ownership` | Changing another administrator's login, e-mail, password or permissions, or a write on the project owner refused with 403 |
 | `mcp/docs/api/admin-sign-in` | Administrator sign-in answered a challenge instead of tokens, or a sign-in code is refused |
 
