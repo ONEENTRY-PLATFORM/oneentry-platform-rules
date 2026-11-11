@@ -16,23 +16,25 @@ Narrow it with query parameters rather than paging and filtering yourself:
 
 | Parameter | What it takes |
 |---|---|
-| `createdAt[from]`, `createdAt[to]` | ISO 8601; either may be omitted |
+| `from`, `to` | ISO 8601, both ends inclusive; either may be omitted |
 | `moduleName` | uppercase module name, one value or a comma-separated list |
-| `moduleEntryId` | the id of the entry inside that module |
+| `moduleEntryId` | the entry's `entityId`; also the sort key of that name |
 | `action` | `CREATE`, `UPDATE`, `DELETE` or `READ` |
 | `result` | `SUCCESS` or `FAILURE` |
 | `adminId` | who made the change |
-| `limit`, `offset` | pagination |
+| `sortByCondition` | `action`, `result`, `login`, `moduleName`, `moduleEntryId` or `createdAt` (the default) |
+| `sortByDirection` | `ASC` or `DESC` (the default) |
+| `limit`, `offset` | pagination; `limit` from 1 to 200, default 50 |
 
 `action` is derived from the HTTP method of the original call (`READ`: sensitive form values were read) and `result` from its status, so a refused call is recorded as `FAILURE` rather than left out. An environment transfer is the exception: its entry is written to the target environment when the run finishes, with the outcome rather than the response status — see `mcp/docs/api/environments#copying-content-from-one-environment-to-another`. An entry carries `id`, `createdAt`, `moduleName`, `entityId`, `moduleEntryId`, `action`, `result`, `error` and the admin beside them.
 
-**The time window is the one parameter whose name differs between reading and clearing.** The listing takes it nested; a flat `from` or `to` sent here is accepted and then **ignored**, and the answer is the unfiltered journal, with no error to notice:
+`createdAt[from]` and `createdAt[to]` are accepted as the same window; the flat names win when both are sent:
 
 ```text
-GET /journal?createdAt[from]=2026-11-03T00:00:00.000Z&createdAt[to]=2026-11-04T00:00:00.000Z
+GET /journal?from=2026-11-03T00:00:00.000Z&to=2026-11-04T00:00:00.000Z&limit=50
 ```
 
-So a `total` matching the unfiltered one is the symptom. Ask for a window you know is empty — a range in the future — and confirm `total` is `0` before trusting any window here. The clear takes the flat names instead.
+A value outside the ranges and lists above, or a date that is not ISO 8601, answers `400` naming the parameter. No `limit` means "everything": page with `offset` up to `total`.
 
 ## Clearing the journal needs an explicit window
 
@@ -44,7 +46,7 @@ DELETE /journal?from=2026-01-01T00:00:00.000Z&to=2026-01-31T23:59:59.999Z
 
 Omit either one, or send a `from` later than the `to`, and the call answers `400`. Narrow it further with the same `moduleName`, `action` and `result` the listing takes — those are optional, and leaving them off means every entry inside the window.
 
-Here the names are **flat**, the opposite of the listing. Send `createdAt[from]` and `createdAt[to]` to this operation and the required pair counts as absent, so it answers `400` complaining that `from` and `to` must be valid ISO 8601 strings. Carrying a window straight across from a listing call is the usual cause of that `400`, and the fix is the parameter names rather than the dates.
+Here the names are **flat** only; the nested spelling the listing also accepts is not read. Send `createdAt[from]` and `createdAt[to]` to this operation and the required pair counts as absent, so it answers `400` complaining that `from` and `to` must be valid ISO 8601 strings. Carrying a window straight across from a listing call is the usual cause of that `400`, and the fix is the parameter names rather than the dates.
 
 The window is the whole safety mechanism, so widen it deliberately and never by accident. A window opened far enough into the past takes everything before it, and nothing on the instance brings those entries back.
 
