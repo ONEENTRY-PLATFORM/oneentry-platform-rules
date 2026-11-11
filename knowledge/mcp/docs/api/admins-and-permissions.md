@@ -75,6 +75,7 @@ Reads are gated the same way writes are. An account that holds no keys reads not
 | Admin accounts | `admins.get` |
 | Menus | `menu.get` |
 | Users | `users.get` |
+| The mail log of an event (`GET /events/{id}/email-logs`) | `users.get` |
 | Journal entries and session traffic | `journal.get` |
 | One attribute set, and the attributes inside it | `settings.attributesSets.get` |
 | Form submissions and their counts | `forms.data.read` |
