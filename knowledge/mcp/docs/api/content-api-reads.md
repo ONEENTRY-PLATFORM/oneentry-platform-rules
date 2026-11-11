@@ -84,6 +84,13 @@ does not clear on a retry, so the two are never confused once you read the statu
 
 → `mcp/docs/api/content-api-permission-rules#read-the-rules-before-reporting-a-public-answer`
 
+A call that carries a visitor's bearer token can also answer
+`503 Service temporarily unavailable, try again later`, with no `Retry-After`. The
+instance could not check the visitor's session, so this says nothing about the token: keep
+the token pair, wait a moment and repeat the call. Refreshing or dropping to guest on it
+ends a session that is still valid. An Admin API call answers the same way for the same
+reason. A token that really is bad or expired always answers `401`.
+
 ## A 405 with an HTML body means the instance is overloaded
 
 Under load a public call can answer `405` with a short HTML page instead of JSON, on a
