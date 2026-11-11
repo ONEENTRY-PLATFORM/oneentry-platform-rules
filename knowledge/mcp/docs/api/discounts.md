@@ -48,6 +48,12 @@ So the effect of adding a discount depends on the setting as well as on the disc
 
 → `mcp/docs/api/settings`
 
+## How discounted amounts are rounded
+
+Every money amount the discount calculation produces carries at most two decimal places: each discount taken off, each discounted item price, and the order totals (`totalSum`, `totalSumWithDiscount`, `totalDue`) in the preview and in the created order. A half cent rounds up, so 30% off 1.10 per item is 0.77, and a further 30% off that is 0.54.
+
+Rounding happens at every step, so the result of a chain of discounts can differ by a cent from multiplying the percentages together. Compare totals the platform returned rather than recomputing them; an order stored before this rule may still hold a longer fraction.
+
 ## Bonuses and personal discounts
 
 `BONUS` and `PERSONAL_DISCOUNT` are the same machinery aimed differently: one accrues value to a customer, the other targets a specific customer or segment. Both use the same conditions and the same type enum.
