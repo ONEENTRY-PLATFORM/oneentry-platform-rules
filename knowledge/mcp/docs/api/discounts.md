@@ -68,6 +68,14 @@ If a human wants an existing order adjusted, that is a refund or a manual change
 4. Provide localized labels for every active locale; customers see them.
 5. Dry run, show the human the resulting configuration, then send.
 
+## Which identifier a discount accepts
+
+The discount's `identifier` is the marker a site reads it by. It is required, starts with a letter and holds only letters, digits, `_` and `-` — the same rule the marker-validation operation and the public read by marker apply. A space, a leading digit or any other character answers `400` on create, and nothing is written.
+
+A marker another discount already has answers `409`, on create and on update. Pick another marker; retrying the same one cannot succeed.
+
+On update, an omitted `identifier` keeps the current one, and `null` or an empty string answers `400`. Only a changed marker is checked against the rule, so a discount stored with a marker outside it can still be saved with that marker left as it is.
+
 ## Coupons
 
 A coupon is a discount gated behind a code the customer supplies. The code is the identifier customers type, so it needs to be unambiguous — and once it is distributed, it cannot be changed without invalidating what was distributed.
@@ -106,3 +114,4 @@ One line to check before calling it configured: a discount that is not meant for
 - **Creating a coupon from a supplied code and calling it one-shot.** It is reusable unless you send `isReusable: false`.
 - **Leaving `isReusable` to the default when the brief says otherwise.** The two operations default in opposite directions.
 - **Expecting a discount to change existing orders.** It does not, by design.
+- **Retrying a create that answered `409`.** The marker is taken; choose another.
