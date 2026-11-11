@@ -98,6 +98,12 @@ A plan carries `isUsed`, and it is `true` while at least one enrolment on it is 
 
 Sending the fields back unchanged answers `200`, so a read-modify-write that touches nothing else still works. Read `isUsed` before promising a human that a plan can be edited.
 
+## Reading a customer's enrolments
+
+`GET /subscriptions/user/{userId}` lists every enrolment of one customer, finished ones included, nearest `dueDate` first. Each row carries its plan, and the plan carries its payment account — identified by `id`, `identifier`, `type` and `localizeInfos`. The account's `settings` and `testSettings` are not part of this response; read the account itself through the payment account routes when you need its configuration.
+
+The call needs the `users.get` permission — the same one that opens the customer. An administrator who has only `subscriptions.manage` gets `403` here; grant `users.get` rather than retrying.
+
 ## Renewing an enrolment by hand
 
 `POST /subscriptions/user/{userId}` with `{ "id": <plan id> }` extends an existing enrolment: it sets `status` to `active`, pushes `dueDate` out by the plan's `periodInDays`, and completes the waiting payment session. The `id` in the body is the **plan's**, not the enrolment's — the enrolment is found from the two together, and a plan the customer is not enrolled in answers `404 Subscription not found`.
