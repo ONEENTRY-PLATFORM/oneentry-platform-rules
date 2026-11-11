@@ -26,6 +26,19 @@ The counting route also answers a narrower question than the listing, so the two
 
 → `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it`
 
+## Creating or editing a submission needs a write key
+
+An operator creates a submission — for example a reply to a review — and rewrites one with two operations, both behind `forms.data.update`, the key that also changes a submission's status:
+
+| Operation | Route |
+|---|---|
+| `AdminFormDataController_create` | `POST /form-data` |
+| `AdminFormDataController_updateUserDataById` | `PUT /form-data/{id}` |
+
+Without the grant both answer `403 Forbidden resource` and nothing is stored. `forms.data.read` does not imply it: an account can list submissions it is not allowed to answer. The body is the one the visitor-side submission takes.
+
+→ `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it`
+
 ## The listing is a POST with the filter in the body
 
 Submissions are always read **by the form's marker**, and that route is a `POST` because the filter travels in the body rather than in the query string. There is no `GET` form of it. The flat listing of every submission answers `405` and names the per-form route instead — take the name and change the method too, not just the path.

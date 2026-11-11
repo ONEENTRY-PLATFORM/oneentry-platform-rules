@@ -118,6 +118,8 @@ Either operator read of one form gives you that body: by id, and by marker, answ
 
 Where a shortened list would take submissions with it, the call answers `409` instead, naming how many submissions and which bindings, and changes nothing. Add `confirmFormDataDeletion: true` to the same body to go through — it is the only way to delete a binding that holds submissions, and an edit that echoes every binding back with its `id` never meets it. Dropping a binding with no submissions still answers `200` either way, and so does every call on an instance without the gate: the status tells you the gate is there, never that the submissions were safe.
 
+Deleting submissions this way is a submission delete, so it needs `forms.data.delete` on top of `forms.update`. Without it the call answers `403` whenever a dropped binding holds submissions — with or without `confirmFormDataDeletion`, before anything changes, and without saying how many there are. With it you get the `409` and the confirmation step above.
+
 → `mcp/docs/api/silent-no-ops` · `mcp/docs/api/content-api-reads#why-a-public-read-still-shows-the-previous-value`
 
 ## The order the errors arrive in
