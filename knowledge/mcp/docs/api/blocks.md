@@ -33,6 +33,16 @@ There is a fetch by marker as well as by id. Prefer the marker: it is the identi
 
 A block created with no `localizeInfos` shows as untitled in the admin panel and is hard for a human to find again.
 
+## Which marker and general type a block accepts
+
+A block create needs both a marker and a general type, and refuses either one when it is not usable:
+
+- **marker** (`identifier`): a non-empty string, a letter first, then letters, digits, `_` or `-`. That is the format the public read by marker accepts. A missing, empty, `null` or off-format marker answers `400` and creates nothing;
+- **general type** (`generalTypeId`): an integer id of a general type that exists on the instance. Anything else answers `400`;
+- a marker another block already holds answers `409`. Pick a free one; do not retry the same body.
+
+On an update both fields may be left out. Sent as `null` or empty they answer `400`. The format, the existence of the type and the `409` are checked only for a value that **changes**, so a block stored earlier with an off-format marker stays editable when its marker is sent back unchanged.
+
 ## Attaching a block to a page
 
 Attachment lives with the page, not with the block, and carries a position within that page. So "add this block to the home page" is a page update, not a block update.
