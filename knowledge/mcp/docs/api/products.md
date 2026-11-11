@@ -48,9 +48,9 @@ After creating, **read the product back by id**. A one-level attribute map is ac
 
 ## Update a product
 
-Two rules that are not visible in the schema:
+Rules that are not visible in the schema:
 
-- **Never include `forms`.** The schema accepts the field and the update rejects it on save.
+- **Fields the product does not store are ignored.** `forms` is one: the schema lists it, the update answers 200 and saves nothing for it. Read the product back to see what was kept.
 - **`updatedDate` is ignored.** The server owns it, so sending back the object you read is safe.
 - **`blocks` and `productPages` are left alone when omitted.** Send them only to change them — and note that `blocks: []` is then a real instruction, meaning "on no blocks", not a filler for a field you had nothing to say about.
 
