@@ -82,6 +82,19 @@ A marker another discount already has answers `409`, on create and on update. Pi
 
 On update, an omitted `identifier` keeps the current one, and `null` or an empty string answers `400`. Only a changed marker is checked against the rule, so a discount stored with a marker outside it can still be saved with that marker left as it is.
 
+## What a discount can point at
+
+A discount is saved only when everything it names exists and can take effect. Otherwise the write answers `400` with a message naming the field, and nothing is stored:
+
+- the threshold of a minimum-cart-amount or lifetime-value condition is `value.amount`, a number of zero or more — a string or a missing amount is rejected;
+- gifts and user groups are given by the numeric id of an existing product or group;
+- a bonus trigger belongs only to a `BONUS` discount, and names the forms or the orders module; for orders it needs an existing order storage and a status of that storage;
+- with discount type `NONE` the amount is stored as `0`, whatever was sent.
+
+The kind (`DISCOUNT`, `BONUS`, `PERSONAL_DISCOUNT`) is fixed at creation. An update that sends a different kind answers `400`; sending the current kind back is accepted. To turn a discount into a bonus, create a new one.
+
+On update, only references that differ from what is stored are checked, so a discount can still be saved with its existing gifts, groups and trigger sent back unchanged.
+
 ## Coupons
 
 A coupon is a discount gated behind a code the customer supplies. The code is the identifier customers type, so it needs to be unambiguous — and once it is distributed, it cannot be changed without invalidating what was distributed.
@@ -121,3 +134,4 @@ One line to check before calling it configured: a discount that is not meant for
 - **Leaving `isReusable` to the default when the brief says otherwise.** The two operations default in opposite directions.
 - **Expecting a discount to change existing orders.** It does not, by design.
 - **Retrying a create that answered `409`.** The marker is taken; choose another.
+- **Changing the kind of an existing discount.** It is fixed at creation; create a new discount instead.
