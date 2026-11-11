@@ -351,6 +351,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | How does a visitor sign out | `mcp/docs/api/content-api-sign-in-and-cart#where-the-session-routes-live` |
 | How does a visitor reset a forgotten password | `mcp/docs/api/password-reset#two-calls-in-order` |
 | Why is the password change asking for a code | `mcp/docs/api/password-reset#the-code-is-required-on-every-provider` |
+| How does a signed-in visitor change their password | `mcp/docs/api/password-reset#changing-the-password-from-the-account-page` |
 | Why is my guest cart empty after adding to it | `mcp/docs/api/content-api-sign-in-and-cart#the-guest-cart-needs-a-uuid-in-x-guest-id` |
 | How do I turn a login into a user id | `mcp/docs/api/users-and-groups#find-a-user-by-their-login` |
 | How do I renew an administrator token | `mcp/docs/api/admin-sign-in#renewing-an-administrator-token` |
