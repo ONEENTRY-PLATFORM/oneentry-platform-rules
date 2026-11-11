@@ -237,7 +237,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why did submissions vanish after a form edit | `mcp/docs/api/forms-and-form-data#an-update-drops-every-config-you-do-not-send-back` |
 | How do I delete something safely | `mcp/docs/server/confirm-and-dry-run` |
 | Why did my page update answer 200 with a body of false | `mcp/docs/api/pages#update-a-page` |
-| Why is my journal time filter being ignored | `mcp/docs/api/journal#reading-the-journal` |
+| Which parameters filter and page the journal listing | `mcp/docs/api/journal#reading-the-journal` |
 | Why did deleting a menu item leave its children behind | `mcp/docs/api/menus#delete-a-menu-or-an-item` |
 | Why did deleting a parent page not delete its children | `mcp/docs/api/pages#delete-a-page` |
 | Why did my block attachment by marker fail | `mcp/docs/api/pages#attaching-blocks` |
