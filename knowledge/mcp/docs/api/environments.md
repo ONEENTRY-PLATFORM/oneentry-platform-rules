@@ -73,6 +73,8 @@ Separate per environment: pages, products, blocks, menus, forms and their submis
 
 The sender address of event e-mails is separate too. A write that names an environment changes the sender for that environment only; the main set and the other environments keep theirs. Read it back in the environment that will send the mail.
 
+Push notifications are separate in the same way. A Firebase service-account key uploaded with `POST /api/admin/events/settings/firebase` while naming an environment belongs to that environment, and the push notifications its events send go through that key. An environment without a key of its own sends no push notifications at all: the main set's key is never used in its place. Upload a key in every environment whose events should reach devices, and read it back with the same environment named.
+
 Shared across all of them: administrator accounts and their permission maps, the admin sign-in itself, the active locales, and platform settings. One admin login works in every environment with no second sign-in, and granting a key grants it everywhere at once.
 
 The record quota is shared too, counting the main set and every ready environment **together**: `records-usage` answers the same totals whichever environment the request names, so an environment filled with test content spends the live one's allowance.
