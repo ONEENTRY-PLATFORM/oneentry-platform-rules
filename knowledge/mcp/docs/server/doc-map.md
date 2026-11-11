@@ -170,6 +170,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | How do I reset a forgotten admin password | `mcp/docs/api/admin-sign-in#resetting-a-forgotten-admin-password` |
 | Why is the server unauthenticated with the right login and password | `mcp/docs/server/authentication#an-instance-with-a-second-factor-needs-the-token` |
 | Why does a read say permissions are temporarily unavailable | `mcp/docs/api/content-api-reads#what-a-503-on-a-public-read-is-telling-you` |
+| Why does a call with a valid token answer 503 instead of 401 | `mcp/docs/api/content-api-reads#what-a-503-on-a-public-read-is-telling-you` |
 | Why can I not list the submissions of a form | `mcp/docs/api/form-submissions#both-read-routes-need-the-forms-data-read-permission` |
 | Why did an operation that worked start answering 403 | `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it` |
 | Why is an interface modules call refused with 403 | `mcp/docs/api/interface-modules#which-permission-keys-manage-interface-modules` |
