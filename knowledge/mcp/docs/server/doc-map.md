@@ -296,6 +296,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Where is the product list operation and why does it want `langCode` | `mcp/docs/api/products#listing-products` |
 | How do I create a menu with its pages | `mcp/docs/api/menus#creating-a-menu-with-its-pages` |
 | Why did my menu arrive with more items than it has | `mcp/docs/api/menus#parent-references-are-polymorphic` |
+| Why does a hidden page still show in my menu | `mcp/docs/api/menus#why-a-hidden-page-still-shows-in-a-public-menu` |
 | How do I set the order of menu items | `mcp/docs/api/menus#ordering-items` |
 | How do I order products on a page and why did my reorder do nothing | `mcp/docs/api/pages#ordering-products-on-a-page` |
 | Why is my product price still the old number | `mcp/docs/api/products#prices-and-the-price-attribute` |
