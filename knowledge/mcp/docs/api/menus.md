@@ -72,6 +72,20 @@ GET /api/content/menus/marker/main?langCode=de_DE   → pages: [blog]          (
 - A menu with no translated page is still found: `200`, with `pages: []` or only its custom items.
 - Custom items are not left out. One with no title in the language arrives with `localizeInfos: {}`, so give it a translation or expect a blank label.
 
+## Why a hidden page still shows in a public menu
+
+Hiding a page does not take it out of the menus that include it. A public menu read returns the item as before, with `isVisible` carrying the page's own visibility, the same flag the public page reads return. Deciding whether to render it is the site's job.
+
+```text
+GET /api/content/menus/marker/main?langCode=en_US
+→ pages: [ {id: 8,  pageUrl: "home",  isVisible: true,  itemType: "page", …},
+           {id: 30, pageUrl: "draft", isVisible: false, itemType: "page", …} ]
+```
+
+- Filter on `isVisible: true` when rendering navigation for visitors, as with page lists.
+- Custom items have no visibility of their own and always arrive with `isVisible: true`.
+- To drop a page from a menu for everyone, remove it from the menu's composition instead of only hiding it.
+
 ## Positions are lexorank here and numbers there
 
 On the admin operations, an item's position is a **lexorank string**. On the public side the same ordering is exposed as a **number**.
