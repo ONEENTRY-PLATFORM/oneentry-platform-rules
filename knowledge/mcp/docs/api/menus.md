@@ -13,7 +13,7 @@ The two things that catch people: parent references are polymorphic, and orderin
 - **custom items** — entries pointing at anything else, with their own titles and targets;
 - a **parent** and a **position** per item, forming the tree.
 
-The identifier is unique, so creating a menu that already exists fails. That is the good failure — read the list first.
+The identifier is unique and follows the public marker format; a taken one answers `409`. The full list of what a write refuses is in `mcp/docs/api/menu-write-checks`.
 
 ## Finding the operations
 

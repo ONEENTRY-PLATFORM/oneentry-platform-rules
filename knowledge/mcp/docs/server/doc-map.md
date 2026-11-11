@@ -81,6 +81,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/block-types` | A dynamic block is empty, or you are configuring one |
 | `mcp/docs/api/similar-product-blocks` | Configuring a block that shows products similar to another |
 | `mcp/docs/api/menus` | Building navigation, or a menu reorganised itself |
+| `mcp/docs/api/menu-write-checks` | A menu write answers 400, 404 or 409, or you are choosing a menu identifier |
 | `mcp/docs/api/templates-and-previews` | Changing how something renders |
 | `mcp/docs/api/files-and-uploads` | Uploading files or referencing them from attributes |
 | `mcp/docs/api/content-api-reads` | A public read refuses, lags, or serves nothing |
