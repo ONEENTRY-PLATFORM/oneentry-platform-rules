@@ -106,7 +106,7 @@ The call needs the `users.get` permission — the same one that opens the custom
 
 ## Renewing an enrolment by hand
 
-`POST /subscriptions/user/{userId}` with `{ "id": <plan id> }` extends an existing enrolment: it sets `status` to `active`, pushes `dueDate` out by the plan's `periodInDays`, and completes the waiting payment session. The `id` in the body is the **plan's**, not the enrolment's — the enrolment is found from the two together, and a plan the customer is not enrolled in answers `404 Subscription not found`.
+`POST /subscriptions/user/{userId}` with `{ "id": <plan id> }` extends an existing enrolment: it sets `status` to `active`, pushes `dueDate` out by the plan's `periodInDays`, and completes the waiting payment session. When the enrolment already has a `dueDate`, the period is added to it, so renewing early stacks time. When it has none — it was never activated, including one cancelled before its first payment — the period counts from the moment of the call, and the enrolment becomes `active` again. The `id` in the body is the **plan's**, not the enrolment's — the enrolment is found from the two together, and a plan the customer is not enrolled in answers `404 Subscription not found`.
 
 It is not a way to create an enrolment. Only subscribing through the Content API does that, so there is no operator route that puts a customer on a plan.
 
