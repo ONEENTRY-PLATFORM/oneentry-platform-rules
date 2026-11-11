@@ -171,6 +171,8 @@ Step 5 is the only real check of delivery. Step 1 matters: taking the `moduleId`
 
 A configured event tells you nothing about what it sent. `GET /events/{id}/email-logs` — `AdminEventsController_findEmailLogs` — does: it answers a paged list, `limit` and `offset` in the query, newest first, with a total beside the items. One entry per attempted recipient, carrying `email`, `subject`, `status`, `error` and `createdAt`.
 
+Every entry names a recipient, so the log is user data: reading it needs `users.get`, not an events key. An account that can edit events but lacks `users.get` gets `403 Forbidden resource` here while the event itself still reads. Ask for `users.get` rather than looking for the recipients elsewhere.
+
 `status` is one of three values:
 
 - `sent` — the platform accepted the message for sending. It is **not** a delivery receipt, so do not report a mail as received on the strength of it.
