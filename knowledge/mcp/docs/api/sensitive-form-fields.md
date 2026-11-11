@@ -51,6 +51,8 @@ Each listing call that returned at least one sensitive value adds one journal en
 
 The entry never contains the values. A listing that revealed nothing, such as a call without the key, adds no entry.
 
+Writes are journaled too. Creating or updating a submission through the admin API adds an entry whose `delta` is the request body, and in it every item whose `marker` is a sensitive field carries `value: "[REDACTED]"`. The other fields keep their values. A marker counts as sensitive when any `forForms` set on the instance marks it, so a plain field that shares its marker with a sensitive field of another form is shown as `[REDACTED]` as well. The same holds for the `formData` of users and orders, and every `authData[].value` — the login and password sent when an admin creates a user — is always `[REDACTED]`.
+
 ## Updating a submission without losing the value
 
 An update replaces the field list of a submission. For a sensitive field, sending `value: null`, or leaving `value` out, keeps the value already stored. So a client can send back a submission exactly as it read it. Send a non-null value to replace the stored one.
@@ -65,3 +67,4 @@ The value of a sensitive field is not used by semantic search over submissions. 
 - Treating `value: null` as an empty answer and asking the visitor to submit again.
 - Granting `forms.data.readSensitive` to every admin because a listing showed `null`.
 - Switching the flag off to read a value back. Use the permission below instead.
+- Reading a submission's value from the journal. Entries show `[REDACTED]`; read the submission with the permission.
