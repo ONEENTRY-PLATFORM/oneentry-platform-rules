@@ -111,7 +111,7 @@ Before you do either:
 - Check whether a suitable set already exists. Entities of one kind usually share one set, and a second set fragments the content model in a way that is awkward to undo.
 - Choose the attribute type from the closed list; there is no way to add a type.
 - Pick a marker that reads well in the admin panel — humans see it.
-- Give every attribute an `identifier`. It is the marker, and nothing enforces it: a definition without one is accepted, and the attribute is then unreachable — its values are stored but never come back in `attributeValues`.
+- Give every attribute an `identifier`. It is the marker; a definition without one answers `400` and names the attribute.
 - Key it `attribute<id>` inside `schema`, never by its marker — next section.
 
 Dry run first, and read the set back to confirm the attribute's id before writing any values against it.
@@ -150,11 +150,9 @@ The bounds are **strings**, not numbers, and an unset one is `""` rather than ab
 
 → `mcp/docs/api/list-options-and-extra-values`
 
-Written one level flat — `"validators": { "requiredValidator": { "strict": true } }` — creating or updating the set answers `400`, and the message names the attribute and the field. The same check covers `localizeInfos`, `listTitles` and `additionalFields`.
+Written one level flat — `"validators": { "requiredValidator": { "strict": true } }` — creating the set, updating it or replacing its schema answers `400`, and the message names the attribute and the field. The same check covers `localizeInfos`, `listTitles` and `additionalFields`.
 
-One route does not run that check: replacing the schema of an existing set. There a flat map is accepted, and the rule is stored where nothing reads it — the attribute then behaves as one with no validators, and a field you meant to make required is not enforced when the value is submitted.
-
-So after replacing a schema, read the set back and confirm each localized field sits under a locale code — through the right read, which is the next section.
+A plain string, number or boolean where one of these fields or `initialValue` expects an object is refused the same way, and so is a `position` that is not an integer. An integer sent as a string, such as `"3"`, is accepted.
 
 → `mcp/docs/api/silent-no-ops`
 
@@ -175,7 +173,7 @@ Two are easy to get wrong by analogy: it is `emailInspectionValidator`, not `ema
 
 Accepted is not the same as enforced. `sizeInPixelsValidator`, `checkingFilesValidator`, `minMaxDateValidator`, `valueValidator` and `checkForLettersValidator` are stored for the admin panel to read, and no submission is rejected because of them. The rest are checked when a value is submitted. So setting one of those five and reporting the field as validated is wrong — confirm by submitting a value that should fail.
 
-The name check follows the locale key. A `validators` map written flat, with no locale level, is not name-checked at all, so on the schema-replace route — which accepts a flat map — an unrecognised name is stored there and no `400` is raised. Key the map by locale and both checks apply.
+The name check follows the locale key. A `validators` map written flat, with no locale level, is refused for being flat before any name in it is looked at, so fix the shape first and the name check then applies.
 
 A set that already holds an unrecognised name keeps it, and nothing re-checks it until the set is written again. That write is where it surfaces: it answers `400` until the name is corrected, and the field is enforced by nothing up to that point.
 
@@ -242,6 +240,20 @@ Changing an attribute's **type** after values exist is the one change to treat a
 If a human asks for it, say what will happen to the existing values and let them decide. Adding a new attribute and migrating deliberately is almost always the better route.
 
 `isInSearchVocabulary: false` on a `string`, `text` or `textWithHeader` attribute keeps its values out of public search query correction, and so does `isVisible: false`. Mind the leading `is` — a key spelled `inSearchVocabulary` is stored in the schema like any unknown key and has no effect at all. See `mcp/docs/api/search-query-correction#tuning-correction-for-a-project`.
+
+## Reorder attributes without replacing the schema
+
+`AdminAttributesSetsController_updateSchema` (`PUT /api/admin/attributes-sets/{id}/schema`) does one of two things, and the body decides which.
+
+A reorder names exactly the attributes the set already has, under their schema key or as `attribute<id>`, and changes nothing but `position`. Other fields may be sent unchanged or left out. Only the positions are written, and `settings.attributes.changePositions` is enough:
+
+```json
+{ "attribute1": { "position": 2 }, "attribute2": { "position": 1 } }
+```
+
+Any other body replaces the whole schema: an attribute added or left out, any field changed, or an empty object. That also needs `settings.attributesSets.update`, answers `403` without it, and runs the checks that creating and updating a set run.
+
+The route answers `404` for an unknown set and `400` when the body is not an object of attribute objects or a `position` is not an integer.
 
 ## Copying values from one locale into another
 
