@@ -29,10 +29,12 @@ Ask which one the human means before configuring anything. The two produce visib
 
 ## Conditions compare attributes
 
-A condition names an attribute and a comparison. Two consequences:
+A condition names an attribute and a comparison. Consequences:
 
 - The attribute must exist in the products' attribute set, and you need its identity from that set — the same read you do before writing any attribute value.
-- Only **indexed** attributes are usable for narrowing. A condition on a non-indexed attribute matches nothing rather than erroring, which reads as "no related products".
+- Only **indexed** attributes are usable: the markers that `GET /api/admin/index-attributes?type=products` returns, plus `price`. Creating or updating a template whose condition names any other marker answers `400` naming it, and nothing is written.
+- `conditions` is an array of objects. Each one either pairs `attributeMarker` with a `conditionMarker`, or narrows by `pageUrls`, `statusMarker`, `title` or `ids`. An unknown `conditionMarker`, half of the attribute pair, or an object that narrows by nothing answers `400` naming the element. Empty-string fields count as absent.
+- An attribute can drop out of the index after a template was saved. That template then matches nothing rather than erroring, which reads as "no related products", and its next update answers `400` until the condition is changed.
 
 → `mcp/docs/api/index-attributes` · `mcp/docs/api/attribute-sets`
 
@@ -62,7 +64,7 @@ Check the relation before touching the block.
 ## Common mistakes
 
 - **Looking for a list field on the product.** Relations are computed, not stored.
-- **Conditioning on a non-indexed attribute.** Silent empty result.
+- **Conditioning on a non-indexed attribute.** Refused with `400` on save; a template saved before the attribute left the index returns nothing.
 - **Confusing global and local evaluation.** Different results, same template.
 - **Deleting a template still referenced by a block.** The block then displays nothing.
 - **Building the whole template before testing it.** Add and verify one condition at a time.
