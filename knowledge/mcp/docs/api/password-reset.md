@@ -10,7 +10,7 @@ Read this before wiring a forgot-password screen, and before concluding from a p
 
 `code` is not an activation code and no provider setting turns it off. The provider option that activates new accounts by code governs registration only; a provider with it switched off still refuses a password change that carries no code, and still issues codes on request.
 
-That is not a gap to work around. The route takes no token and identifies the account by nothing but a name the visitor types, so the code is the only evidence the account is theirs. There is no operation that changes a password without one, and none that changes the password of the signed-in visitor by checking the old one.
+That is not a gap to work around. The route takes no token and identifies the account by nothing but a name the visitor types, so the code is the only evidence the account is theirs. There is no anonymous operation that changes a password without one. A visitor who is signed in changes it from the account page instead, and that path checks neither a code nor the old password.
 
 ## Two calls in order
 
@@ -56,6 +56,21 @@ Every session that account holds on that provider is dropped as part of the chan
 So a site that resets a password mid-visit must clear whatever it cached and send the visitor through sign-in again with the new password. Do not assume the tokens you were holding still work, and do not treat that `401` as a sign the reset failed — it is the proof that it succeeded.
 
 → `mcp/docs/api/content-api-sign-in-and-cart#where-the-session-routes-live`
+
+## Changing the password from the account page
+
+A signed-in visitor changes the password through the profile update, `PUT /api/content/users/me`, by sending the new value as an `authData` entry under the marker of the form's password field. It takes the visitor's bearer token and nothing else: no code, no old password.
+
+```json
+{ "formIdentifier": "visitor-form", "langCode": "en_US",
+  "authData": [ { "marker": "password", "value": "chosen-secret" } ] }
+```
+
+The answer is `200` with `true`. Every other session of the account is closed by it: tokens held on other devices answer `401`, and their refresh tokens are refused. The session that sent the update stays signed in, so the page that made the change keeps working without a new sign-in.
+
+The visitor is notified the way a reset notifies them. The update names no event, so every password-changed event of the forms module is sent. Configure one if the site should tell visitors that their password changed.
+
+A profile update without an `authData` password entry signs nobody out.
 
 ## Common mistakes
 
