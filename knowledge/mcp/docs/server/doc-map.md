@@ -33,6 +33,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/server/allow-levels` | A call was refused before anything was sent |
 | `mcp/docs/server/confirm-and-dry-run` | Previewing a mutation, or handling a confirm token |
 | `mcp/docs/server/audit-log` | You need to know what is recorded, or to read the log |
+| `mcp/docs/api/version-history` | Taking a snapshot of a record, or rolling one back to an earlier version |
 
 ## The tools
 
@@ -185,6 +186,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | How do I delegate one section of the site to an editor | `mcp/docs/api/admin-page-scope#delegating-a-section-of-the-site-to-an-editor` |
 | Why is my page create or delete refused with 403 | `mcp/docs/api/admin-page-scope#what-a-refusal-tells-you` |
 | How do I lift a page scope restriction | `mcp/docs/api/admin-page-scope#there-is-no-empty-list` |
+| Which permission does rolling back a record need | `mcp/docs/api/version-history#which-permission-each-call-needs` |
+| Why does a version history call answer 400 | `mcp/docs/api/version-history#which-records-have-a-version-history` |
 | Can an export permission be granted | `mcp/docs/api/admins-and-permissions#exporting-data-has-its-own-permissions` |
 | Why is creating or deleting a data environment refused with 403 | `mcp/docs/api/admins-and-permissions#managing-data-environments-has-its-own-permission` |
 | Why does naming an environment answer 400 before my token is checked | `mcp/docs/api/environments#what-a-wrong-environment-name-answers` |
