@@ -139,6 +139,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/journal` | Finding who changed something, or clearing the instance's own record of it |
 | `mcp/docs/api/content-api-journal` | Showing what the public API has been asked for, or chasing an error a site reports |
 | `mcp/docs/api/events` | Sending a mail or a push when something happens |
+| `mcp/docs/api/event-mailing-checks` | A recurring mailing on an event refused with 400, or what such a refusal leaves stored |
 | `mcp/docs/api/workflows` | A requirement shaped like a schedule, or a reaction no endpoint offers |
 | `mcp/docs/api/workflow-nodes` | Writing the nodes of a flow, and the configuration the catalogue does not declare |
 | `mcp/docs/api/settings` | Instance-wide settings, limits and quota |
@@ -341,6 +342,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does my form event send no mail | `mcp/docs/api/events#an-event-with-no-recipient-looks-configured` |
 | Did my event actually send anything | `mcp/docs/api/events#checking-whether-an-event-actually-sent-mail` |
 | Why did my event send a mail but no push | `mcp/docs/api/events#which-channels-an-event-sends-on` |
+| Why is my event's mailing refused with 400 | `mcp/docs/api/event-mailing-checks#which-mailing-values-are-refused` |
 
 ## Answers about visitors and sessions
 
