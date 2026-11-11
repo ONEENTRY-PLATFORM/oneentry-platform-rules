@@ -24,7 +24,7 @@ Narrow it with query parameters rather than paging and filtering yourself:
 | `adminId` | who made the change |
 | `limit`, `offset` | pagination |
 
-`action` is derived from the HTTP method of the original call (`READ`: sensitive form values were read) and `result` from its status, so a refused call is recorded as `FAILURE` rather than left out. An entry carries `id`, `createdAt`, `moduleName`, `entityId`, `moduleEntryId`, `action`, `result`, `error` and the admin beside them.
+`action` is derived from the HTTP method of the original call (`READ`: sensitive form values were read) and `result` from its status, so a refused call is recorded as `FAILURE` rather than left out. An environment transfer is the exception: its entry is written to the target environment when the run finishes, with the outcome rather than the response status — see `mcp/docs/api/environments#copying-content-from-one-environment-to-another`. An entry carries `id`, `createdAt`, `moduleName`, `entityId`, `moduleEntryId`, `action`, `result`, `error` and the admin beside them.
 
 **The time window is the one parameter whose name differs between reading and clearing.** The listing takes it nested; a flat `from` or `to` sent here is accepted and then **ignored**, and the answer is the unfiltered journal, with no error to notice:
 
