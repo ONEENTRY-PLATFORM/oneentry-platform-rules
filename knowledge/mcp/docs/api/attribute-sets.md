@@ -180,6 +180,16 @@ The name check follows the locale key. A `validators` map written flat, with no 
 
 A set that already holds an unrecognised name keeps it, and nothing re-checks it until the set is written again. That write is where it surfaces: it answers `400` until the name is corrected, and the field is enforced by nothing up to that point.
 
+## Validator values are checked too
+
+Besides the name, three validators are checked for shape when a set is created, updated or has its schema replaced; a bad value answers `400` naming the attribute, the locale and the validator, and nothing is stored.
+
+- `requiredValidator` and `trimValidator` take `true`, `false` or an object. A string or number is refused.
+- `regExpValidator` takes an object `{ "patternValue": "<pattern>", "invert": false, "flags": [] }`. `patternValue` must be a string that compiles as a regular expression with those flags, `invert` a boolean, `flags` an array of strings. A bare string such as `"("`, an array, or a pattern like `(a+)+$` (an unbounded repeat inside a group that is itself repeated, which can hang a consumer that runs it) is refused.
+- `fieldMaskValidator` takes an object whose `maskValue`, when present, is a string.
+
+The other validators are not checked for shape. A set that already holds a value of this kind keeps it and is still served; it answers `400` the next time that schema is written, until the value is corrected.
+
 ## When a required rule is on and when it is off
 
 `requiredValidator` is on as soon as the key is present under the locale, whatever value it carries: `true`, `{}`, `{ "strict": true }` and `{ "customErrorText": "Required field!" }` all make the field required. Submitting the form without that marker, or with an empty value for it, answers `400` and names the marker.
