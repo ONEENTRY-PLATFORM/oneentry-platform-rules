@@ -135,6 +135,8 @@ Each of pages, blocks and products also carries a quick search — `GET /api/con
 
 It is the cheap answer to "find the page called roughly this" and it does not cap its answer in groups of five.
 
+On products the public quick search leaves out products with `isVisible: false`, so an empty answer for a hidden product does not mean the product is gone. The admin `GET /api/admin/products/quick/search` still returns hidden products; use it to confirm one exists.
+
 ## Semantic search over one kind of entity
 
 Separately, seven kinds carry a `POST /{kind}/vector/search` route that matches by meaning rather than by word — products, pages, orders, users, discounts, admins and form data. It answers the question the word search cannot: "something like this", where the human's wording and the stored wording share no words.
