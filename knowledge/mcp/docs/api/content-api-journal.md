@@ -49,9 +49,9 @@ What you do send is checked. A value that is not ISO 8601 answers `400 Invalid p
 
 `statusCodes` is one comma-separated string, and it mixes two kinds of token: the ranges `4xx` and `5xx`, and exact codes. `statusCodes=4xx,500` means "every client error, plus 500".
 
-A token it does not recognise is **dropped without comment**. Send `statusCodes=junk` and the call answers `200` with the whole unfiltered period rather than an empty list or a `400` — and a typo inside a longer list silently widens the filter instead of narrowing it. Check `total` against the unfiltered one before trusting the result.
+Every token is checked. Anything other than `4xx`, `5xx` or a code from 400 to 599 answers `400` with a message naming the token, for example `Invalid statusCodes item "junk": expected 4xx, 5xx or a code 400-599`. One bad token in a longer list refuses the whole call, so `statusCodes=4xx,junk` is a `400`, not a filter on `4xx`. Codes below 400, such as `200`, are refused too: only refused requests are recorded here.
 
-`path` matches anywhere inside the recorded path, not just at its start: `path=cart` finds `/api/content/users/me/cart/items/999`. It is a plain substring, so no wildcards are needed and none are interpreted.
+`path` matches anywhere inside the recorded path, not just at its start, and ignores case: `path=cart` finds `/api/content/users/me/cart/items/999`. It is a plain substring. `%`, `_` and `\` are matched as those characters, so `path=products_all` finds only paths that contain that exact text.
 
 ## One error on its own carries the request context
 
@@ -92,7 +92,7 @@ This is the one call in the area that depends on something outside the instance'
 - **Using `journal.get` here.** It opens neither listing; the two keys are separate from it and from each other.
 - **Sending `createdAt[from]` and `createdAt[to]`.** Ignored; this listing takes the flat names.
 - **Reading an empty listing as no errors.** With no window it covers the last 24 hours.
-- **Trusting a `statusCodes` filter without checking `total`.** An unrecognised token is dropped and the filter widens.
+- **Sending a status class other than `4xx` or `5xx`.** Any other token answers `400`; there is no `2xx` here.
 - **Calling the clear with the view key.** It needs `journal.delete`.
 - **Calling the clear with no window by accident.** Without `from` and `to` it removes every record.
 - **Reading a `503` on the summary as a missing permission.** The grant is fine; the counts are not available.
