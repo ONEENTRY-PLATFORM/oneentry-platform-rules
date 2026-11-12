@@ -375,5 +375,6 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | How do I add a status trigger of my own | `mcp/docs/api/order-status-triggers#a-storage-can-define-triggers-of-its-own` |
 | Why is my subscription status never equal to cancelled or expired | `mcp/docs/api/subscriptions#plans-and-enrolments` |
 | Why can I not delete a subscription plan | `mcp/docs/api/subscriptions#delete-a-plan` |
+| Why does subscribing answer 400 about a price or a language | `mcp/docs/api/subscriptions#the-subscribe-language-must-carry-the-plan-price` |
 | How is the body of a refund shaped | `mcp/docs/api/orders#previewing-a-refund-before-issuing-one` |
 | Why does a refund answer 400 when its preview worked | `mcp/docs/api/orders#why-a-refund-answers-400-when-its-preview-worked` |
