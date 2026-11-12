@@ -134,6 +134,8 @@ DELETE /api/admin/products/category/{pageId}
 { "ids": [ 104, 105 ] }
 ```
 
+This route removes each product from that category only. A product that also sits in other categories stays in them; a product with no other category is deleted together with its data. `DELETE /api/admin/products/category-total/{pageId}`, which empties a whole category, follows the same rule, as does deleting one product from one category. `DELETE /api/admin/products` deletes the products everywhere.
+
 The sibling `DELETE /api/admin/products/delete/multi` is the one to avoid: the same body answers `200 false` and deletes nothing, and a bare array or a query string answers `5xx`. For one product, the single-delete operation needs no category.
 
 Whichever you use, this is a destructive call: dry-run it, show the human the target, and count what is about to go.
