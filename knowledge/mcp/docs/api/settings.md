@@ -70,6 +70,8 @@ The sender identity used for outbound notifications. Changing it changes what cu
 
 An address that does not pass the receiving side's checks results in messages that quietly do not arrive. Treat a change here as something to verify with a real send, not just a successful write.
 
+The address must be on one of the project's allowed email domains (listed in the general settings under `system.common.emailDomains`). Any other domain is rejected with 400 `Sender domain is not allowed` and nothing is stored. A project with no allowed domains configured accepts any domain.
+
 ## Captcha and system settings
 
 Some system settings — captcha keys among them — are permanently confirm-gated. They involve credentials issued by an external service, and rotating them affects every form on the site at once.
