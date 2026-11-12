@@ -47,6 +47,8 @@ A fresh instance has exactly one active locale, usually `en_US`, which makes har
 
 Build the object by iterating the active codes. If you only have content for one language, say so to the human and ask what should appear in the others — do not quietly leave them empty.
 
+Products check the keys. A product create or update whose `localizeInfos` carries a code that is not an active locale answers `400` naming that code and writes nothing. A code the product already carries is still accepted, so a product stays editable after its language is switched off.
+
 ## The same keying applies to attribute values
 
 `attributesSets` is keyed by locale first and by attribute second:
