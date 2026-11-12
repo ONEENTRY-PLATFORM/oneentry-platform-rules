@@ -53,6 +53,7 @@ Rules that are not visible in the schema:
 - **Fields the product does not store are ignored.** `forms` is one: the schema lists it, the update answers 200 and saves nothing for it. Read the product back to see what was kept.
 - **`updatedDate` is ignored.** The server owns it, so sending back the object you read is safe.
 - **`blocks` and `productPages` are left alone when omitted.** Send them only to change them — and note that `blocks: []` is then a real instruction, meaning "on no blocks", not a filler for a field you had nothing to say about.
+- **`revision` guards against overwriting a colleague's edit.** The product read returns `revision`, a counter that grows on every write to the product — an update, a status change, a template change, a visibility switch, an import. Send back the `revision` you read: if it is lower than the current one the update answers 409 and writes nothing, so re-read the product and merge. Without `revision` there is no check and the last write wins. The new value comes back in the `X-Product-Revision` response header of those calls (a status or template change names it only when it covers a single product); the body stays `true`/`false`. A body copied from an old read and sent twice conflicts the second time.
 
 Read the product first and send the smallest body that expresses your change. A large speculative body fails as one opaque error; a small one tells you what is wrong.
 
@@ -165,6 +166,7 @@ Filter objects accept only `attributeMarker`, `conditionMarker`, `conditionValue
 - **Swallowing a failed list into an empty result.** The next run creates duplicates of everything.
 - **Reporting a bulk `set-status` from its response.** Read a product back by id; the status code is not evidence.
 - **Sending `forms` on an update.** The schema accepts it and the save does not.
+- **Updating from a stale read.** Echoing a product read minutes ago, with its `revision`, answers 409 once anyone else has changed the product; without `revision` it silently reverts their change.
 - **A one-level attribute map.** Silently empty. Read back.
 - **Putting every colour in one product.** One article number, one product.
 - **A free-text field where the values are a closed set.** Use a `list`.
