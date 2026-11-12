@@ -46,6 +46,8 @@ Whether several discounts can apply to one order at the same time is an instance
 
 So the effect of adding a discount depends on the setting as well as on the discount. Check it before promising a human what the total will be.
 
+When discounts stack, `maxDiscountValue` caps the whole reduction, not each discount on its own: product discounts and order discounts together never take more than that percentage off the original price of the items. With a 30% cap, a product discounted by 30% gets nothing more from a 20% order discount. Predict a total from the cap first, then from the individual discounts.
+
 → `mcp/docs/api/settings`
 
 ## How discounted amounts are rounded
