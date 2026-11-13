@@ -54,9 +54,17 @@ Because a status change is what makes a product buyable or unbuyable, treat it a
 
 ## What making a status the default changes
 
-A status has an `isDefault` flag, and at most one status holds it. Writing `isDefault: true` on a status is a bulk product change, not a label change: shortly after the call returns, every product with no status, and every product on the previous default, carries the new one. The previous default loses the flag.
+A status has an `isDefault` flag, and at most one status holds it. Writing `isDefault: true` on a status is a product change, not a label change: shortly after the call returns, every product with no status carries the new default. The previous default loses the flag, and products that hold it keep it.
 
-Editing anything else on a status, its labels included, leaves products alone. Say which products will move before you set the flag, and read a few back by id afterwards.
+To move those products as well, send `moveProductsFromPreviousDefault: true` in the same create or update body. Only products on the previous default move; products on any other status are never touched. The flag is a one-off instruction, not a stored field, and a value that is not a boolean answers `400`.
+
+```json
+{ "isDefault": true, "moveProductsFromPreviousDefault": true }
+```
+
+Moving products off the previous default changes what a site shows for them, and it cannot be told apart afterwards from a status set by hand. Ask the human before you send the flag, and name the status those products hold now.
+
+Editing anything else on a status, its labels included, leaves products alone. Read a few products back by id afterwards.
 
 ## Statuses and site behaviour
 
