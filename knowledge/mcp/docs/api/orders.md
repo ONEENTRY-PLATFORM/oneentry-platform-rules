@@ -96,14 +96,46 @@ The preview answers what would be taken and what would remain: `refundAmount`, `
 
 Always preview first and quote `refundAmount` to the human before the real call. The amount is recomputed against the order's discounts, so it is not the product price times the quantity and cannot be worked out by hand.
 
+## What an issued refund answers
+
+The real call answers `201`:
+
+```json
+{ "status": "success", "orderRefundId": 12, "amount": 7,
+  "succeeded": [ { "id": 12, "sessionId": 501, "amount": 7, "status": "succeeded" } ],
+  "failed": [] }
+```
+
+`amount` is what was actually returned, and each entry of `succeeded` is one charge that gave money back. `status` is `success` when every charge behind the refund went through and `partial` when some did not — then `failed` lists those. Report a `partial` as partial; never as done.
+
+An order can be refunded more than once, a few products at a time, until what was ordered is used up. After that the next call answers `400 Refund amount should be > 0`. The history read lists every refund issued, each with its `id`, `status`, `amount`, `products` and `note` — read it before a second refund rather than trusting your memory of the first.
+
+## Refunding an order paid in stages
+
+An order paid in stages is refunded **by stage**, not by quantity. Each product entry names the stage markers to return in `stages`:
+
+```json
+{ "note": "deposit returned",
+  "products": { "118": { "stages": ["deposit"] } } }
+```
+
+Read the markers from `GET /api/admin/payments/stages/order/{id}`, which lists every stage with its `marker`, `value` and `status`. On such an order:
+
+- `quantity` answers `400` — it has no meaning there;
+- a product entry without `stages` answers `400`;
+- a marker the product does not have answers `400` naming it;
+- a stage that was never paid answers `5xx`, and nothing is written.
+
+So name only stages whose `status` reads `completed`, and preview first.
+
 ## What a refund body ignores without saying so
 
 Four parts of that body fail quietly, and all four leave `refundAmount` smaller than you meant:
 
 - a product id the order does not contain contributes **nothing** — no error, no mention;
-- a `quantity` higher than the number ordered is **clamped** to the ordered count, so asking for 11 of 10 refunds 10;
+- in the preview, a `quantity` higher than the number ordered is **clamped** to the ordered count, so asking for 11 of 10 previews 10 — the real refund refuses the same body with `400`;
 - `quantity` omitted, or `0`, selects nothing;
-- `stages` is for an order paid in stages; on an order paid in one charge it is ignored.
+- `stages` is for an order paid in stages; on an order paid in one charge it is ignored (the reverse is refused — see above).
 
 So a preview answering `refundAmount: 0` means the selection matched nothing — check the ids against the order's products before reading it as "there is nothing to refund". `products` must be present even when empty: a body carrying only `note` answers `5xx`.
 

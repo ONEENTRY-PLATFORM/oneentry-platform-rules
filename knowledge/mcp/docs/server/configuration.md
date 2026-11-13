@@ -22,6 +22,7 @@ A setting present in a higher source wins outright; there is no merging of indiv
 | Flag | Meaning | Default |
 |---|---|---|
 | `--base-url <url>` | Admin API base URL, must contain `/api/admin` | `http://localhost:3003/api/admin` |
+| `--environment <name>` | Data environment every call works in; `public` or an empty value means the main data set | none — the main data set |
 | `--allow <level>` | `read`, `write` or `destructive` | `read` |
 | `--login <login>` | Admin login; the password comes from the environment | none |
 | `--audit <path>` | JSONL audit log; required in remote mode | none |
@@ -47,6 +48,7 @@ A setting present in a higher source wins outright; there is no merging of indiv
 |---|---|
 | `ONEENTRY_CMS_BASE_URL` | `--base-url` |
 | `ONEENTRY_CMS_LOGIN` | `--login` |
+| `ONEENTRY_CMS_ENVIRONMENT` | `--environment` |
 | `ONEENTRY_CMS_PASSWORD` | *(environment only)* |
 | `ONEENTRY_CMS_TOKEN` | *(environment only)* — a pre-issued access token instead of login and password, and the only option when the instance asks for a second factor at sign-in |
 | `ONEENTRY_MCP_ALLOW` | `--allow` |
@@ -76,7 +78,7 @@ A flat JSON object read from the current working directory. A missing file is fi
 }
 ```
 
-Keys mirror the flags in camelCase: `baseUrl`, `allow`, `login`, `password`, `token`, `auditPath`, `cacheDir`, `requestTimeoutMs`, `maxResponseBytes`, `port`, `host`, `allowedOrigins`, and a nested `knowledge` object with `repo`, `ref`, `path` and `refreshTtlMs`.
+Keys mirror the flags in camelCase: `baseUrl`, `environment`, `allow`, `login`, `password`, `token`, `auditPath`, `cacheDir`, `requestTimeoutMs`, `maxResponseBytes`, `port`, `host`, `allowedOrigins`, and a nested `knowledge` object with `repo`, `ref`, `path` and `refreshTtlMs`.
 
 There is no `.env` support. A `.env` file next to the server is not read.
 
@@ -90,6 +92,16 @@ This server intentionally exposes the Admin API only.
 ```
 
 This is a guarantee rather than a convention: the Content and Developer APIs cannot be reached through this server at any allow level.
+
+## Pointing the server at a data environment
+
+`--environment` (or `ONEENTRY_CMS_ENVIRONMENT`) makes every request of this server carry `x-environment` with that name — calls and uploads alike — so every read and write lands in that environment. Leave it unset for the main data set; `public` and an empty value mean the same and send nothing.
+
+It is one setting per process. No tool argument changes it, so an agent that needs two environments needs two servers.
+
+A name of the wrong shape — anything but lowercase letters, digits and single underscores, starting with a letter, at most forty characters — is a startup error. A well-formed name the instance's registry does not list is not: the server starts, `cms_whoami` and `cms_guide` say the environment is not usable, and every API call is refused before it is sent. An instance with no environment registry at all is treated the same way, because it would ignore the header and serve the main data set.
+
+→ `mcp/docs/api/environments#which-data-set-your-own-calls-reach`
 
 ## Never pass a password as a flag
 
@@ -135,7 +147,7 @@ An audit path is **mandatory** in remote mode; the server refuses to start witho
 
 ## Checking what the server actually resolved
 
-`cms_whoami` reports the mode, base URL, allow level, the authenticated admin and its permissions, the catalog state with any warnings, the documentation source with its repository, ref and commit, and the audit path.
+`cms_whoami` reports the mode, base URL, data environment, allow level, the authenticated admin and its permissions, the catalog state with any warnings, the documentation source with its repository, ref and commit, and the audit path.
 
 `cms_guide` reports the same policy in one line, plus the API map. If a setting you passed does not appear in either, it did not take effect — check the precedence order above and whether the variable name is exact.
 

@@ -196,6 +196,9 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why is creating or deleting a data environment refused with 403 | `mcp/docs/api/admins-and-permissions#managing-data-environments-has-its-own-permission` |
 | Why does naming an environment answer 400 before my token is checked | `mcp/docs/api/environments#what-a-wrong-environment-name-answers` |
 | Which data environment do my calls reach | `mcp/docs/api/environments#which-data-set-your-own-calls-reach` |
+| How do I start this server in a data environment | `mcp/docs/server/configuration#pointing-the-server-at-a-data-environment` |
+| Which settings does a data environment share with the main set | `mcp/docs/api/environments#what-the-two-sets-share-and-what-they-do-not` |
+| Why does a request still reach the old environment after a marker re-point | `mcp/docs/api/environment-markers#a-marker-is-a-second-way-to-name-an-environment` |
 | How do I point a client at a different data environment | `mcp/docs/api/environment-markers#a-marker-is-a-second-way-to-name-an-environment` |
 | Why does renaming an environment marker change nothing | `mcp/docs/api/environment-markers#why-renaming-a-marker-does-nothing` |
 | Why did a transfer answer 201 and leave the target page as it was | `mcp/docs/api/environment-transfer#a-duplicate-without-a-resolution-is-not-written` |
@@ -312,6 +315,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why do my uploaded images have no preview | `mcp/docs/api/files-and-uploads#no-preview-template-no-preview-and-no-error` |
 | How do I upload a file through this server | `mcp/docs/server/cms-upload-file` |
 | Where does alt text for an image live | `mcp/docs/api/files-and-uploads#a-file-record-has-nowhere-to-keep-alt-text` |
+| Why is an image I wrote as one object read back as a list | `mcp/docs/api/files-and-uploads#the-public-read-answers-a-file-value-as-a-list` |
 | Why is a document I attached not searchable | `mcp/docs/api/file-content-search#why-a-document-you-attached-is-not-found` |
 | Why do old images still show the old thumbnail size | `mcp/docs/api/templates-and-previews#changing-a-preview-template-does-not-re-crop-old-images` |
 | I regenerated previews and one image is unchanged | `mcp/docs/api/templates-and-previews#one-unchanged-preview-does-not-mean-it-failed` |
@@ -355,6 +359,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | How does a signed-in visitor change their password | `mcp/docs/api/password-reset#changing-the-password-from-the-account-page` |
 | Why is my guest cart empty after adding to it | `mcp/docs/api/content-api-sign-in-and-cart#the-guest-cart-needs-a-uuid-in-x-guest-id` |
 | How do I turn a login into a user id | `mcp/docs/api/users-and-groups#find-a-user-by-their-login` |
+| Why does a user read show groups when the write takes groupIds | `mcp/docs/api/users-and-groups#put-a-user-into-a-group` |
 | How do I renew an administrator token | `mcp/docs/api/admin-sign-in#renewing-an-administrator-token` |
 | Why did an admin lose its session after a permission edit | `mcp/docs/api/admins-and-permissions#a-permission-change-signs-the-target-admin-out` |
 | Why can a sign-in provider not be deleted | `mcp/docs/api/users-and-groups#a-sign-in-provider-with-users-cannot-be-deleted` |
@@ -378,3 +383,5 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does subscribing answer 400 about a price or a language | `mcp/docs/api/subscriptions#the-subscribe-language-must-carry-the-plan-price` |
 | How is the body of a refund shaped | `mcp/docs/api/orders#previewing-a-refund-before-issuing-one` |
 | Why does a refund answer 400 when its preview worked | `mcp/docs/api/orders#why-a-refund-answers-400-when-its-preview-worked` |
+| What does an issued refund answer | `mcp/docs/api/orders#what-an-issued-refund-answers` |
+| How do I refund an order paid in stages | `mcp/docs/api/orders#refunding-an-order-paid-in-stages` |

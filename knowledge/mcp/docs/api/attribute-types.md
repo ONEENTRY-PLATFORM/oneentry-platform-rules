@@ -90,18 +90,13 @@ An accordion of a dozen questions is one attribute with a dozen items — not on
 
 → `mcp/docs/api/content-modelling#textwithheader-holds-several-heading-and-text-pairs`
 
-## Files and images depend on the count
+## Write a file value as a list
 
-The shape of a `file` or `image` value depends on **how many files there are**, not on the entity it belongs to: one file is a single object, two or more is a list. `groupOfImages` is always a list, even with one image.
+A `file` or `image` value holding one file may be written as a bare record or as a list of one; `groupOfImages` and any value with two or more files are a list. Write the list.
 
-Write code that survives both:
+The public read answers a list whatever was written, and `[]` for an emptied value. The admin read answers in the form that was sent, so code reading it must handle both.
 
-```text
-value is a list  → take the first element
-value is an object → use it directly
-```
-
-An attribute that holds one image today can hold two tomorrow, because a content manager added one. Code that assumes the singular shape breaks at exactly that moment.
+→ `mcp/docs/api/files-and-uploads#the-public-read-answers-a-file-value-as-a-list`
 
 ## The value form of a list and a radioButton
 
