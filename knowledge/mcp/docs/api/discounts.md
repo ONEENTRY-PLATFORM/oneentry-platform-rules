@@ -37,6 +37,7 @@ Two things follow:
 
 - Conditions over attributes work only on **indexed** attributes. A condition on a non-indexed attribute matches nothing, silently, and the discount appears not to work.
 - A discount with no conditions applies broadly. That is occasionally intended and usually not.
+- A category entry in a condition or in `exclusions` is `{"id": <category>, "isNested": <bool>}`. With `isNested: true` it covers the category and every subcategory below it; with `false` or omitted, only products placed directly in that category. Send `isNested: true` when the brief says "this section and everything in it".
 
 → `mcp/docs/api/index-attributes`
 
@@ -131,6 +132,7 @@ One line to check before calling it configured: a discount that is not meant for
 - **Choosing `FIXED_PRICE` when `FIXED_AMOUNT` was meant.** One sets the price, the other reduces it.
 - **Confusing per-item and per-order applicability.** Very different totals.
 - **Conditioning on a non-indexed attribute.** Silently matches nothing.
+- **Omitting `isNested` on a parent category.** The discount then skips every product in its subcategories.
 - **Creating a discount with no conditions and no coupons.** It applies to everything, for everyone.
 - **Creating a coupon from a supplied code and calling it one-shot.** It is reusable unless you send `isReusable: false`.
 - **Leaving `isReusable` to the default when the brief says otherwise.** The two operations default in opposite directions.
