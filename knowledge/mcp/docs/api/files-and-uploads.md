@@ -63,7 +63,7 @@ The public files route is unaffected. It is governed by the user group's own fil
 
 ## No file type is refused
 
-There is no allowlist of extensions and no setting that introduces one. Every part sent is stored whatever its name says it is — a document, a page, a vector image, a name carrying no extension at all — and it is served back under a content type read off that name, so a file a browser treats as a document opens as a page on the instance's own address.
+There is no allowlist of extensions and no setting that introduces one. Every part sent is stored whatever its name says it is — a document, a page, a vector image, a name carrying no extension at all — and it is served back under a content type read off that name. A file a browser would render as a document — HTML, XHTML, SVG or XML — is served as a download (`Content-Disposition: attachment`): opening its `downloadLink` saves the file instead of displaying it, while an SVG placed in an `<img>` tag or a CSS background still displays as an image.
 
 Three limits apply on the way in, and they are the whole list:
 
