@@ -127,6 +127,8 @@ The field is a **full replacement**, not an addition. Send every group the user 
 - `groupIds: []` — every membership is removed.
 - field omitted entirely — membership is left as it is.
 
+Reading a user answers membership under a different name: `groups`, a list of group ids, with no `groupIds` in the answer. The write accepts `groups` too, with the same full-replacement meaning, so sending a read user back changes nothing. Write `groupIds` in new code, and read `groups`.
+
 `authProviderId` is required in the body and must be the provider the user actually signed up through; anything else answers 404. An id in `groupIds` that no group carries answers 400 and writes nothing at all, so a rejected call never leaves a half-applied set.
 
 ```json
