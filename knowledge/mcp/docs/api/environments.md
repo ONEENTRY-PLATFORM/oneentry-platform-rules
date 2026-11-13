@@ -28,15 +28,19 @@ So the callback address registered in a provider's dashboard for an environment 
 
 ## Which data set your own calls reach
 
-**Read this before your first write on any instance that has environments.** You do not choose: the operator does, once, when the server starts. No tool takes an environment argument, and nothing you can pass to `cms_api_call` changes the set your call lands in.
+**Read this before your first write on any instance that has environments.** You do not choose: the operator does, once, when the server starts, with `--environment` or `ONEENTRY_CMS_ENVIRONMENT`. No tool takes an environment argument, and nothing you can pass to `cms_api_call` changes the set your call lands in.
 
 `cms_whoami` is the answer, under `environment`:
 
 | What it says | What it means |
 |---|---|
 | a name | every call of this session reads and writes **that** environment, and the main set is not reachable from here |
-| `null` | every call works in the main set of data |
+| a name, with `environmentStatus` `unknown` | the instance has no such environment, or no environments at all; every call is refused before it is sent |
+| a name, with `environmentStatus` `not-ready` | the environment exists but is being created or removed; the instance refuses every call |
+| `null` | every call works in the main set of data — also when the operator configured `public` |
 | no such field at all | the server predates environments and sends no header, so every call works in the main set |
+
+An `environmentError` beside the status names the cause. Do not change any payload over it: tell the human which environment the server is configured with, and that it needs restarting with a name the registry lists.
 
 So a human asking you to add a page "on staging" is asking a question about the server's configuration, not about your payload. Check `cms_whoami` first. If it does not name that environment, say so and stop — the work needs a server pointed at it, or a person in the admin panel.
 
@@ -59,7 +63,7 @@ On the Content API the same mistake is indistinguishable from a token problem �
 
 ## The shape an environment name may take
 
-A name that does not fit answers `400 Invalid x-environment header value` on any route, and that refusal is about the characters, not about whether the environment exists:
+On the Admin API a name that does not fit answers `400 Invalid x-environment header value` — the Content API answers its token refusal instead, as above — and that refusal is about the characters, not about whether the environment exists:
 
 - lowercase letters, digits and underscores only, starting with a letter;
 - no two underscores in a row and no trailing underscore;
@@ -75,7 +79,9 @@ The sender address of event e-mails is separate too. A write that names an envir
 
 Push notifications are separate in the same way. A Firebase service-account key uploaded with `POST /api/admin/events/settings/firebase` while naming an environment belongs to that environment, and the push notifications its events send go through that key. An environment without a key of its own sends no push notifications at all: the main set's key is never used in its place. Upload a key in every environment whose events should reach devices, and read it back with the same environment named.
 
-Shared across all of them: administrator accounts and their permission maps, the admin sign-in itself, the active locales, and platform settings. One admin login works in every environment with no second sign-in, and granting a key grants it everywhere at once.
+Shared across all of them: administrator accounts and their permission maps, the admin sign-in itself, the active locales and the general types. One admin login works in every environment with no second sign-in, and granting a key grants it everywhere at once.
+
+Most other settings are **not** shared, even the ones that feel instance-wide. Payment accounts, sign-in providers, events, user groups, templates, modules and order storages each answer their own listing inside an environment. So set them up in the environment that needs them, and never take what the main set has as proof of what an environment has — read the listing with that environment named.
 
 The record quota is shared too, counting the main set and every ready environment **together**: `records-usage` answers the same totals whichever environment the request names, so an environment filled with test content spends the live one's allowance.
 

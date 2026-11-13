@@ -11,6 +11,7 @@ Neither touches the Admin API for its answer beyond the authentication the sessi
 Returns a short markdown briefing, generated from the live state of the server:
 
 - the mode and base URL, and the write policy in one sentence;
+- the data set every call lands in — the main one, or the configured environment and whether it is usable;
 - how many operations the catalog holds;
 - how many documents and sections the knowledge index holds, and where they came from;
 - the loop to follow, a pointer to `mcp/docs/server/doc-map`, and the instruction never to invent a path;
@@ -46,7 +47,8 @@ Searches will find almost nothing, and every document referenced by a pointer wi
 Returns the resolved state as JSON:
 
 ```json
-{ "mode": "local", "baseUrl": "https://your-instance.example/api/admin", "allow": "write",
+{ "mode": "local", "baseUrl": "https://your-instance.example/api/admin",
+  "environment": null, "environmentHint": "…", "allow": "write",
   "authenticated": true,
   "admin": { "id": 1, "permissionCount": 96, "permissions": ["menu.create", "…"] },
   "catalog": { "operations": 478, "swaggerHash": "…", "builtAt": "…",
@@ -59,6 +61,7 @@ Returns the resolved state as JSON:
 
 ## What to check in it
 
+- **`environment`** — before the first write. `null` is the main data set, the live one; a name is the environment every call carries. When the server could not confirm that name, `environmentStatus` reads `unknown`, `not-ready` or `unverified` and `environmentError` says why: at `unknown` every call is refused before it is sent, and an empty permission list beside it comes from that refusal, not from missing grants. Only the operator can change it — tell the human.
 - **`allow`** — before planning any write. Planning a delete against a read-only server wastes the whole turn.
 - **`admin.permissions`** — the exact list the local pre-check uses. Compare it against the `permission` field of the operation you intend to call, and ask for the grant *before* you build the payload.
 - **`catalog.operations`** — zero means nothing can be searched or called.

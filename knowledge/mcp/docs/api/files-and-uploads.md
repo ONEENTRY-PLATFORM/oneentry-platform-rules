@@ -126,24 +126,25 @@ So do not serve one stored file to two records by copying the attribute value fr
 
 A file uploaded under a different record — a page, say — is left alone when a product that references it is deleted. It is left alone when nothing references it any more, too: only the delete-file call removes it.
 
-## One file is an object two are a list
+## The public read answers a file value as a list
 
-The value shape follows the **number of files**, not the entity kind:
+On the way in, a `file` or `image` value with one file is accepted **either way** — as the bare record or as a list holding it. Two or more files, and every `groupOfImages` value, are a list.
 
-- one file — a single object;
-- two or more — a list;
-- `groupOfImages` — always a list, even with one image.
+The two reads then disagree about the shape:
 
-Handle both. An attribute holding one image today holds two the moment a content manager adds one, and code that assumed the singular shape breaks at exactly that point.
+- **The public read always answers a list**, whatever was written. One file written as a bare record comes back as a list of one, and an emptied value — `""`, `null`, `[]` or `{}` — comes back as `[]`.
+- **The admin read answers in the form you sent.** A bare record stays a bare record there, and `""` stays `""`.
+
+Write the list. It is the form both reads agree on, it survives a second file being added, and it makes read-modify-write leave the value's shape alone.
+
+Code reading the admin API still meets both forms, because a value may have been written either way:
 
 ```text
 value is a list   → take the first element
 value is an object → use it directly
 ```
 
-On the way in, a single file is accepted **either way** — as the bare record or as a list holding it. The admin read then answers with whichever form you sent, so the shape you write is the shape you get back.
-
-Write the list. It is the form that survives a second file being added, and it makes read-modify-write leave the value's shape alone.
+A storefront reading the Content API can rely on the list and treat `[]` as no file.
 
 ## A file record has nowhere to keep alt text
 

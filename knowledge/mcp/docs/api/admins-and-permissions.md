@@ -128,7 +128,7 @@ Read the key names in that order — the entity first, `export` second. `export.
 
 It is an ordinary key, like the export ones: it appears in the vocabulary, and an admin provisioned with the instance holds it. Read your own map in `cms_whoami` before asking anyone for the grant.
 
-Like the total logout, these operations carry **no permission in the catalog**, so the local pre-check cannot stop the call: the refusal arrives from the instance after the request went out. A `403` on one of them is this key and nothing else.
+The catalog carries this key on the registry writes, on the three marker writes and on the transfer, so the local pre-check refuses those before any request when your map lacks it. The three marker-token operations do not carry it: there the refusal arrives from the instance as `403` after the request went out. Either way, a `403` on an environment operation is this key and nothing else.
 
 Copying into the main set is a separate key, `environments.transferToPublic`, held by an admin provisioned with the instance but not implied by `environments.manage`. Such a copy also checks the write keys of every kind it would write — see `mcp/docs/api/environments#copying-content-from-one-environment-to-another`.
 
