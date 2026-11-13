@@ -73,6 +73,16 @@ When the plan's payment account is settled manually rather than through a paymen
 
 The enrolment stays pending and is not listed among the customer's active subscriptions until an operator renews it. Renewing completes the waiting session; cancelling the enrolment cancels it. Subscribing again replaces the waiting session with a new one.
 
+## The subscribe language must carry the plan price
+
+Subscribing takes a `langCode`, and the plan's price is read from its products in that language. Pick a language the products are priced in.
+
+- A language that is not active on the instance answers `400 Language "<code>" is not active`.
+- On a plan sold through a payment provider, a product with no price or no currency in that language answers `400 Product's price is not defined (productId: <id>)` or `400 Product's currency is not defined (productId: <id>)`.
+- On a manually settled plan, a language in which none of the plan's products has a price answers `400 Subscription price is not defined`. A plan that is meant to cost nothing needs an explicit price of `0` on its products.
+
+Each of these refusals happens before anything is written: the customer's existing enrolment keeps its status and its provider link, so a lapsed subscription can still be recovered. Retry in a priced language rather than changing the enrolment.
+
 ## Delete a plan
 
 A plan any enrolment still points at cannot be deleted. The call answers `400`, names how many subscribers it has and how many of those are active or pending, and changes nothing:
