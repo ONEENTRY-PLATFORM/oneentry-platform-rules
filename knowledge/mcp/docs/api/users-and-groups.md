@@ -94,6 +94,8 @@ A login is usually an email address, so the path segment carries `@` and a dot. 
 
 One attribute of a sign-in form carries the flag isLogin. Its value is not an ordinary profile field: it is the credential the person signs in with. Writing it in the user card moves the credential too, so the displayed value and the working one never drift apart. You do not name a form when you do it — the form of the user's own sign-in provider is used.
 
+Submissions follow the new login. Those the user sent, those sent about the user, and the list of users a form is bound to are all moved to the new value in the same write, so there is nothing to rewrite by hand afterwards: filtering submissions by the new login finds the old ones too, and a form bound to the user keeps accepting submissions for them.
+
 A value counts as a change only when it differs from what the profile already holds under that marker. The card sends `formData` back whole on every save, so an edit that leaves the field alone is never refused, whatever state the account is in.
 
 A real change answers `400` and writes nothing when:
