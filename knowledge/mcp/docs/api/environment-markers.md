@@ -10,7 +10,9 @@ Read this when somebody asks you to "point staging at the new environment", or w
 
 A request sends `x-environment-marker: <marker>` instead of `x-environment: <name>`. Everything after the name is resolved is identical: the same set of data, the same refusal when the environment is not ready, the same answer shapes.
 
-One marker names one environment; an environment carries as many markers as a project needs. Re-pointing one moves every client that sends it, at once and with no change on their side. That is the only reason markers exist — if nothing will ever need moving, the environment name is enough.
+One marker names one environment; an environment carries as many markers as a project needs. Re-pointing one moves every client that sends it, at once and with no change on their side — on the Content API only for a client that holds a token issued for the marker. That is the only reason markers exist — if nothing will ever need moving, the environment name is enough.
+
+→ `mcp/docs/api/environment-markers#a-content-api-client-needs-a-marker-token`
 
 A marker starts with a lowercase letter or a digit and continues with lowercase letters, digits, hyphens and underscores, up to sixty-four characters. The shape is wider than an environment name, which takes no hyphens, so `shop-staging` is a marker but never an environment name.
 
@@ -31,6 +33,25 @@ The public real-time channel reads the marker too — in the connection headers,
 
 → `mcp/docs/api/environments#what-a-wrong-environment-name-answers`
 
+## A Content API client needs a marker token
+
+An application token issued in the settings belongs to the environment it was issued in, and no other environment accepts it. A storefront that sends a marker together with such a token works until the marker is re-pointed, then every request answers `401 Invalid or missing app token`, because the environment the marker now names never issued that token.
+
+A **marker token** belongs to the marker instead. Send it in `x-app-token` beside `x-environment-marker`, and it is accepted in whichever environment the marker names at that moment. Re-pointing the marker moves the storefront with its token unchanged; a neighbouring server notices the re-point within about fifteen seconds.
+
+It works only together with its own marker:
+
+| request | answer |
+|---|---|
+| `x-environment-marker` of the marker the token was issued for | accepted, in the environment the marker names now |
+| `x-environment` naming that same environment, no marker | `401 Invalid or missing app token` |
+| no environment header at all (the main set) | `401 Invalid or missing app token` |
+| another marker | `401 Invalid or missing app token` |
+
+A token issued in the settings keeps working beside a marker as before, so nothing breaks for an existing client — it just does not survive a re-point. Revoking a marker token takes effect on the next request. Removing the marker, or deleting the environment it names (which removes the marker), revokes every token issued for it.
+
+→ `mcp/docs/api/environments#a-request-names-its-environment-in-a-header`
+
 ## Managing the markers of an environment
 
 | operation | what it does |
@@ -39,8 +60,11 @@ The public real-time channel reads the marker too — in the connection headers,
 | `AdminEnvironmentMarkersController_create` | binds a new marker, taking `marker` and `environmentId` |
 | `AdminEnvironmentMarkersController_update` | re-points an existing marker, taking `environmentId` |
 | `AdminEnvironmentMarkersController_remove` | removes a marker |
+| `AdminEnvironmentMarkersController_findTokens` | lists the marker's tokens that are not revoked, each with its value |
+| `AdminEnvironmentMarkersController_createToken` | issues a marker token, taking `name` and `expiredDate`; the answer carries the token |
+| `AdminEnvironmentMarkersController_removeToken` | revokes one marker token |
 
-Reading the list is open to any signed-in administrator — it is what you quote to whoever configures a client. The three writes need `environments.manage` and answer `403 Forbidden resource` without it, exactly as the registry of environments does.
+Reading the list is open to any signed-in administrator — it is what you quote to whoever configures a client. The three writes need `environments.manage` and answer `403 Forbidden resource` without it, exactly as the registry of environments does. All three token operations need `environments.manage` too, the listing included, because it returns the token values; a marker no marker id matches answers `404`.
 
 A marker value already in use answers `409`. An `environmentId` no environment has answers `404`. Binding a marker to an environment that is still being created is accepted on purpose, so the marker is ready for the moment the environment is.
 
@@ -69,5 +93,6 @@ So when a human asks you to point a client at another environment: re-point the 
 - **Renaming a marker by sending `marker` to the update.** It answers `200` and keeps the old value; remove and bind instead.
 - **Expecting a re-pointed marker to move your own session.** The header is the operator's choice, not yours.
 - **Reading a Content API `401` as a dead token.** An unresolvable marker answers the same message.
+- **Giving a storefront that sends a marker a token from the settings.** It stops working at the first re-point; issue a marker token instead.
 - **Using a hyphenated marker as an environment name.** Environment names take no hyphens.
 - **Assuming a deleted environment leaves its markers behind.** They go with it, and the names free up.
