@@ -10,7 +10,9 @@ Read this when somebody asks you to "point staging at the new environment", or w
 
 A request sends `x-environment-marker: <marker>` instead of `x-environment: <name>`. Everything after the name is resolved is identical: the same set of data, the same refusal when the environment is not ready, the same answer shapes.
 
-One marker names one environment; an environment carries as many markers as a project needs. Re-pointing one moves every client that sends it, at once and with no change on their side — on the Content API only for a client that holds a token issued for the marker. That is the only reason markers exist — if nothing will ever need moving, the environment name is enough.
+One marker names one environment; an environment carries as many markers as a project needs. Re-pointing one moves every client that sends it with no change on their side — on the Content API only for a client that holds a token issued for the marker. That is the only reason markers exist — if nothing will ever need moving, the environment name is enough.
+
+The move is **not instant**. For up to about fifteen seconds after a re-point, a request sending the marker may still be served by the environment it named before, and a token issued there keeps answering `200` for that long. Wait that out before writing anything through the marker, and before telling anyone the switch is done.
 
 → `mcp/docs/api/environment-markers#a-content-api-client-needs-a-marker-token`
 
@@ -80,7 +82,7 @@ Re-pointing is the operation that does work, and it is the one to reach for when
 
 ## What this client can and cannot do here
 
-**No tool here sends either header.** `cms_api_call` takes no headers, so you cannot read or write an environment by naming it, by name or by marker. Maintaining the marker list is therefore work you do *for* other clients, not a way to move your own session.
+**You cannot choose a header per call.** When the operator starts this server with an environment, every call carries `x-environment` with that name; otherwise none does. It never sends `x-environment-marker`, and `cms_api_call` takes no headers, so you cannot reach another environment by name or by marker. Maintaining the marker list is therefore work you do *for* other clients, not a way to move your own session.
 
 Your own calls land wherever the server was started, and `cms_whoami` is the only thing that tells you where. Re-pointing a marker does not move this session, and a write you make after re-pointing one still goes to the same place it went before.
 

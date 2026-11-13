@@ -68,7 +68,7 @@ Keep the **whole record** — that is what an attribute value references and wha
 
 The record carries no field for alternative text. Decide once per project where that lives — a sibling attribute next to each image field, named consistently — and write the convention down, because nothing in the platform enforces it and every project otherwise invents its own.
 
-→ `mcp/docs/api/attribute-types#files-and-images-depend-on-the-count`
+→ `mcp/docs/api/attribute-types#write-a-file-value-as-a-list`
 
 ## When something looks wrong
 
