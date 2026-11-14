@@ -67,4 +67,6 @@ The `data` of a snapshot is the record as it was, with secrets removed:
 
 A rollback restores the content of the record but never its credentials or privileges. For `admins` it keeps the current password, permission map, owner and developer flags, a pending e-mail change and the certificate binding. For `users` it keeps the current password.
 
+Stored secret keys of an integration are merged, not overwritten. For `payment_accounts` (`settings` and `testSettings`) and `users_auth_providers` (`config`), a secret the snapshot does not hold keeps its current value, and a secret the snapshot does hold comes back with it. Every other field of those settings returns to its snapshot value. Rolling one of these records back to a snapshot taken before a key was entered therefore keeps the key, while older values such as a shop id or a return URL do come back, so read the settings after the rollback.
+
 To change those, use their own operations — see `mcp/docs/api/admin-account-ownership#who-may-change-permissions`. Rolling back an admin to undo a permission change does nothing to the permissions.
