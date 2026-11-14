@@ -205,6 +205,8 @@ A `404` here is therefore about the file rather than about the shape of the name
 
 The delete call takes `type`, `entity` and `id` as its own parameters — the same folder values the upload used — and the file's name separately. That name is accepted in either form: the full path a stored record carries, or the last segment of that path on its own. Both address the same file, so handing back the name an upload returned removes it. The last segment alone is the form to prefer when you are unsure what an instance accepts. A name matching nothing stored under those folders answers `404`, and that `404` means the name, not the state of the file.
 
+An image uploaded with a preview template is deleted together with its previews. Send the image's own name only: the files behind its `previewLink` addresses are removed by the same call, and their storage is returned to the quota with the image's. Deleting a preview address afterwards answers `404` — the preview is already gone, not misnamed.
+
 ## Development mode differences
 
 An instance can be configured to keep uploads locally rather than in its usual storage. Where that is on, links and behaviour differ from production.
