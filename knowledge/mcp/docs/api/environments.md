@@ -147,7 +147,7 @@ A dry run item at `status: "duplicate"` is not written by a real run until you r
 
 Copying **into the main set** (`to: "public"`) is guarded more tightly than copying between environments, because it writes the live site:
 
-- It needs `environments.transferToPublic` on top of `environments.manage`, and answers `403` without it, dry run included.
+- It needs `environments.transferToPublic` on top of `environments.manage`, and answers `403` without it, dry run included. That refusal comes before the body is checked: a caller without the key gets `403` for any body naming `to: "public"`, even one that would otherwise fail with `400`. A `400` therefore means the caller holds the key.
 - It also needs the write key of every item the plan would write, dependencies included: the kind's `create` key for an item at `create`, its `update` key for `update` or a duplicate resolved with `replace` or `merge`, its `delete` key in delete mode. A `403` names the missing keys. On a real run the same check happens when the run starts, so a key withdrawn in between fails the run before anything is written.
 - `overwrite: true` on a real run needs `confirm: true` as well; without it the call answers `400` and nothing is queued.
 - A dry run adds a line to `warnings`: entities are written one at a time, so visitors see a partly updated site while the run lasts, with a rough duration. Show it to the human before a large run.
