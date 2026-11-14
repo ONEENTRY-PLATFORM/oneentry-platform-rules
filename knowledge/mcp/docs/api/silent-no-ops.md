@@ -10,7 +10,7 @@ This document lists the known cases with the route that actually works. Read it 
 
 | operation | what it answers | what does not happen | the route that works |
 |---|---|---|---|
-| attribute set create, update or schema replace with `schema` keyed by marker instead of `attribute<id>` | `201` / `200` | the admin panel cannot open any attribute of the set; its page lands on the not-found page | key each attribute `attribute<id>` with the marker in `identifier`, then read the set back and compare every key with its `id` |
+| attribute set create or update with `schema` keyed by marker instead of `attribute<id>` | `201` / `200` | the admin panel cannot open any attribute of the set; its page lands on the not-found page | key each attribute `attribute<id>` with the marker in `identifier`, then read the set back and compare every key with its `id` |
 | file upload with no valid `template` | `201` | no `previewLink` is generated | create a template-previews record first and pass its numeric id |
 | block update with `blockPages: []` | `200` | every page attachment is removed, nesting included | omit the field when placement is not what you are changing; an empty array is an instruction |
 | form create with no `type` | `201` | the form is stored with `type: null`, and nothing in the response says so | send `type` — it is declared and validated, so a wrong value is refused rather than stored |
