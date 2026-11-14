@@ -12,6 +12,12 @@ An account holds the configuration for one provider on this instance: its creden
 
 **No payment accounts are provisioned.** Every account on an instance was created by someone, so an instance may legitimately have none.
 
+## Why a second account of the same provider is refused
+
+Every provider type can be connected once per instance. Creating an account of a type that already has one, or changing an existing account to such a type, answers `400`. Only the `custom` type can repeat. To switch the provider's credentials or mode, update the account you have; do not add another.
+
+An account's `identifier` is unique too. A create or update that reuses one held by another account answers `409`. Check a candidate first with `GET /api/admin/payments/accounts/marker-validation/{marker}` — it answers `valid: false` when the identifier is taken. Keeping an account's own identifier in an update is fine.
+
 ## Never read or write credentials casually
 
 An account's configuration contains provider credentials. Two rules:
