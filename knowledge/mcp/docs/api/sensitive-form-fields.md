@@ -1,10 +1,10 @@
 # Sensitive form fields
 
-A form field can be marked sensitive, for a passport number, a diagnosis or a bank detail. The value is still accepted and kept with the submission. But no response returns it, except a submissions listing read by an admin who holds a dedicated permission, and every such read is recorded in the instance journal.
+A form field can be marked sensitive, for a passport number, a diagnosis or a bank detail. The value is still accepted and kept with the submission. But no response returns it, except a submissions listing or an admin order read by an admin who holds a dedicated permission, and every such read is recorded in the instance journal. Orders whose storage uses the form are covered too.
 
 Read this when a submission comes back with `value: null` for a field the visitor filled in, or before you mark a field sensitive.
 
-→ `mcp/docs/api/form-submissions` · `mcp/docs/api/attribute-sets` · `mcp/docs/api/journal`
+→ `mcp/docs/api/form-submissions` · `mcp/docs/api/orders` · `mcp/docs/api/attribute-sets` · `mcp/docs/api/journal`
 
 ## How to mark a field sensitive
 
@@ -52,6 +52,17 @@ Each listing call that returned at least one sensitive value adds one journal en
 The entry never contains the values. A listing that revealed nothing, such as a call without the key, adds no entry.
 
 Writes are journaled too. Creating or updating a submission through the admin API adds an entry whose `delta` is the request body, and in it every item whose `marker` is a sensitive field carries `value: "[REDACTED]"`. The other fields keep their values. A marker counts as sensitive when any `forForms` set on the instance marks it, so a plain field that shares its marker with a sensitive field of another form is shown as `[REDACTED]` as well. The same holds for the `formData` of users and orders, and every `authData[].value` — the login and password sent when an admin creates a user — is always `[REDACTED]`.
+
+## Sensitive fields in an order form
+
+An order storage takes its fields from a form, so a sensitive field of that form is hidden in the `formData` of its orders in the same way:
+
+- Creating or updating an order answers the field with `"value": null` and `"isSensitive": true`.
+- Every order read answers it the same way: the public order listings and single-order reads, the admin listings of all orders, of one storage and of an interface module scope, `GET /orders-storage/{id}/order/{orderId}` and `GET /orders/{id}`. Event notifications and workflow steps built from an order also get the field without its value.
+- The four admin reads return the real value to an admin holding `forms.data.readSensitive`. Each such read adds one journal entry with `moduleName` `ORDERS`, `action` `READ`, `journalingEvent` `formDataSensitiveViewed`, and a `delta` of `orderIds` and `markers`, without the values.
+- An order update that sends the field with `value: null` keeps the stored value.
+- An orders export has no column for a sensitive field.
+- Switching the flag on also hides the field in orders placed earlier.
 
 ## Updating a submission without losing the value
 
