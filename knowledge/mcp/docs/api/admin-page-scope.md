@@ -80,11 +80,16 @@ Creating or updating an admin is confirm-gated, so show the map you are about to
 | Operation | What has to be in scope |
 |---|---|
 | `AdminPagesController_create` | the `parentId` in the body |
-| `AdminPagesController_update` | the page id in the path |
+| `AdminPagesController_update` | the page in the path, and a new `parentId` if the body moves it |
 | `AdminPagesController_remove` | the page id in the path |
 | `AdminPagesController_deleteMany` | every id in the body list |
+| `AdminPagesController_moveMany` | every page moved, and the new parent |
+| `AdminPagesController_copy` | the parent of the page, since the copy lands beside it |
+| `AdminPagesController_setVisibility`, the page position operations | the page in the path |
 
-Reads are not governed by it. A scoped account still lists the root pages and reads any page by id or by page URL, so what it can see and what it can change are different sets.
+Reads are governed too. Lists show only pages inside the branches, the root list shows the scope roots instead of the real roots, and reading a page outside the branches by id or URL answers `403`.
+
+→ `mcp/docs/api/admin-record-scope-and-field-access#what-a-scope-changes-for-reads-and-writes`
 
 ## Creating a page needs a parent inside the scope
 
@@ -104,7 +109,7 @@ So a `403` from this operation never leaves a half-finished delete behind. Split
 
 ## What a refusal tells you
 
-The `403` names the page ids that caused it, so one call finds every offending id in the request rather than one per attempt. When the refusal is about the parent of a new page it says so instead.
+The `403` carries `code: "SCOPE_DENIED"` and `permission: "pages.scope"`, and names the page ids that caused it in `ids` and in the message, so one call finds every offending id in the request rather than one per attempt. When the refusal is about the parent of a new page it says so instead.
 
 A third wording appears when the id in the request cannot be used at all — not a positive whole number, or beyond the 32-bit range. It names the unusable id rather than the scope, and it is the answer on every operation in the table above, not only on create. Send a real page id and the call is judged on the scope again.
 
@@ -117,13 +122,9 @@ Read it as "this page is outside the branches I was given", not as "I lack the p
 
 `cms_whoami` shows the map, so check whether `pages.scope` is in it before reporting a page write as impossible.
 
-## The check is on the page not on the destination
+## Moving a page out of the branch is refused
 
-Update and delete look at where the page **currently sits**. An update carrying a `parentId` that points outside the branch is not refused, and the page ends up outside.
-
-That has a consequence worth knowing before you send it: the account can no longer edit the page it just moved. Every later update or delete of it answers `403`, and only an unscoped account can move it back.
-
-Several page operations are not governed by the scope at all — `AdminPagesController_updatePagePosition`, `AdminPagesController_moveMany`, `AdminPagesController_copy` and `AdminPagesController_setVisibility`. Do not assume a scoped account is confined to its branches for everything it can do to a page; assume it for the four operations in the table above and check the rest.
+A write that would put a page outside the branches is refused: an update whose `parentId` points elsewhere, a move under a parent outside the scope, and a move to the root all answer `403`. So a scoped account cannot lose a page by moving it away.
 
 ## The scope inside an environment
 
@@ -147,6 +148,6 @@ So to let a scoped editor work in an environment, copy their branch into it firs
 - **Reading a `403` on a page write as a missing permission.** Check `pages.scope` first.
 - **Retrying a bulk delete id by id after a `403`.** Nothing was deleted; fix the list instead.
 - **Treating a `403` as proof the page exists.** A page that never existed answers the same.
-- **Assuming a scoped account cannot reach other pages at all.** Reads are unrestricted.
+- **Expecting a scoped account to read the whole tree.** It sees only its branches.
 
 → `mcp/docs/api/pages#update-a-page` · `mcp/docs/api/admins-and-permissions#the-local-check-and-what-it-means`
