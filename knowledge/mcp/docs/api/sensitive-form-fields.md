@@ -1,14 +1,14 @@
 # Sensitive form fields
 
-A form field can be marked sensitive, for a passport number, a diagnosis or a bank detail. The value is still accepted and kept with the submission. But no response returns it, except a submissions listing or an admin order read by an admin who holds a dedicated permission, and every such read is recorded in the instance journal. Orders whose storage uses the form are covered too.
+A form field can be marked sensitive, for a passport number, a diagnosis or a bank detail. The value is still accepted and kept with the submission. But no response returns it, except a submissions listing or an admin order read by an admin who holds a dedicated permission, and every such read is recorded in the instance journal. Orders whose storage uses the form, and the profiles of users who signed up through a form, are covered too.
 
 Read this when a submission comes back with `value: null` for a field the visitor filled in, or before you mark a field sensitive.
 
-→ `mcp/docs/api/form-submissions` · `mcp/docs/api/orders` · `mcp/docs/api/attribute-sets` · `mcp/docs/api/journal`
+→ `mcp/docs/api/form-submissions` · `mcp/docs/api/orders` · `mcp/docs/api/users-and-groups` · `mcp/docs/api/journal`
 
 ## How to mark a field sensitive
 
-Set `isSensitive: true` on the attribute in the schema of an attribute set whose type is `forForms`, the set a form takes its fields from. Read the set back afterwards: on sets of any other type the flag is dropped from the answer and has no effect.
+Set `isSensitive: true` on the attribute in the schema of an attribute set whose type is `forForms`, the set a form takes its fields from, or `forUsers`, the set of a sign-up form. Read the set back afterwards: on sets of any other type the flag is dropped from the answer and has no effect.
 
 ```json
 { "attribute1": { "id": 1, "type": "string", "identifier": "passport",
@@ -64,6 +64,18 @@ An order storage takes its fields from a form, so a sensitive field of that form
 - An orders export has no column for a sensitive field.
 - Switching the flag on also hides the field in orders placed earlier.
 
+## Sensitive fields in a user profile
+
+The form of an auth provider takes its fields from a `forUsers` set, so a sensitive field of that set is hidden in the `formData` of the users who signed up through it:
+
+- `GET /users/me` returns the user's own values in full. The sign-up answer returns the field with `value: null`.
+- Admin user reads (`GET /users`, `GET /users/{id}`, `POST /users/all`, `POST /users/paginated`, `POST /users/search`) answer `value: null` with `isSensitive: true`. When the field is the notification e-mail or SMS field of the form, `notificationData.email` or `notificationData.phoneSMS` is `null` as well.
+- An admin holding `forms.data.readSensitive` gets the values. Each such read adds a journal entry with `moduleName` `USER`, `action` `READ`, `journalingEvent` `formDataSensitiveViewed` and a `delta` of `userIds` and `markers`, without values.
+- `PUT /users/{id}` with the field at `value: null` keeps the stored value, so a card can be saved back as read.
+- The field may be the login field or a notification field. Sign-in and notifications keep working, but the login itself is the user's `identifier` and is shown and searchable as before.
+- `POST /users/all` and interface module scopes answer `400` for a filter on a sensitive field. The users export has no column for it.
+- Users imported into the provider get the field hidden in the same way, and switching the flag on hides it for users who signed up earlier.
+
 ## Updating a submission without losing the value
 
 An update replaces the field list of a submission. For a sensitive field, sending `value: null`, or leaving `value` out, keeps the value already stored. So a client can send back a submission exactly as it read it. Send a non-null value to replace the stored one.
@@ -74,7 +86,8 @@ The value of a sensitive field is not used by semantic search over submissions. 
 
 ## Common mistakes
 
-- Marking the field on a set of a type other than `forForms` and expecting values to be hidden.
+- Marking the field on a set of a type other than `forForms` or `forUsers` and expecting values to be hidden.
+- Expecting a sensitive login field to hide the user's `identifier`.
 - Treating `value: null` as an empty answer and asking the visitor to submit again.
 - Granting `forms.data.readSensitive` to every admin because a listing showed `null`.
 - Switching the flag off to read a value back. Use the permission below instead.
