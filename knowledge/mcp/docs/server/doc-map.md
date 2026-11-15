@@ -363,6 +363,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | How do I renew an administrator token | `mcp/docs/api/admin-sign-in#renewing-an-administrator-token` |
 | Why did an admin lose its session after a permission edit | `mcp/docs/api/admins-and-permissions#a-permission-change-signs-the-target-admin-out` |
 | Why can a sign-in provider not be deleted | `mcp/docs/api/users-and-groups#a-sign-in-provider-with-users-cannot-be-deleted` |
+| Why does creating a sign-in provider or signing up through it answer 400 | `mcp/docs/api/users-and-groups#what-a-sign-in-provider-create-or-update-refuses` |
 | How do I issue an application token | `mcp/docs/api/settings#issuing-an-application-token` |
 | How do I delete a key from a visitor state object | `mcp/docs/api/content-api-sign-in-and-cart#removing-a-key-from-the-visitor-state-object` |
 
