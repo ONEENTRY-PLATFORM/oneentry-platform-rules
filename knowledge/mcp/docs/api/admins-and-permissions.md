@@ -26,13 +26,13 @@ It matters most when you edit a map you just read: change the value you meant to
 
 The two refusals are told apart by their wording, not their status. One says the key is outside the vocabulary; the other says the key is real and the value is not the shape it takes, and names that shape. An unknown key is a name to fix; an invalid value is a value to fix on a grant that does exist. Either way nothing is stored, the valid keys sent beside the offending one included.
 
-Most keys take `true` or `false`. Two do not: `admins.modules` takes a list of area identifiers, and `pages.scope` a non-empty list of page ids, or `false` for no restriction.
+Most keys take `true` or `false`. A few do not: `admins.modules` takes a list of area identifiers, every `*.scope` key a non-empty list of record ids or `false` for no restriction, and `fields.access` an object of field rules.
 
 `AdminsController_getPermissionsValueTypes` names those keys and the shape each expects. Call it before building a map out of the vocabulary — the key list alone does not say which keys are not flags.
 
-The shapes are published, not enforced alike. `pages.scope` is refused when the value is the wrong shape; `admins.modules` stores whatever it is sent, `true` included. Read the map back after writing it.
+The shapes are published, not enforced alike. A scope key or `fields.access` is refused when the value is the wrong shape; `admins.modules` stores whatever it is sent, `true` included. Read the map back after writing it.
 
-→ `mcp/docs/api/admin-page-scope#the-value-is-a-list-of-page-ids-not-a-boolean`
+→ `mcp/docs/api/admin-page-scope#the-value-is-a-list-of-page-ids-not-a-boolean` · `mcp/docs/api/admin-record-scope-and-field-access#which-records-an-admin-may-touch`
 
 ## Creating an admin can answer 405
 
