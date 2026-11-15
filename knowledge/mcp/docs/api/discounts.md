@@ -139,3 +139,4 @@ One line to check before calling it configured: a discount that is not meant for
 - **Expecting a discount to change existing orders.** It does not, by design.
 - **Retrying a create that answered `409`.** The marker is taken; choose another.
 - **Changing the kind of an existing discount.** It is fixed at creation; create a new discount instead.
+- **Reordering discounts through the update body.** `position` and `version` sent to the discount update are ignored, so echoing a read back is safe but moves nothing. Change the order with `AdminDiscountsController_updatePosition`; the version number advances only when a snapshot is taken.
