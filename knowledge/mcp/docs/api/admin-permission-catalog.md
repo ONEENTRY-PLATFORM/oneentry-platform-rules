@@ -15,15 +15,19 @@ Read it before you build a permission map for a new admin, and whenever an opera
   "permissions": [
     { "key": "blocks.delete", "section": "blocks", "kind": "delete",
       "sensitive": false, "valueType": "boolean", "gated": true }
-  ]
+  ],
+  "scopes": [{ "key": "forms.scope", "section": "forms", "isTree": false }],
+  "fields": { "discounts": ["startDate", "endDate", "gifts"] }
 }
 ```
 
-There is one entry for every key that `AdminsController_getAllAvailablePermissionsKeys` lists, and no others.
+`permissions` has one entry for every key that `AdminsController_getAllAvailablePermissionsKeys` lists, and no others. `scopes` lists the keys that confine an account to chosen records, and `fields` lists, per area, the field names a field rule may name.
+
+→ `mcp/docs/api/admin-record-scope-and-field-access#which-records-an-admin-may-touch`
 
 - `section` — the area the key belongs to. It is the first dotted segment, except for `settings.*` keys, where it is the first two (`settings.locales`).
 - `kind` — one of `read`, `create`, `update`, `delete`, `switch`, `status`, `positions`, `export`, `other`. Use it to grant or withdraw one kind of action across every area at once, for example every `delete` key or every `export` key.
-- `valueType` — `boolean`, `string[]` or `number[]`, the same shapes the value-types listing reports. Only `boolean` keys are granted as `true`.
+- `valueType` — `boolean`, `string[]`, `number[]` or `object`, the same shapes the value-types listing reports. Only `boolean` keys are granted as `true`.
 - `sensitive` and `gated` — see the two sections below.
 
 ## Which permissions count as sensitive
@@ -51,7 +55,14 @@ A refusal for a missing key carries the key in its body:
 
 `message` is unchanged, so code that reads only `message` keeps working. When `code` is `PERMISSION_DENIED`, ask for exactly the key in `permission` — not a neighbouring key, and not a wider set.
 
-Some `403` responses carry no `code`: page-scope refusals, rules about the project owner, and grants beyond your own. Read those by their `message` as before. The key is not the cause there, so asking for it changes nothing.
+Two other codes mean the key is not the problem:
+
+| `code` | Meaning |
+|---|---|
+| `SCOPE_DENIED` | The record is outside the records the account may touch; `permission` names the scope key, `ids` the records |
+| `FIELD_DENIED` | The request changes a field the account may only read; `fields` names them |
+
+Some `403` responses carry no `code`: rules about the project owner, and grants beyond your own. Read those by their `message` as before. The key is not the cause there, so asking for it changes nothing.
 
 ## Keys on block visibility and position maintenance
 
@@ -69,6 +80,7 @@ Without the key they answer `403` with `code: PERMISSION_DENIED`, and nothing ch
 - **Granting every catalog key.** Sensitive keys are refused unless your own account holds them, and they should not be granted without an explicit request anyway.
 - **Granting a `number[]` or `string[]` key as `true`.** That is a `400`; send its value.
 - **Answering a `PERMISSION_DENIED` by requesting a wider set.** Ask for the one key named in `permission`.
-- **Reading a `403` with no `code` as a missing key.** Check scope and ownership first.
+- **Reading a `403` with no `code` as a missing key.** Check ownership and your own grants first.
+- **Answering `SCOPE_DENIED` or `FIELD_DENIED` by asking for the key in `permission`.** The account already holds it; the record or the field is what is restricted.
 
 → `mcp/docs/api/admins-and-permissions#a-recognised-key-with-the-wrong-value-is-a-different-400` · `mcp/docs/api/admin-page-scope`
