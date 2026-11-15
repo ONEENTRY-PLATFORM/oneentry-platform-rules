@@ -79,5 +79,6 @@ A status affects what the Content API exposes and what a site shows. Two implica
 - **Referencing a status by id.** Ids are local to the instance.
 - **Deleting a status still in use.** Reassign the products first.
 - **Creating a near-duplicate.** Two statuses meaning the same thing split the catalogue in ways that are tedious to unpick.
+- **Sending `position` or `version` in a status update.** Both are ignored. Reorder with `AdminProductStatusController_updateModulePosition`; the version number advances only when a snapshot is taken.
 
 → `mcp/docs/api/verification-recipes#products`
