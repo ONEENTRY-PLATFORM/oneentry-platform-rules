@@ -150,6 +150,18 @@ The same call also writes `formData` and `notificationData` from whatever the bo
 
 So deleting a provider means dealing with its users first, and deleting people to tidy up a configuration is almost never what was wanted. Say that the provider has users and let the human decide. An id no provider has answers `404 Provider not found`.
 
+## What a sign-in provider create or update refuses
+
+`AdminUsersAuthProviderController_createProvider` and `AdminUsersAuthProviderController_updateProvider` check the whole body before anything is saved, and answer `400` with nothing written when:
+
+- a numeric setting is not a whole number in its range: `accessTokenTtlSec` and `refreshTokenTtlMc` 1 to 31536000, `systemCodeTlsSec` 1 to 86400, `systemCodeLength` 4 to 32, `deleteNoneActiveUsersAfterDays` 1 to 3650. Leave a setting out to get its default;
+- `formId` or `userGroupId` names no existing form or group;
+- `identifier` is already used by another provider. This holds for simultaneous calls too: of several creates with one identifier, exactly one succeeds.
+
+A create without `userGroupId` puts new users of the provider into the guest group. On an instance with no guest group it answers `400` asking for `userGroupId`: pass the id of an existing group.
+
+If the default group of a provider is deleted later, every sign-up through that provider answers `400` and creates no user. Update the provider with an existing `userGroupId` to restore sign-up.
+
 ## Where social network sign-in is configured
 
 Providers for Google, Apple, VK and the other supported networks are created here as well, with `type: "oauth"`, but their settings, the catalog that lists what each network requires, and the refusals they produce have their own document.
