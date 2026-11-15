@@ -100,6 +100,14 @@ Expect the `401` rather than a `400` for a dead token, and never read it as the 
 
 → `mcp/docs/api/admins-and-permissions#a-permission-change-signs-the-target-admin-out` · `mcp/docs/api/journal#what-closes-a-session-record`
 
+## Renewing from a browser without storing the token
+
+Every answer that carries a token pair also sets a `refreshToken` cookie: `HttpOnly`, `Secure`, `SameSite=Strict`, sent back only to paths under `/api/admin/auth`. That covers `POST /api/admin/auth/login`, `POST /api/admin/auth/login/mfa`, a completed password reset and every renewal. The challenge answer of a two-step sign-in sets none.
+
+`POST /api/admin/auth/refresh` and `POST /api/admin/auth/logout` read the token from that cookie first and fall back to `refreshToken` in the body, so a browser on the same site can send an empty body and never hold the token in script. Sign-out still needs the access token in `Authorization`, and its answer clears the cookie.
+
+The body keeps carrying `refreshToken`, and a body-only client works as before. A client that keeps a cookie jar must keep one jar per account: when both arrive, the cookie wins. With neither, the answer is `400` naming `refreshToken`.
+
 ## Turning the second factor on
 
 `user.adminMfaRequired` is a boolean in the `user` section of the general settings, written with the ordinary general settings update under `settings.general.update`. It is off unless someone set it.
