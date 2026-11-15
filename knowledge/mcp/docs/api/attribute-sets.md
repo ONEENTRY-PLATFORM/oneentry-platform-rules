@@ -128,7 +128,7 @@ Inside `schema`, each attribute sits under `attribute` followed by its numeric `
   "position": 1, "isVisible": true, "localizeInfos": { "en_US": { "title": "Page title" } } } }
 ```
 
-A schema keyed by marker is accepted on create, update and schema replace, and answers success. The admin panel then cannot open any attribute of that set: the attribute's page lands on the not-found page. Content API reads are unaffected, so only the admin panel shows the damage.
+A schema keyed by marker is accepted on create and update, and answers success. The admin panel then cannot open any attribute of that set: the attribute's page lands on the not-found page. Content API reads are unaffected, so only the admin panel shows the damage.
 
 Give every attribute an integer `id` unique within the set, key it `attribute<id>`, and after the write read the set back and confirm each key matches its `id`.
 
@@ -153,7 +153,7 @@ The bounds are **strings**, not numbers, and an unset one is `""` rather than ab
 
 → `mcp/docs/api/list-options-and-extra-values`
 
-Written one level flat — `"validators": { "requiredValidator": { "strict": true } }` — creating the set, updating it or replacing its schema answers `400`, and the message names the attribute and the field. The same check covers `localizeInfos`, `listTitles` and `additionalFields`.
+Written one level flat — `"validators": { "requiredValidator": { "strict": true } }` — creating or updating the set answers `400`, and the message names the attribute and the field. The same check covers `localizeInfos`, `listTitles` and `additionalFields`.
 
 A plain string, number or boolean where one of these fields or `initialValue` expects an object is refused the same way, and so is a `position` that is not an integer. An integer sent as a string, such as `"3"`, is accepted.
 
@@ -161,7 +161,7 @@ A plain string, number or boolean where one of these fields or `initialValue` ex
 
 ## The validator name comes from a fixed list
 
-A validator name is not free text. Creating a set, updating it, or replacing its schema with a name outside the list answers `400`, and the message names the attribute, the locale and the name it did not recognise, then lists the ones it accepts. That response is where to read the list — no read operation returns it.
+A validator name is not free text. Creating or updating a set with a name outside the list answers `400`, and the message names the attribute, the locale and the name it did not recognise, then lists the ones it accepts. That response is where to read the list — no read operation returns it.
 
 ```text
 requiredValidator         trimValidator             stringInspectionValidator
@@ -182,7 +182,7 @@ A set that already holds an unrecognised name keeps it, and nothing re-checks it
 
 ## Validator values are checked too
 
-Besides the name, three validators are checked for shape when a set is created, updated or has its schema replaced; a bad value answers `400` naming the attribute, the locale and the validator, and nothing is stored.
+Besides the name, three validators are checked for shape when a set is created or updated; a bad value answers `400` naming the attribute, the locale and the validator, and nothing is stored.
 
 - `requiredValidator` and `trimValidator` take `true`, `false` or an object. A string or number is refused.
 - `regExpValidator` takes an object `{ "patternValue": "<pattern>", "invert": false, "flags": [] }`. `patternValue` must be a string that compiles as a regular expression with those flags, `invert` a boolean, `flags` an array of strings. A bare string such as `"("`, an array, or a pattern like `(a+)+$` (an unbounded repeat inside a group that is itself repeated, which can hang a consumer that runs it) is refused.
@@ -256,17 +256,17 @@ If a human asks for it, say what will happen to the existing values and let them
 
 ## Reorder attributes without replacing the schema
 
-`AdminAttributesSetsController_updateSchema` (`PUT /api/admin/attributes-sets/{id}/schema`) does one of two things, and the body decides which.
+`AdminAttributesSetsController_updateSchema` (`PUT /api/admin/attributes-sets/{id}/schema`) only changes the order of the attributes a set already has. It needs `settings.attributes.changePositions`.
 
-A reorder names exactly the attributes the set already has, under their schema key or as `attribute<id>`, and changes nothing but `position`. Other fields may be sent unchanged or left out. Only the positions are written, and `settings.attributes.changePositions` is enough:
+Name every attribute of the set, under its schema key or as `attribute<id>`, and change nothing but `position`. Other fields may be sent unchanged or left out. Only the positions are written:
 
 ```json
 { "attribute1": { "position": 2 }, "attribute2": { "position": 1 } }
 ```
 
-Any other body replaces the whole schema: an attribute added or left out, any field changed, or an empty object. That also needs `settings.attributesSets.update`, answers `403` without it, and runs the checks that creating and updating a set run.
+Any other body answers `400` and writes nothing, whatever permissions the caller holds: an attribute added or left out, any other field changed, or an empty object for a set that has attributes. To add, change or remove attributes, send the whole `schema` to `AdminAttributesSetsController_update` (`PUT /api/admin/attributes-sets/{id}`).
 
-The route answers `404` for an unknown set and `400` when the body is not an object of attribute objects or a `position` is not an integer.
+The route also answers `404` for an unknown set and `400` when the body is not an object of attribute objects or a `position` is not an integer.
 
 ## Copying values from one locale into another
 
