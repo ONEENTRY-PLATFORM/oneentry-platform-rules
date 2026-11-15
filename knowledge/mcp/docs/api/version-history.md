@@ -55,6 +55,16 @@ A read permission never allows a rollback. Without the key the call answers `403
 
 An account holding `pages.scope` may snapshot and roll back only the pages inside its branches, exactly as with an ordinary page update. A page outside them answers `403` naming the page id, even though the account holds `pages.update`.
 
+## Rolling back a product or order status
+
+A rollback of `product_statuses` or `order_statuses` follows the same rules as an ordinary update of that status:
+
+- **The default flag is not rolled back.** `isDefault` keeps its current value, because only one status may be the default of a catalog or of an order storage axis. To change the default, update the status itself.
+- **A marker held by another status is refused.** When the snapshot's `identifier` now belongs to a different status, the rollback answers `400` with the same message as an update onto that marker (`Product's status with this identifier already exists` / `Order's status with this identifier already exists`), and nothing changes. Rename or delete the other status first.
+- **Status maps follow the restored marker.** When rolling back an order status brings back an older `identifier`, every trigger of that storage's status map that pointed at the current marker is moved to the restored one, exactly as an update that renames the status does.
+
+→ `mcp/docs/api/order-status-triggers#where-the-status-maps-live` · `mcp/docs/api/product-statuses#what-making-a-status-the-default-changes`
+
 ## What a snapshot does not show
 
 The `data` of a snapshot is the record as it was, with secrets removed:
