@@ -65,6 +65,15 @@ A rollback of `product_statuses` or `order_statuses` follows the same rules as a
 
 → `mcp/docs/api/order-status-triggers#where-the-status-maps-live` · `mcp/docs/api/product-statuses#what-making-a-status-the-default-changes`
 
+## Rolling back an order storage
+
+A snapshot of `orders_storage` also records which payment accounts the storage accepts, and a rollback brings that set back together with the storage's own settings. After the rollback, `paymentAccountIds` in a read of the storage matches the snapshot, exactly as if the storage had been updated with that list.
+
+- A payment account deleted after the snapshot was taken is skipped; the others are linked again.
+- Some older snapshots carry no account list. Rolling back to one of them leaves the current accounts in place, so read the storage after the rollback.
+
+→ `mcp/docs/api/version-history#what-a-rollback-leaves-alone`
+
 ## What a snapshot does not show
 
 The `data` of a snapshot is the record as it was, with secrets removed:
