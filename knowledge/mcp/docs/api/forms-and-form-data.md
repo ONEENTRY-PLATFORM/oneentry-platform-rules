@@ -114,6 +114,8 @@ A public read of the entity keeps naming the previous binding while its answer i
 
 Keep each entry's `id`, and read back: same ids, same count.
 
+An entry that keeps its `id` keeps its module too. Sending a different `moduleId` with a kept `id` answers `400` and changes nothing; the same `moduleId`, or no `moduleId` at all, is accepted. To move a binding to another module, leave the old entry out and add a new one without an `id` in the same update: that drops the old binding, so the confirmation below applies when it holds submissions. An instance that predates this check answers `200` and leaves the module unchanged.
+
 Either operator read of one form gives you that body: by id, and by marker, answer the same keys — `isPrivate` included, bindings under `formModuleConfigs` — so the marker, which is often the only identifier you were given, is enough to edit a form safely. A visitor-side read of the same marker is a different projection and not an input to this update.
 
 Where a shortened list would take submissions with it, the call answers `409` instead, naming how many submissions and which bindings, and changes nothing. Add `confirmFormDataDeletion: true` to the same body to go through — it is the only way to delete a binding that holds submissions, and an edit that echoes every binding back with its `id` never meets it. Dropping a binding with no submissions still answers `200` either way, and so does every call on an instance without the gate: the status tells you the gate is there, never that the submissions were safe.

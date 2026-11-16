@@ -38,7 +38,7 @@ They have no operation of their own. They are fields of an entry in `formModuleC
                            "isAnonymous": true } ] }
 ```
 
-`isRating` turns the binding into a rating binding, `ratingCalculation` decides how scores combine, `maxRatingScale` and `allowHalfRatings` define the scale, `allowRerating` says whether one author may score twice, `isAnonymous` whether an unauthenticated visitor may submit.
+`isRating` turns the binding into a rating binding, `ratingCalculation` decides how scores combine, `maxRatingScale` and `allowHalfRatings` define the scale, `allowRerating` says whether one author may score twice, `isAnonymous` whether an unauthenticated visitor may submit. `showAggregatedRating` is a display flag for the storefront: it is stored and read back on the binding and changes nothing the API calculates. An instance that predates it answers `200` and reads the binding back without the key, so read back before relying on it.
 
 Read the form first and send the whole list back: an omitted `formModuleConfigs` deletes every binding **and its submissions**, and answers `200 true`.
 
