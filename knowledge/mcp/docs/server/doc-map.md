@@ -200,6 +200,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Which permission does rolling back a record need | `mcp/docs/api/version-history#which-permission-each-call-needs` |
 | Why does a version history call answer 400 | `mcp/docs/api/version-history#which-records-have-a-version-history` |
 | Why does rolling back a status answer 400 or keep its default flag | `mcp/docs/api/version-history#rolling-back-a-product-or-order-status` |
+| Does rolling back an order storage bring back its payment accounts | `mcp/docs/api/version-history#rolling-back-an-order-storage` |
 | Can an export permission be granted | `mcp/docs/api/admins-and-permissions#exporting-data-has-its-own-permissions` |
 | Why is creating or deleting a data environment refused with 403 | `mcp/docs/api/admins-and-permissions#managing-data-environments-has-its-own-permission` |
 | Why does naming an environment answer 400 before my token is checked | `mcp/docs/api/environments#what-a-wrong-environment-name-answers` |
