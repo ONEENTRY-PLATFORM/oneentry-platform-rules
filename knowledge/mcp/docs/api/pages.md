@@ -82,6 +82,18 @@ PUT /api/admin/pages/{pageId}/products/{productId}/position
 
 Neighbours are named by product id. A neighbour left out — omitted or `null` — means "no neighbour on that side", which is how a product goes to either end of the row. A body carrying no `position` object answers `400` naming that field; `destinationId` on its own is not a substitute for it. In a row of one kind leave `leftObjectType` and `rightObjectType` out: a kind borrowed from another list answers `400` naming the side, the neighbour id and the kind that was looked for, and the product keeps the place it had.
 
+A product can also be pinned to an ordinal place in a page's list. Pin and release go through `AdminProductsController_lockSorting`:
+
+```text
+POST /api/admin/products/positions/{positionId}/lock
+  { "index": 2, "isLocked": true }    pin at the second place
+  { "isLocked": false }               release
+```
+
+With `isLocked` in the body the call sets that state, so repeating it changes nothing. Without `isLocked` each call flips the current state, and a repeat from a stale screen releases a pin someone else set: send the explicit value whenever the intent is known. `isLocked` that is not a boolean answers `400`, pinning without `index` answers `400`, and an unknown `positionId` answers `404`.
+
+While a product is pinned, moving it answers `409` and writes nothing, and so does a `swapData` whose destination is pinned. Release the pin, move the product, then pin it again if it should stay fixed.
+
 Read the new order back with a product list sorted by position, and make that request address **one** page — either the per-page listing, or the general listing whose body is a single filter carrying one page URL. A position sort on a request that addresses no single page comes back in creation order instead, and the move reads as if it did nothing.
 
 The public read of the same page by URL returns that order in the same direction, so `sortOrder` means the same thing on both sides. Sort descending to reproduce the order the panel shows.
