@@ -57,12 +57,14 @@ GET /api/content/products/103?langCode=en_US
 ```
 
 Nothing is missing and nothing is deleted. Wait the number of seconds the header names and
-send the same request again; it succeeds once the burst passes.
+send the same request again; a read shed by a burst usually clears once the burst passes.
 
 This is the answer a prerender or an export that fans out hundreds of parallel reads will
 meet first. Bound your own concurrency and retry on `503` rather than treating it as an
 absent entity — a build that maps `503` onto "not found" bakes a missing page into the
-output and keeps it until the next deploy.
+output and keeps it until the next deploy. If the same read keeps answering `503` through
+several retries and a longer pause, stop retrying at that rate and report it to the
+instance operator, keeping the entity out of any "missing" branch meanwhile.
 
 The health route keeps answering while reads are being shed, so a `503` on content plus a
 healthy instance is the expected combination, not a contradiction.
@@ -108,7 +110,8 @@ wrong address, an instance limit — arrives as JSON with `statusCode` and `mess
 one is load being shed: wait a second or two, then send the same request unchanged, backing
 off further on each repeat. Do not change the method or the address, and do not report the
 route as unsupported. The same burst can also leave some calls with no answer until your
-client times out; treat those the same way.
+client times out; treat those the same way. The HTML page can also arrive with a `2xx`
+status instead of `405`; decide by `Content-Type`, not by the status line.
 
 Check the content type before parsing any error body. A client that parses every answer as
 JSON fails on this one before it ever sees the status.
