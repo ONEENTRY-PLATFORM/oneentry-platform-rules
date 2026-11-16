@@ -1,4 +1,4 @@
 tmp/
-.claude/settings.local.json
+.claude/
 .idea
 .mcp.json
