@@ -87,6 +87,16 @@ A hidden field is not searchable, because a match would confirm its value.
 
 → `mcp/docs/api/global-search`
 
+## Reading the action journal under field rules
+
+`GET /api/admin/journal` (`JournalController_list`) applies the reader's field rules to the `delta` of every entry, the same way reading the record itself does.
+
+- The area of an entry follows its `journalingEvent`: a `pageUpdated` entry drops the fields hidden for pages, an `adminUpdated` entry drops those hidden for admins. Entries of an area without field rules keep every field.
+- Hidden attributes and hidden `formData` items are left out of `delta`.
+- When the reader has attribute rules and a `delta` carries attribute values without naming their attribute set, or `formData` without naming its form, those values are left out whole.
+
+So a missing field in a journal `delta` can mean the reader may not see it, not that the request omitted it. Read the record by id with an account that may see the field to confirm.
+
 ## What the refusal codes tell you
 
 | `code` | Read it as | What to do |
