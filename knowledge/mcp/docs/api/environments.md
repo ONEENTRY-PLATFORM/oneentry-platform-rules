@@ -152,6 +152,14 @@ Copying **into the main set** (`to: "public"`) is guarded more tightly than copy
 - `overwrite: true` on a real run needs `confirm: true` as well; without it the call answers `400` and nothing is queued.
 - A dry run adds a line to `warnings`: entities are written one at a time, so visitors see a partly updated site while the run lasts, with a rough duration. Show it to the human before a large run.
 
+In either direction, a copy writes only what the caller could write through the ordinary section operations. When the caller's permission map limits a kind to certain records with a `*.scope` key, or carries `fields.access` rules for that kind, the plan marks the affected items `status: "blocked"` with a `reason`, and a real run leaves them untouched:
+
+- an item that would update or delete an existing record in the target, when that record lies outside the caller's scope there;
+- an item that would create a record in the main set, when its source record lies outside the caller's scope in the source environment (creating one in an environment is not limited, because the copy stays outside the caller's scope there too);
+- any write of a kind the caller has field rules for, because a copy writes the whole record and would bypass them.
+
+A blocked update does not stop the records that depend on it: they still link to the target's existing record. A blocked creation blocks its dependents too. Read every `blocked` item to the human before a real run, because a run that answers `201` can still leave some of what they selected unwritten.
+
 Orders, visitors and submissions are not among the kinds that travel, and asking for one answers `400` — that is a boundary, not a gap to work around.
 
 Project settings travel only in part. Error pages, sign-in providers and events are kinds you may name, and a sign-in provider arrives with its settings but **without its secrets** — its signing key and OAuth secret stay in the source, and a dry run says so in `warnings`. A provider the transfer creates gets a fresh signing key of its own, so tokens issued in one environment are never valid in the other; the OAuth secret stays empty, so fill it in before anyone signs in to the target through that OAuth provider. An update keeps the secrets the target already has. Order storages with their statuses, and Content API access rules, do not travel at all: a dry run lists the ones the source has filled in, with counts on both sides, in `warnings`, and the human sets them up by hand.
