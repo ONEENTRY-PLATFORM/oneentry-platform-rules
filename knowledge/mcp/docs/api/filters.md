@@ -149,8 +149,15 @@ GET /api/content/filters/marker/catalog?langCode=en_US
 ```
 
 - Skip items with `isVisible: false` when rendering a facet for visitors, as with menus.
-- Other item types have no visibility of their own and carry no `isVisible`.
+- Payment-method items carry `isVisible` too (see the next section); other item types carry none.
 - To drop an entity from a filter for everyone, remove the item from the filter.
+
+## Discounts and payment methods in a public filter
+
+The public filter read serves a discount item only while that discount applies to the caller, by the same rules as prices: the current time is inside its `startDate`…`endDate` window, and a `PERSONAL_DISCOUNT` limited to user groups is served only to a signed-in user of one of those groups who is not in its exclusions. Anonymous callers count as the guest group. Send the user's `Authorization: Bearer` token with the read to get their personal discounts.
+
+- A discount whose window has not started or has ended is absent, not flagged; it appears on its own once the window opens.
+- A payment-method item carries `isVisible` of the payment account, and `value` is the account type (`stripe`, `custom`, …), not its id.
 
 ## Reading available values
 
@@ -168,6 +175,7 @@ Use it before reporting that a filter returns nothing — often the value simply
 - **Patching a position field on a filter item.** Use the position operation.
 - **Nesting by parent id alone.** Send `newParentType` too; ids overlap.
 - **Rendering every public filter item.** Hidden pages and products arrive with `isVisible: false`.
+- **Reading personal discounts from a filter without the user's token.** They are served only to their user groups.
 - **Expecting a pinned item to have products behind it.** Pinning is presentation only.
 - **Looking for a way to pin one value.** Pinning is set on the attribute.
 - **Assuming a pinned facet is a fixed set.** New values are added to it automatically.
