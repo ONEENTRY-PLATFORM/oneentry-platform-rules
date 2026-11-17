@@ -20,6 +20,8 @@ cms_api_search { "query": "import" }
 
 Creating a template whose identifier exists fails. Read the templates before creating one, and reuse an existing template rather than making a near-duplicate — two templates that differ by one column are how a wrong mapping gets used by accident.
 
+An identifier may contain only lowercase Latin letters, digits and underscores (`catalog_daily_feed`). Anything else is refused with `400` naming `identifier`. The identifier is what a template run is started by, as a path segment, so derive it from the template name as a slug instead of passing the name itself. Templates saved before this rule may carry other characters; they keep their identifier on update, and a run addresses them with the identifier URL-encoded.
+
 ## Building a mapping
 
 The mapping targets attributes, so you need the attribute set first: each attribute's type, its identity, and its marker. A column mapped onto an attribute of the wrong type either fails per row or stores something unusable.
