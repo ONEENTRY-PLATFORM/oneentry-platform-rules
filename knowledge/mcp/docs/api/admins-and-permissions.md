@@ -228,3 +228,4 @@ Admin permissions govern the Admin API. Content API access is governed by user g
 - **Reading a new `403` as lost rights.** The operation more often gained a requirement.
 - **Calling the total logout to fix a stuck session.** It ends everyone else's too.
 - **Moving an admin through its create or update body.** `position` and `positionId` in the `AdminsController_create` or `AdminsController_update` body are ignored, although the schema lists them, and the call still answers `201` / `200`. Reorder with `AdminsController_updateModulePosition`, which needs `admins.changePositions`.
+- **Setting an admin's dates or a missing attribute set through its body.** `createdDate` and `updatedDate` in the `AdminsController_create` or `AdminsController_update` body are ignored: the platform sets the creation date once and never changes it. An `attributeSetId` that names no existing attribute set answers `404` and nothing is saved; send `null` to leave the admin without one.

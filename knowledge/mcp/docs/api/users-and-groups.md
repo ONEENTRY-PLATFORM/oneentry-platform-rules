@@ -178,5 +178,6 @@ Providers for Google, Apple, VK and the other supported networks are created her
 - **Updating a user without echoing back its form data.** It is overwritten, and that includes the sign-in field.
 - **Missing a read restriction** and investigating the data instead.
 - **Putting user details into a report.** Personal data stays in the instance.
+- **Backdating a group or a sign-in provider.** `createdDate` and `updatedDate` in a group create or update body, or in a sign-in provider create body, are ignored; the creation date is set by the platform and does not change.
 
 → `mcp/docs/api/content-api-permission-rules` · `mcp/docs/api/verification-recipes#permissions`
