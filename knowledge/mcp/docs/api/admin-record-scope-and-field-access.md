@@ -55,6 +55,7 @@ For `pages.scope`, the list of root pages becomes the pages named in the scope, 
 - Area keys and field names come from `fields` in the permission catalog. A name not listed there is refused with `400`.
 - Attributes are named by the marker of their attribute set and the marker of the attribute. `*` stands for every attribute of the set, and a rule on one attribute wins over `*`.
 - An attribute set or attribute marker that does not exist is refused with `400`, so a typo is never stored as a rule that does nothing.
+- Attribute rules also cover submitted form values: the `formData` items of users, form submissions, orders and integration collection rows. Each item is judged by its `marker` against the attribute set of the record's form (the auth provider's form for a user, the storage form for an order, the collection form for a row). A hidden item is left out of every response; changing a read-only item answers `403` with `FIELD_DENIED`; a hidden item you never received stays as stored when you update the record without it.
 - Send `false`, or leave the key out, to lift every field rule.
 
 → `mcp/docs/api/admin-permission-catalog#what-the-permission-catalog-returns`
