@@ -48,6 +48,8 @@ Most networks need `oauthClientId`, `oauthSecret` and `oauthAuthUrl`. Apple is t
 
 `oauthTokenUrl` is optional everywhere and overrides the network's standard endpoint when set.
 
+An overridden endpoint must be reachable on the public internet. The instance does not call loopback, private-network or link-local addresses at sign-in, and this holds for `oauthTokenUrl` and `oauthUserInfoUrl` alike, including a public name that resolves to such an address or a response that redirects to one. Saving such a value succeeds; the sign-in that uses it answers `400`.
+
 ## Settings are checked when you save them
 
 The create and update calls validate the settings of an `oauth` provider. Two things are refused with `400`:
@@ -83,6 +85,7 @@ One network supplies no display name at all, so `oauthNameMarker` has no effect 
 - **The network reported an address it has not verified.** The sign-in is refused so an unverified address cannot claim an existing account. Ask the person to confirm their address with the network, then retry.
 - **The stored settings name a network the instance does not support.** Compare `oauthProvider` against the catalog.
 - **`oauthAuthUrl` is missing**, or the authorization code was issued for a different redirect address than the one sent with it.
+- **`oauthTokenUrl` or `oauthUserInfoUrl` points at an internal address.** The instance refuses to connect to loopback, private-network or link-local addresses. Point the setting at the network's public endpoint, or remove it to use the standard one.
 - **The authorization code was already used, or has expired.** These codes are single-use and short-lived; obtain a fresh one rather than replaying the request.
 
 When the network itself rejects the exchange, the response says only that the attempt failed. Check the credentials and the redirect address registered with the network — the same code cannot be retried.
