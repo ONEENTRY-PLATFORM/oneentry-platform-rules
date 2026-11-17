@@ -77,6 +77,17 @@ They are not the names of the entities' own routes, and a near neighbour is not 
 
 Drilldown mode is the exception that makes reachability visible. `limit` with a single `types` value answers `400 Drilldown mode (limit/offset) requires exactly one accessible type` when that kind is not reachable for you, and `200` when it is, whether or not anything matched. That is the cheapest way to tell "nothing matched" apart from "you cannot search this".
 
+## Which kinds an administrator can reach
+
+A kind is searched for an administrator only when both of these hold, and otherwise it is dropped in silence:
+
+- the admin panel section that owns the kind is among the administrator's sections;
+- the administrator holds the read key that the kind's own read routes require: `pages.get` for `pages`, `menu.get` for `menus`, `settings.attributesSets.get` for `attributes_sets` and `attributes`, `catalog.products.get` for `products`, `blocks.get` for `blocks` and `slides`, and likewise for every other kind whose reads are keyed.
+
+Search never shows a title the administrator could not open: if reading the record by id answers `403`, the kind is absent from search too. Granting the section alone is not enough. `templates`, `ai_provider_accounts` and `custom_modules` need no key, because their reads need none.
+
+→ `mcp/docs/api/admins-and-permissions`
+
 ## Settings records the admin search also finds
 
 Six of those kinds are not content but configuration, and they behave alike:
@@ -88,9 +99,9 @@ Six of those kinds are not content but configuration, and they behave alike:
 | `ai_provider_accounts` | the platform settings section |
 | `custom_modules` | the platform settings section |
 | `users_auth_providers` | the users section |
-| `product_relations_templates` | the catalogue section, **and** holds `catalog.products.updateRelationTemplate` |
+| `product_relations_templates` | the catalogue section, **and** holds `catalog.products.get` and `catalog.products.updateRelationTemplate` |
 
-The section is the whole gate for the first five: an administrator who can reach the payments section finds a payment account by name without holding `payments.accounts.get` or any other key, and an administrator with no sections at all finds nothing anywhere. Relation templates are the one kind that also wants a key, and without it the group is dropped in silence rather than refused.
+Each of them also needs its read key, as above: `filter.get`, `payments.accounts.get`, `usersAuthProvider.get`; the two platform-settings kinds need none. Relation templates want two keys, the catalogue read and the right to edit templates, and without either the group is dropped in silence rather than refused. An administrator with no sections at all finds nothing anywhere.
 
 **Only the title and the identifier are matched.** The stored configuration of an account — its keys, its secrets, its connection settings — is never searched and never returned, so a credential cannot be found through search even by an administrator who could read the record itself. Searching for a value you know is in there answers nothing, and that is the feature working.
 
