@@ -80,8 +80,22 @@ Reads are gated the same way writes are. An account that holds no keys reads not
 | One attribute set, and the attributes inside it | `settings.attributesSets.get` |
 | Form submissions and their counts | `forms.data.read` |
 | Custom module container state and logs | `settings.modules.get` |
+| Order storages, their orders, order statuses and refund requests | `orders.storage.get` |
+| Payment sessions, payment stages of an order and refunds | `payments.sessions.get` |
+| Payment accounts | `payments.accounts.get` |
+| Discounts, discount settings, coupons and bonus balances | `discounts.get` |
+| Forms | `forms.get` |
+| Events and their sender settings | `events.get` |
+| Blocks | `blocks.get` |
+| Products, hidden ones included, and related-product templates | `catalog.products.get` |
+| Filters | `filter.get` |
+| Subscription plans (a user's own subscriptions need `users.get`) | `subscriptions.get` |
+| Collections / the rows inside them | `collections.collection.get` / `collections.row.get` |
+| User groups | `userGroups.get` |
+| Content API permission rules of user groups | `userPermissions.get` |
+| User sign-in providers | `usersAuthProvider.get` |
 
-One key covers every read of that data rather than a single route: the listing, reading one by id, and the search and pagination forms beside it all require it. A `403` on one is not worked around by reaching for a neighbour.
+One key covers every read of that data rather than a single route: the listing, reading one by id, and the search and pagination forms beside it all require it. A `403` on one is not worked around by reaching for a neighbour. The same keys apply to the developer API routes of these areas.
 
 Helpers stay open. Checking whether an administrator login or email, a marker or a page URL is already taken, and reading the permission vocabulary, work without a read key. Checking whether a site user's login is taken (`POST /users/check-login-existence`) is the exception: it tells you whether a person is registered, so it needs `users.get` like any other user read. It compares the login the same way sign-up through an email provider does, ignoring letter case, so `{"exist": false}` means sign-up will not reject the login as taken. The admin panel issues more than a dozen reads on every load and only some are open this way: `GET /settings-general`, the attribute-set listing `GET /attributes-sets`, and the self-read `GET /admins/me`, which returns the signed-in administrator's own account, answer for any signed-in admin, and `401` with no token. The rest are gated like any other read: reading **another** administrator's account by id needs `admins.get`, and so does the administrator listing.
 
