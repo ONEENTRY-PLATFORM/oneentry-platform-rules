@@ -76,12 +76,22 @@ A list filtered or sorted by a hidden attribute answers `403` with `FIELD_DENIED
 
 Search results never match on a hidden attribute value either: a record found only through such a value is left out.
 
+## Searching by a field you cannot see
+
+A hidden field is not searchable, because a match would confirm its value.
+
+- The quick search of products, pages and blocks matches on the title only. With `localizeInfos` hidden for that area it answers `403` with `FIELD_DENIED`; use the paginated list instead.
+- The global search does not match on a hidden title, admin e-mail or page URL, and leaves that value out of the item. An item whose title is hidden carries the record's marker as `title`.
+- Filter items whose record has a hidden title come back with `localizeInfos: null`.
+
+→ `mcp/docs/api/global-search`
+
 ## What the refusal codes tell you
 
 | `code` | Read it as | What to do |
 |---|---|---|
 | `SCOPE_DENIED` | The record, or one of `ids`, is outside the scope named in `permission` | Work on a record inside the scope, or ask for it to be added |
-| `FIELD_DENIED` | The request changes one of `fields`, which the account may only read | Send those fields unchanged, or ask for the rule to be lifted |
+| `FIELD_DENIED` | The request changes, filters or searches by one of `fields`, which the account may not use that way | Leave those fields out of the change or the query, or ask for the rule to be lifted |
 
 `fields` names attributes as `attributes.<set marker>.<attribute marker>`.
 
