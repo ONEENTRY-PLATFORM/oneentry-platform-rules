@@ -63,7 +63,7 @@ Decide which of the two you mean before you build the body, and never carry `del
 
 A successful call answers `200` with a body of `true`, and an id the collection does not hold is **accepted in silence** — `{"deleteAll": false, "ids": [999]}` answers `200 true` having deleted nothing. So the status proves the call was understood, not that any row existed. Read the rows back and compare the count.
 
-Two malformed bodies fail differently. Neither a `deleteAll` nor a usable `ids` — `{"deleteAll": false, "ids": []}` — answers `400 Not enough data for deletion`. A body with no `ids` key at all, `{}`, answers `5xx`: send both fields and the call behaves.
+A body that asks for nothing answers `400 Not enough data for deletion`: an empty `ids` list without `deleteAll: true` — `{"deleteAll": false, "ids": []}` — and an empty body `{}` are refused the same way, and nothing is deleted. A `deleteAll` that is not a boolean, or an `ids` that is not a list of integers, answers `400` with the validation messages.
 
 ## Common mistakes
 
@@ -71,7 +71,7 @@ Two malformed bodies fail differently. Neither a `deleteAll` nor a usable `ids` 
 - **Sending `deleteAll: true` with a narrow `ids` list.** The list is ignored and the collection is emptied.
 - **Reading `200 true` as proof rows existed.** Unknown ids are accepted silently.
 - **Posting a row to the numeric id.** Row creation is addressed by the collection's marker.
-- **Omitting `ids` from the bulk body.** It answers `5xx`; send both fields.
+- **Sending an empty bulk body.** `{}` answers `400`; name the `ids`, or send `deleteAll: true` on purpose.
 - **Expecting a count back from the bulk delete.** It answers a bare `true`.
 - **Deleting the form the collection is built on.** It answers `409` until the collection is re-pointed or gone — `mcp/docs/api/forms-and-form-data#delete-a-form`.
 
