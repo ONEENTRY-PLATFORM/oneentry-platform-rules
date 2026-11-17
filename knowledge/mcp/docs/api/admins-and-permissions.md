@@ -227,3 +227,4 @@ Admin permissions govern the Admin API. Content API access is governed by user g
 - **Creating an admin to work around a refusal.** Gated, capped, not the answer.
 - **Reading a new `403` as lost rights.** The operation more often gained a requirement.
 - **Calling the total logout to fix a stuck session.** It ends everyone else's too.
+- **Moving an admin through its create or update body.** `position` and `positionId` in the `AdminsController_create` or `AdminsController_update` body are ignored, although the schema lists them, and the call still answers `201` / `200`. Reorder with `AdminsController_updateModulePosition`, which needs `admins.changePositions`.
