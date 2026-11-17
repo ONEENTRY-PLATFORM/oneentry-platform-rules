@@ -47,6 +47,16 @@ So verify by sampling — read a few entities by id — rather than by refreshin
 
 → `mcp/docs/api/index-attributes#bulk-changes-take-proportionally-longer`
 
+## What happens when the file's columns differ from the template
+
+A template remembers the header of every column it maps. When you run a spreadsheet or CSV template against a new file, the headers of that file are compared with the remembered ones before anything is imported:
+
+- **Same headers, same positions.** The run starts as usual.
+- **Same headers, other positions** (a column added in front, columns reordered). Each column is found by its header and the run starts; values still land in their own fields.
+- **A remembered header is absent.** The run does not start. The call answers `400`, and `detail` names the file and the missing columns.
+
+Renaming a column header in the source file therefore breaks the template on purpose. Send the file with the template's headers, or build a new template from the new file. Do not rename the template's columns by hand to make a run pass.
+
 ## Imports create records and records cost quota
 
 Every imported row is a record against the instance's total limit. A doubled import does not merely duplicate content, it can exhaust the quota and make **all** further creates fail, including unrelated ones.
@@ -76,5 +86,6 @@ If a run reports failures, fix the template or the file. Do not re-run the same 
 - **Refreshing a listing to check progress.** Sample by id instead.
 - **Re-running after a partial failure** without checking what already exists.
 - **Mapping labels onto choice attributes.** They need ids.
+- **Renaming headers in a file a template runs on.** The run is refused with `400`; keep the headers or build a new template.
 
 → `mcp/docs/api/verification-recipes`
