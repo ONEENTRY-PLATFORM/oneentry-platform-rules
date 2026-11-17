@@ -138,6 +138,20 @@ Filters and their items are ordered, and as everywhere in this API that ordering
 
 Items and custom items of a filter are numbered separately, so one id can name one of each. A parent is the pair `newParentId` + `newParentType` (`filter-item` or `filter-custom-item`), on `PUT /filters/{id}/items/reparent` and on both item position operations. Send the type every time: without it the id is taken as a filter item first. Read back, every item and custom item reports its parent as `parentId` + `parentType`; the site tree follows the same pair.
 
+## Hidden pages and products stay in a public filter
+
+Hiding a page or a product does not remove it from the filters that include it. The public filter read returns the item as before, and page and product items carry `isVisible` with the entity's own visibility. A hidden product is not readable on its own (`GET /api/content/products/{id}` answers `404`), so a link from its item leads nowhere.
+
+```text
+GET /api/content/filters/marker/catalog?langCode=en_US
+→ items: [ {type: "product", value: "83",   isVisible: true,  …},
+           {type: "product", value: "3393", isVisible: false, …} ]
+```
+
+- Skip items with `isVisible: false` when rendering a facet for visitors, as with menus.
+- Other item types have no visibility of their own and carry no `isVisible`.
+- To drop an entity from a filter for everyone, remove the item from the filter.
+
 ## Reading available values
 
 There is an operation returning the distinct values an indexed attribute currently holds. It is what a facet is built from, and it is also the fastest way to check whether a filter value you are about to send exists at all.
@@ -153,6 +167,7 @@ Use it before reporting that a filter returns nothing — often the value simply
 - **Assuming a truncated result means "no more matches".** The response was capped; page it.
 - **Patching a position field on a filter item.** Use the position operation.
 - **Nesting by parent id alone.** Send `newParentType` too; ids overlap.
+- **Rendering every public filter item.** Hidden pages and products arrive with `isVisible: false`.
 - **Expecting a pinned item to have products behind it.** Pinning is presentation only.
 - **Looking for a way to pin one value.** Pinning is set on the attribute.
 - **Assuming a pinned facet is a fixed set.** New values are added to it automatically.
