@@ -271,6 +271,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does a listing answer 400 for an empty filter | `mcp/docs/api/interface-module-data#an-empty-filter-answers-400` |
 | How do I pin a value in a facet | `mcp/docs/api/filters#pinning-is-set-on-an-attribute-not-on-a-value` |
 | Why did a new value appear in my pinned facet by itself | `mcp/docs/api/filters#a-pinned-attribute-picks-up-new-values-on-its-own` |
+| Why does a hidden product still show in my filter | `mcp/docs/api/filters#hidden-pages-and-products-stay-in-a-public-filter` |
 | Why does a search by meaning return nothing for a kind | `mcp/docs/api/index-attributes#why-a-search-by-meaning-finds-nothing-for-a-kind` |
 | Why does the site search return only five results | `mcp/docs/api/global-search#results-come-back-grouped-in-fives` |
 | Why is limit refused on the search | `mcp/docs/api/global-search#paging-one-kind-needs-limit-and-exactly-one-type` |
