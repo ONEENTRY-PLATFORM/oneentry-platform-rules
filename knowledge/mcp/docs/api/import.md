@@ -63,6 +63,13 @@ What identifies an existing record is a flag on an attribute in the set: `isSku`
 
 Check the set for that flag first, then confirm the behaviour with a two-row test before re-running anything at scale.
 
+Two kinds of row need a look before a run, because the match field cannot do its job for them:
+
+- **A row with the match field empty is skipped.** It could never be matched on a later run, so importing it would add a new record every time. Fill the value in the file if the row matters.
+- **A value repeated within one file yields one record.** The rows are applied in order, so the last one wins. The run still succeeds; the repetition is reported as a warning.
+
+The finished job reports both, together with rows skipped for an empty name: `skipped` lists each row with a `reason` (`empty_unique_key`, `empty_name`), `warnings` lists each repeated value (`duplicate_unique_key`) with the rows that carried it, and `skippedCount` / `warningsCount` give the totals. Row numbers count data rows from 1, the header row not included. A successful job with a non-zero `skippedCount` did not import every row.
+
 ## Reading what a session did
 
 Read the session rather than inferring from the data. It tells you what was processed and what failed, which is the difference between "the file had bad rows" and "the mapping is wrong".
