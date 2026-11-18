@@ -16,12 +16,14 @@ Each scope key takes a list of record ids. An account without the key reaches ev
 | `catalog.scope` | catalogue categories | each listed category and everything below it |
 | `forms.scope` | forms and their submissions | the listed forms |
 | `blocks.scope`, `discounts.scope`, `menus.scope`, `templates.scope`, `collections.scope` | records of that area | the listed records |
-| `orders.storage.scope` | order storages and their orders | the listed storages |
+| `orders.storage.scope` | order storages, their orders and the payment sessions of those orders | the listed storages |
 | `userGroups.scope` | user groups | the listed groups |
 
 The value follows the `pages.scope` rules: a non-empty list of whole positive ids, or `false` for no restriction. `[]` and `true` are refused with `400`.
 
 A product is in scope when at least one of its categories is inside `catalog.scope`. A product with no category is outside it.
+
+A payment session is in scope when its order is in a storage inside `orders.storage.scope`. A session with no order, such as a subscription payment, is outside it. Session lists, the payment export and the payment stages of an order follow the same rule.
 
 ## What a scope changes for reads and writes
 
