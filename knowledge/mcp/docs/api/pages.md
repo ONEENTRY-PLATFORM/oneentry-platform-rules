@@ -90,7 +90,7 @@ POST /api/admin/products/positions/{positionId}/lock
   { "isLocked": false }               release
 ```
 
-With `isLocked` in the body the call sets that state, so repeating it changes nothing. Without `isLocked` each call flips the current state, and a repeat from a stale screen releases a pin someone else set: send the explicit value whenever the intent is known. `isLocked` that is not a boolean answers `400`, pinning without `index` answers `400`, and an unknown `positionId` answers `404`.
+With `isLocked` in the body the call sets that state, so repeating it changes nothing. Without `isLocked` each call flips the current state, and a repeat from a stale screen releases a pin someone else set: send the explicit value whenever the intent is known. `isLocked` that is not a boolean answers `400`, pinning without `index` answers `400`, and an unknown `positionId` answers `404`. `index` is a whole number counted from 1 (the first place): a string, a fraction, zero or a negative number answers `400` and nothing is pinned.
 
 While a product is pinned, moving it answers `409` and writes nothing, and so does a `swapData` whose destination is pinned. Release the pin, move the product, then pin it again if it should stay fixed.
 
