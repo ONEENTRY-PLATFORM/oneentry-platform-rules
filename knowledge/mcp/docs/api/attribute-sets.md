@@ -42,7 +42,7 @@ There is one route that addresses a value by marker instead, and it is the only 
 
 `marker` is the attribute's **identifier inside the set** — not the `<type>_id<id>` key and not a position in the schema. The route resolves it against whatever set the record itself carries, which is why the caller does not need to know that set. `langCode` is a query parameter and falls back to `en_US` when omitted.
 
-`type` is a closed list: `products`, `pages`, `blocks`, `forms`, `events`, `templates`, `template_previews`, `admins`. Users, orders and discounts are not reachable this way — read those entities whole.
+`type` is a closed list: `products`, `pages`, `blocks`, `forms`, `events`, `templates`, `admins`. Any other value answers `400`. Users, orders, discounts and template previews are not reachable this way — read those entities whole.
 
 Two answers look alike and mean different things:
 
