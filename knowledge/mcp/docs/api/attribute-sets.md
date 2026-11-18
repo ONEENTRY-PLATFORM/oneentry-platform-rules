@@ -270,7 +270,16 @@ The route also answers `404` for an unknown set and `400` when the body is not a
 
 ## Copying values from one locale into another
 
-`AdminAttributesSetsController_copyValues` — `POST /attributes-sets/{id}/copy-values` — fills one or more locales from another, for named attributes, across **every record that uses the set**. It needs `settings.attributesSets.update`. Use it instead of walking the records yourself.
+`AdminAttributesSetsController_copyValues` — `POST /attributes-sets/{id}/copy-values` — fills one or more locales from another, for named attributes, across the records that use the set **and that the caller may change**. It needs `settings.attributesSets.update`. Use it instead of walking the records yourself.
+
+The caller's own rights decide which records are written; the rest are skipped without an error, and `updated` counts only what was written:
+
+- records of a section are written only with that section's update permission (`catalog.products.update`, `pages.update`, `blocks.update`, `forms.update`, `users.update` and so on);
+- with a record scope on the section (`catalog.scope`, `pages.scope`, …), only records inside it are written;
+- a `read` or `hidden` field rule on `attributesSets` or `localizeInfos` of the section leaves that part of each record as it was;
+- an attribute in `attributeIdentifiers` that the caller may only read or not see answers `403` with `code: FIELD_DENIED` and `fields` naming it, and nothing is written.
+
+So an `updated` lower than you expected is not a failure: read a skipped record, check the caller's permissions, and run the copy under an admin that may change it.
 
 ```json
 { "sourceLang": "en_US",
