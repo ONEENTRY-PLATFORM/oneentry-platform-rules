@@ -75,6 +75,22 @@ Two operations that any signed-in administrator could call now each require thei
 
 Without the key they answer `403` with `code: PERMISSION_DENIED`, and nothing changes. Administrators that already held other keys hold these too. An account created with an empty map does not.
 
+## Which key starts or stops a full reindex
+
+Three operations that control indexing require `settings.index.manage`:
+
+| Operation | What it does |
+|---|---|
+| `IndexAttributeController_reindexAll` — `POST /index-attributes/reindex-all` | Queues a reindex of the whole project or of one kind |
+| `IndexAttributeController_stopIndex` — `POST /index-attributes/stop` | Stops the indexing that is running now |
+| `IndexAttributeController_cleanFailedJobs` — `POST /index-attributes/failed-jobs/clean` | Clears the list of failed indexing work |
+
+Without the key they answer `403` with `code: PERMISSION_DENIED` and `permission: settings.index.manage`, and nothing is queued, stopped or cleared. The status reads, such as `IndexAttributeController_getHealth` and `IndexAttributeController_getQueueStats`, need no key. Administrators that already held other keys hold this one too. An account created with an empty map does not.
+
+A full reindex is a long, heavy job on a large catalog. Do not start one to make a single fresh value appear; wait for it or re-read the entity instead.
+
+→ `mcp/docs/api/index-attributes#how-far-behind-the-instance-is-right-now`
+
 ## Common mistakes
 
 - **Granting every catalog key.** Sensitive keys are refused unless your own account holds them, and they should not be granted without an explicit request anyway.
