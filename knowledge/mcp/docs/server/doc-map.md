@@ -182,6 +182,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why is the document search refused with 403 | `mcp/docs/api/file-content-search#two-permissions-nobody-holds-yet` |
 | Why does a flow node refuse every method I send | `mcp/docs/api/workflow-nodes#configure-the-cms-api-node` |
 | Why is a flow's event output example empty | `mcp/docs/api/workflow-nodes#configure-the-cms-events-node` |
+| Why does a function node not start or see no module | `mcp/docs/api/workflows#what-code-a-function-node-can-run` |
 | Why was my admin permission write refused with 400 | `mcp/docs/api/admins-and-permissions#an-unrecognised-permission-key-is-refused-with-400` |
 | Which permission values are not booleans | `mcp/docs/api/admins-and-permissions#a-recognised-key-with-the-wrong-value-is-a-different-400` |
 | Why does creating an admin answer 405 | `mcp/docs/api/admins-and-permissions#creating-an-admin-can-answer-405` |

@@ -10,7 +10,7 @@ This document covers the configuration as a whole: how it is stored, how it is s
 
 One configuration per instance, held as a flat array of nodes. A node carries `id`, `type`, `z` (the id of the tab it belongs to), `wires` (its outgoing connections, one list per output) and whatever configuration its own type reads. A node of type `tab` is a flow's container.
 
-The flow format and the general-purpose node types are Node-RED's: each node set reports the `module` it came from, and most report `node-red`. So `inject`, `function`, `switch`, `change`, `template`, `split` and `delay` behave as that project documents them, and a flow built there transfers here.
+The flow format and the general-purpose node types are Node-RED's: each node set reports the `module` it came from, and most report `node-red`. So `inject`, `function`, `switch`, `change`, `template`, `split` and `delay` behave as that project documents them, and a flow built there transfers here, with one exception: the code of a `function` node runs in a restricted sandbox, described below.
 
 ```json
 { "flows": [
@@ -21,6 +21,17 @@ The flow format and the general-purpose node types are Node-RED's: each node set
     "path": "/pages", "params": "{\"langCode\":\"en_US\"}",
     "wires": [ [] ] } ] }
 ```
+
+## What code a function node can run
+
+The code of a `function` node runs in a sandbox of its own, cut off from the server that hosts the instance. Write it as plain JavaScript over the message:
+
+- Available: `msg`, `return msg` or an array for several outputs, `async` code and `await`, `node.send`, `node.done`, `node.status`, `node.log`, `node.warn`, `node.error`, `context`, `flow` and `global` with `get`, `set` and `keys`, `env.get`, `setTimeout` and `setInterval`, and the node's On Start and On Stop code.
+- Not available: `require`, `process`, `Buffer`, `node.on`, and external modules. A `function` node that declares external modules (its `libs` list) does not start.
+- Behind an `http in` node, `msg.req` is a copy of the request (`headers`, `query`, `params`, `cookies`, `method`, `url`, `body`); changing it changes nothing downstream, and `msg.res` cannot be read in the code but still reaches `http response`.
+- `env.get` reads only variables defined in the flows themselves; anything else is `undefined`.
+- Synchronous code is stopped after the node's own `timeout`, or after ten seconds when it has none, and `execute-to` answers `400` with a time-limit message.
+- A thrown error fails the run: `execute-to` answers `400` with the error's message.
 
 ## A save replaces the whole configuration
 
@@ -83,5 +94,6 @@ Report a requirement of this shape as buildable from the platform's own primitiv
 - **Running `execute-to` on a node that is not saved, or behind a timer.** The first answers not found, the second times out at thirty seconds.
 - **Promising a node kind without reading `GET /workflows/nodes`.** Which sets are installed differs between instances.
 - **Calling a schedule-shaped requirement unsupported** because no operation is named after it.
+- **Loading a module or reading server settings in a `function` node.** It has no `require`, no external modules and no server environment; pass values in the message or define them in the flow.
 
 → `mcp/docs/api/workflow-nodes` · `mcp/docs/api/journal`
