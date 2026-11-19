@@ -82,6 +82,14 @@ Two kinds of row need a look before a run, because the match field cannot do its
 
 The finished job reports both, together with rows skipped for an empty name: `skipped` lists each row with a `reason` (`empty_unique_key`, `empty_name`), `warnings` lists each repeated value (`duplicate_unique_key`) with the rows that carried it, and `skippedCount` / `warningsCount` give the totals. Row numbers count data rows from 1, the header row not included. A successful job with a non-zero `skippedCount` did not import every row.
 
+## Number and price cells
+
+A cell mapped onto a number attribute, or onto the attribute marked as the product price, is read as a number written the way spreadsheets write it. Spaces between digit groups are dropped, a single comma is the decimal separator, and when both a comma and a dot appear the right-most one is. So `100,50` imports as `100.50` and `1 200,00` as `1200.00`.
+
+A cell that is not a number after that, such as `12 USD` or `abc`, and a negative price, is imported empty. It is never turned into `0`, because a price of zero sells the product for free. The run still succeeds and lists the cell in `warnings` with `reason` `invalid_number` or `negative_price`, its row, column header and original value. An empty number cell stays empty.
+
+After a catalog run, read `warningsCount`: a non-zero value means some products have no price or an empty number field. Fix the cells in the file and run the import again.
+
 ## Reading what a session did
 
 Read the session rather than inferring from the data. It tells you what was processed and what failed, which is the difference between "the file had bad rows" and "the mapping is wrong".
