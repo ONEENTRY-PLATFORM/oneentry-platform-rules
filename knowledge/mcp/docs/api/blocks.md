@@ -41,7 +41,11 @@ A block create needs both a marker and a general type, and refuses either one wh
 - **general type** (`generalTypeId`): an integer id of a general type that exists on the instance. Anything else answers `400`;
 - a marker another block already holds answers `409`. Pick a free one; do not retry the same body.
 
-On an update both fields may be left out. Sent as `null` or empty they answer `400`. The format, the existence of the type and the `409` are checked only for a value that **changes**, so a block stored earlier with an off-format marker stays editable when its marker is sent back unchanged.
+The template and the attribute set are optional:
+
+- **template** (`templateId`) and **attribute set** (`attributeSetId`): either `null` or left out (the block has none), or a positive whole number that is the id of a template / attribute set existing on the instance. A fraction, zero, a negative number, a string, a number too large to be an id, or an id nothing has answers `400` and writes nothing.
+
+On an update both fields may be left out. Sent as `null` or empty they answer `400`. The format, the existence of the type, template and attribute set, and the `409` are checked only for a value that **changes**, so a block stored earlier with an off-format marker stays editable when its marker is sent back unchanged.
 
 ## Attaching a block to a page
 
