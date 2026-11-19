@@ -32,15 +32,17 @@ A storefront does not need an admin session to attach a file. There is a public 
 
 `type`, `entity` and `id` are **folder names and nothing else**. No entity is checked to exist: a well-formed address naming a record that was never created is accepted and simply produces a path nobody will look under. They are for tidiness, not for binding a file to anything.
 
-The *shape* of the three is checked, though, and the public upload checks it more narrowly than the admin one does. There, each of `type` and `entity` must be a single name of Latin letters, digits, `_` and `-`, and `id` must be a positive whole number written in digits:
+The *shape* of the three is checked, though. On the public upload each of `type` and `entity` must be a single name of Latin letters, digits, `_` and `-`, and `id` must be a positive whole number written in digits:
 
 - `0`, a negative number, a fraction, a leading zero, a non-numeric string and a number above `2147483647` are each answered `400` for `id`;
 - a separator, a dot, a space, a non-Latin letter or a percent sign in `type` or `entity` is answered `400` as well — so percent-encoding a separator does not get it through either;
 - the response names which parameter is at fault, and nothing is stored.
 
-The public download applies the same rule to `id`. The public delete and every admin file route apply the looser one: each value must still be a single segment, so a `/`, a `\`, or a bare `..` or `.` is `400`, but anything else passes.
+The admin upload applies the same rule to `type` and `entity`. Its `id` is a folder name too, of the same characters, but need not be a number: a name such as `attribute-settings` is accepted, and a separator, dot, space or percent sign is `400`.
 
-Two things follow. An address the admin route accepts is not guaranteed to work on the public one, so do not carry folder values from an admin script into a storefront without checking them; and a download answering `400` rather than `404` is telling you the parameters are malformed, not that the file is missing. Plain Latin names and whole-number ids are accepted everywhere — send the values you mean, and there is nothing to be gained by assembling a path inside them.
+The public download applies the public rule to `id`. The public delete and the admin download and delete apply a looser one: each value must still be a single segment, so a `/`, a `\`, or a bare `..` or `.` is `400`, but anything else passes, which keeps files stored under older, looser names removable.
+
+Two things follow. An admin `id` that is not a whole number is refused on the public upload, so do not carry folder values from an admin script into a storefront without checking them; and a download answering `400` rather than `404` is telling you the parameters are malformed, not that the file is missing. Plain Latin names and whole-number ids are accepted everywhere — send the values you mean, and there is nothing to be gained by assembling a path inside them.
 
 Two consequences worth saying out loud when advising on this:
 
@@ -224,7 +226,7 @@ Do not assume a link you obtained on one instance works on another, and do not c
 - **Expecting the instance to refuse a file type.** It refuses none; the attribute's validators are the project's rule.
 - **Changing folder values or the field name when an upload answers `503`.** The instance's storage is unavailable for a while; nothing was stored and no quota was used. Retry the same call after a pause, and report it to the instance operator if it persists.
 - **Reading a `403` on upload or delete as a problem with the file.** The admin routes need `files.create` and `files.delete`.
-- **Assembling a path inside `type`, `id` or `entity`.** Each is a single folder name; a separator or `..` is a `400`, and on the public upload so is any character outside Latin letters, digits, `_` and `-`.
+- **Assembling a path inside `type`, `id` or `entity`.** Each is a single folder name; on either upload any character outside Latin letters, digits, `_` and `-` is a `400`, an encoded separator included.
 - **Sending a decorative `id` on a public upload.** `0`, `-1`, `1.5` and `abc` are each a `400` there; it takes a positive whole number.
 - **Deleting a file without finding its references.** Silent missing images.
 - **Copying a file reference between instances.** Upload again instead.
