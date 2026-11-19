@@ -109,6 +109,8 @@ The public read of the same page by URL returns that order in the same direction
 
 A page created without `localizeInfos` may be accepted and is unusable — it appears untitled in the admin panel and has nothing to render.
 
+A `pageUrl` you send must contain at least one non-space character. An empty or whitespace-only `pageUrl` answers `400` on create and on update, and nothing is written. To create a page without an address, leave the field out instead of sending an empty string.
+
 To check a page URL before claiming it, use `GET /pages/validation/{id}/{pageUrl}` — and read the answer the right way round. It answers **`true` when the URL is already taken** by another page, `false` when it is free. The `id` is the page the URL is being considered for, so a page asked about its own current URL answers `false`.
 
 That polarity is the reverse of the `marker-validation` operations used for almost every other entity, which answer `valid: true` when a marker is **free**. Two checks, opposite senses: read whichever you are calling rather than carrying the habit across.
