@@ -96,6 +96,7 @@ Two things worth telling a human:
 
 - A field whose attribute has no preview template assigned stores the value exactly as sent, with no preview and no error. Assign one and submissions created afterwards carry previews; the ones already stored keep what they have.
 - A value that already carries `previewLink` is stored untouched, so re-sending a record uploaded with `template=` costs nothing and changes nothing.
+- Previews are built only from a `downloadLink` exactly as this instance's upload returned it. A link on another host, or with a query string or fragment added, is stored as sent, with no preview and no error.
 
 → `mcp/docs/api/files-and-uploads#attaching-a-file-to-a-form-submission`
 
