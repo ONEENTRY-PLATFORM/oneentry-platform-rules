@@ -21,6 +21,8 @@ Each scope key takes a list of record ids. An account without the key reaches ev
 
 The value follows the `pages.scope` rules: a non-empty list of whole positive ids, or `false` for no restriction. `[]` and `true` are refused with `400`.
 
+Flat areas also take one list per action, and discounts and blocks can be confined by type: `mcp/docs/api/admin-scope-by-action-and-type#how-to-give-separate-lists-for-view-change-and-delete`.
+
 A product is in scope when at least one of its categories is inside `catalog.scope`. A product with no category is outside it.
 
 A payment session is in scope when its order is in a storage inside `orders.storage.scope`. A session with no order, such as a subscription payment, is outside it. Session lists, the payment export and the payment stages of an order follow the same rule.
