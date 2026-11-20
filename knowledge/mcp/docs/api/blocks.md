@@ -51,7 +51,7 @@ On an update both fields may be left out. Sent as `null` or empty they answer `4
 
 Attachment lives with the page, not with the block, and carries a position within that page. So "add this block to the home page" is a page update, not a block update.
 
-Create or locate the block first, then attach it **by its numeric id**. The page's `blocks` and `nestedBlocks` arrays hold ids; a marker sent in either answers `5xx` and attaches nothing.
+Create or locate the block first, then attach it **by its numeric id**. The page's `blocks` and `nestedBlocks` arrays hold ids; a marker sent in either answers `400` and attaches nothing.
 
 Attachment also works from this side, through `blockPages` — see the next section for what that field does to nesting.
 

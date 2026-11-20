@@ -27,7 +27,7 @@ An account's configuration contains provider credentials. Two rules:
 
 ## Why a provider key reads back as asterisks
 
-A provider credential that is set — `secretKey`, `signingSecretKey`, `serverKey`, `apiKey`, `callbackToken`, in `settings` or `testSettings` — reads back as `********` from every account call: list, read, create and update. An empty value stays empty, so you can still tell a key that is not set. The `status` of an account is worked out from the real keys, so a masked key still reports `connected`.
+A provider credential that is set — `secretKey`, `apiSecretKey`, `signingSecretKey`, `serverKey`, `apiKey`, `callbackToken`, in `settings` or `testSettings` — reads back as `********` from every account call: list, read, create and update. An empty value stays empty, so you can still tell a key that is not set. The `status` of an account is worked out from the real keys, so a masked key still reports `connected`.
 
 On update, `********`, an empty string or a credential left out of the body all keep the stored key. Only a new value replaces it, and `null` removes it.
 
@@ -38,6 +38,8 @@ Through this server a set key may show as the redaction placeholder instead of `
 ## Sessions are the lifecycle
 
 A payment session represents one attempt: created, then moving through the provider's flow to a terminal state. The order's payment axis reflects where the session got to.
+
+Creating a session yourself — `AdminPaymentsController_createPaymentSession`, `POST /payments/sessions` — needs `payments.settings.update`, not a sessions key; without it the call answers `403` with `code: PERMISSION_DENIED` naming that key, and no session is created.
 
 You read sessions. You do not advance them by writing statuses — the provider's callbacks do that, and a hand-written status that contradicts the session is worse than none.
 

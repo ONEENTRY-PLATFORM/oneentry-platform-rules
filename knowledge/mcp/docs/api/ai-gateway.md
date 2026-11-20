@@ -49,6 +49,12 @@ Poll `AdminAiGatewayController_getJob` until `status` is terminal — `completed
 
 `AdminAiGatewayController_cancelJob` stops a job that is still running. Cancelling one that already completed or failed answers `409`.
 
+A job belongs to the admin who submitted it. Reading or cancelling it from another admin account answers `404`, the same as a job id that does not exist, so poll with the account that submitted.
+
+## Keys for generating a workflow function
+
+Generating code for a function node — `AdminAiGatewayController_generateWorkflowFunction` — needs `workflows.update`. Reading the generation history of a node — `AdminAiGatewayController_getNodeHistory` — needs `workflows.get`. Without the key the call answers `403` with `code: PERMISSION_DENIED` naming it, and no job is submitted.
+
 ## Submitting twice is the expensive mistake
 
 Each job consumes tokens against the account's limits. A duplicate submission costs real money and produces a second result nobody asked for.

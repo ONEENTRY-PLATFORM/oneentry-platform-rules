@@ -11,7 +11,7 @@ Read this before writing a node, and read the neighbouring document for how the 
 This is the node that does work, and the one most requirements end up resting on:
 
 - `method` — the HTTP method, in either case: `get` and `GET` both work, as do `post`, `put` and `delete`.
-- `path` — the Admin API path without the `/api/admin` prefix. A `{name}` placeholder in it is filled from `params`; one with no matching key fails the run with `Missing parameter: <name>`.
+- `path` — the Admin API path without the `/api/admin` prefix. A `{name}` placeholder in it is filled from `params`; one with no matching key fails the run with `Missing parameter: <name>`. A value that is empty, `.` or `..`, or that contains `/`, `\`, `?` or `#`, fails the run with `Invalid path parameter: <name>` and no call is made.
 - `params` — the query parameters, as a **JSON string**, not an object. Left out, the incoming message's own `params` is used.
 - `data` — the request body, also as a JSON string. Left out, the message's `data` is used.
 - `operation` — optional, an operation id. Reading the flows back then adds an `outputExample` for it, empty where none is known.
@@ -25,7 +25,11 @@ Both strings are templates over the message, so `{{payload.id}}` inside one is s
   "wires": [ [] ] }
 ```
 
-The node has no field for a token: the instance issues the request against its own Admin API. So a flow reaches any operation an operator could, and a write it makes is a real write.
+The node has no field for a token. Every `admin-api` node runs with the permissions of the admin who last saved a changed configuration, and reading the flows back shows that account as `runAsAdminId` on each node. A call that account may not make fails the run with `Forbidden resource`; a write it may make is a real write. Saving an identical configuration changes nothing, the runner included.
+
+So a save by a narrowly permitted account narrows every `admin-api` node in every flow, not only the ones it touched. Check `runAsAdminId` after a save, and save from an account that holds every key the flows need.
+
+`execute-to` is the exception: a test run uses the permissions of the admin calling it, whoever saved the flows.
 
 ## Which operations the admin-api node offers
 

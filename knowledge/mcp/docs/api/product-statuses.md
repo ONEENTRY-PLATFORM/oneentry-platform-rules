@@ -35,7 +35,7 @@ There is an operation that checks whether a marker is free before you create a s
 Statuses are customer data, so creating one is legitimate. Before you do:
 
 - confirm the concept is not already covered by an existing status under a different name;
-- pick a marker that reads well and will not need renaming, because things reference it;
+- pick a marker that reads well and will not need renaming, because things reference it. It must start with a Latin letter and hold only Latin letters, digits, `_` and `-`; anything else, a space included, answers `400`;
 - provide localized labels for every active locale — the label is what a human sees in the admin panel and on a site.
 
 Dry run, send, then read the list back and confirm the marker is what you intended.

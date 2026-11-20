@@ -55,6 +55,20 @@ A read permission never allows a rollback. Without the key the call answers `403
 
 An account holding `pages.scope` may snapshot and roll back only the pages inside its branches, exactly as with an ordinary page update. A page outside them answers `403` naming the page id, even though the account holds `pages.update`.
 
+## Why a rollback answers 403 despite the update key
+
+A rollback is checked field by field against the keys an ordinary change of that field needs. When the snapshot would change one of these fields, the update permission alone is not enough:
+
+| Record | Field the snapshot would change | Key also needed |
+|---|---|---|
+| `pages` | parent page | `pages.move` |
+| `pages` | visibility | `pages.switching` |
+| `products` | visibility | `catalog.products.switching` |
+| `products` | status | `catalog.products.editStatus` |
+| `products` | template | `catalog.products.setTemplate` |
+
+Without the key the rollback answers `403` with `code: PERMISSION_DENIED` and the missing key in `permission`, and nothing is restored — not the guarded field, and not the other fields of the snapshot. A snapshot whose value for the field matches the current one needs no extra key. Ask for the key named in `permission`, then roll back again.
+
 ## Rolling back a product or order status
 
 A rollback of `product_statuses` or `order_statuses` follows the same rules as an ordinary update of that status:
