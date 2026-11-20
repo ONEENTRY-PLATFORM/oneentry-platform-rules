@@ -179,6 +179,12 @@ Match quality follows what has been indexed, so a kind whose content was loaded 
 
 → `mcp/docs/api/index-attributes#why-a-search-by-meaning-finds-nothing-for-a-kind`
 
+## Finding which attribute holds a value
+
+To learn which attribute of which kind of record holds a value, rather than which records match, use the attribute value mode of the admin search.
+
+→ `mcp/docs/api/attribute-value-search#what-one-row-of-the-answer-means`
+
 ## Using it well
 
 1. Ask the human for the exact wording they saw, not a paraphrase.
