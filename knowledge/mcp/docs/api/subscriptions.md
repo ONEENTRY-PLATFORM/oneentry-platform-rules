@@ -59,7 +59,7 @@ Treat a price change on an active plan as a business decision with existing subs
 
 ## Content API surface
 
-Customers see subscriptions through the Content API: listing what is available, subscribing, cancelling, and checking what is currently active. Those routes need the corresponding permissions granted to the relevant group.
+Customers see subscriptions through the Content API: listing what is available, subscribing, cancelling, checking what is currently active, and recovering a lapsed subscription with `POST /api/content/subscriptions/recover`. Those routes need the corresponding permissions granted to the relevant group. Recovery has its own permission record: the record for `/api/content/subscriptions` does not cover it, so grant both.
 
 If a customer-facing subscribe call returns a permission error, the fix is granting the existing permission to the group — not creating a permission.
 

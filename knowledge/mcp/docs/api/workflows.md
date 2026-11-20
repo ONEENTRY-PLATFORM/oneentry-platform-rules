@@ -10,7 +10,7 @@ This document covers the configuration as a whole: how it is stored, how it is s
 
 One configuration per instance, held as a flat array of nodes. A node carries `id`, `type`, `z` (the id of the tab it belongs to), `wires` (its outgoing connections, one list per output) and whatever configuration its own type reads. A node of type `tab` is a flow's container.
 
-The flow format and the general-purpose node types are Node-RED's: each node set reports the `module` it came from, and most report `node-red`. So `inject`, `function`, `switch`, `change`, `template`, `split` and `delay` behave as that project documents them, and a flow built there transfers here, with one exception: the code of a `function` node runs in a restricted sandbox, described below.
+The flow format and the general-purpose node types are Node-RED's: each node set reports the `module` it came from, and most report `node-red`. So `inject`, `function`, `switch`, `change`, `template`, `split` and `delay` behave as that project documents them, and a flow built there transfers here with two exceptions: the code of a `function` node runs in a restricted sandbox, described below, and node types that reach the host or open raw connections — `exec`, `file`, `watch`, `tcp`, `udp`, `tls`, `websocket`, `mqtt` — are not installed. Check every `type` in a flow against `GET /workflows/nodes` before saving it.
 
 ```json
 { "flows": [
