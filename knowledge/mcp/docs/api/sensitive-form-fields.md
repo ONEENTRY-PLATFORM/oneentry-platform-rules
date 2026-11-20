@@ -78,7 +78,12 @@ The form of an auth provider takes its fields from a `forUsers` set, so a sensit
 
 ## Updating a submission without losing the value
 
-An update replaces the field list of a submission. For a sensitive field, sending `value: null`, or leaving `value` out, keeps the value already stored. So a client can send back a submission exactly as it read it. Send a non-null value to replace the stored one.
+An update replaces the field list of a submission, and the two update routes treat a sensitive field differently.
+
+- Admin API, `PUT /api/admin/form-data/{id}`: sending `value: null` keeps the value already stored, so the submission can be sent back exactly as it was read.
+- Content API, `PUT /api/content/form-data/{id}`: the visitor's edit is checked like a new submission. `value: null` answers `400` saying the value must be a string, and an entry with no `value` answers `400`, whether or not the field is required. Leaving the entry out answers `400` for a required field, and for an optional one it is accepted and erases the stored value.
+
+So a site that lets a visitor edit a submission must ask for the sensitive value again and send it. Echoing the read back fails, and dropping the field loses it.
 
 ## Sensitive fields are left out of search and filters
 

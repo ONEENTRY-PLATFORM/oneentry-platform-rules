@@ -39,7 +39,7 @@ Through this server a set key may show as the redaction placeholder instead of `
 
 A payment session represents one attempt: created, then moving through the provider's flow to a terminal state. The order's payment axis reflects where the session got to.
 
-Creating a session yourself — `AdminPaymentsController_createPaymentSession`, `POST /payments/sessions` — needs `payments.settings.update`, not a sessions key; without it the call answers `403` with `code: PERMISSION_DENIED` naming that key, and no session is created.
+Creating a session yourself — `AdminPaymentsController_createPaymentSession`, `POST /payments/sessions` — needs `payments.settings.update`, not a sessions key; without it the call answers `403` with `code: PERMISSION_DENIED` naming that key, and no session is created. It also cancels the session the order is waiting on, so the visitor's open session reads back `canceled`. Never create one just to inspect a payment.
 
 You read sessions. You do not advance them by writing statuses — the provider's callbacks do that, and a hand-written status that contradicts the session is worse than none.
 
