@@ -89,8 +89,8 @@ On update, an omitted `identifier` keeps the current one, and `null` or an empty
 
 A discount is saved only when everything it names exists and can take effect. Otherwise the write answers `400` with a message naming the field, and nothing is stored:
 
+- gifts, `exclusions`, `userExclusions`, `userGroups`, `attributeSetId` and every condition's `entityIds` take ids of existing records; the `400` names the field, such as `conditions[0].entityIds`, and lists each missing id;
 - the threshold of a minimum-cart-amount or lifetime-value condition is `value.amount`, a number of zero or more — a string or a missing amount is rejected;
-- gifts and user groups are given by the numeric id of an existing product or group;
 - a bonus trigger belongs only to a `BONUS` discount, and names the forms or the orders module; for orders it needs an existing order storage and a status of that storage;
 - with discount type `NONE` the amount is stored as `0`, whatever was sent.
 
