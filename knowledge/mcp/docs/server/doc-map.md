@@ -91,11 +91,15 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | docId | Read it when |
 |---|---|
 | `mcp/docs/api/products` | Creating, updating or listing products |
+| `mcp/docs/api/attribute-value-writes` | Changing one attribute value of a product, order, user or submission without sending the whole record |
 | `mcp/docs/api/product-statuses` | Setting whether a product is available |
 | `mcp/docs/api/product-relations` | Related, similar or recommended products |
 | `mcp/docs/api/filters` | Narrowing a listing, or configuring facets |
 | `mcp/docs/api/index-attributes` | A filter finds nothing, or a new value is missing from a list |
 | `mcp/docs/api/global-search` | Locating an entity by a word a human used, or building a site search on the public one |
+| `mcp/docs/api/attribute-value-search` | Finding which attribute, in which kind of record, holds a value a human gave you |
+| `mcp/docs/api/related-data` | Reading records of several sections in one call — a user's orders, a cart, who bought a product |
+| `mcp/docs/api/related-data-root-lists` | Listing, counting or grouping a whole entity in one call — orders per month, newest users |
 | `mcp/docs/api/file-content-search` | Finding a document by words written inside it, or a document search that returns nothing |
 | `mcp/docs/api/search-query-correction` | Correcting typos in a public search query, or a search that answered with a corrected query |
 
@@ -294,6 +298,11 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Which kinds may I pass in `types` | `mcp/docs/api/global-search#which-kinds-the-admin-side-accepts` |
 | Can the search find a payment or AI account, a filter or a module | `mcp/docs/api/global-search#settings-records-the-admin-search-also-finds` |
 | Can a stored credential be found through the search | `mcp/docs/api/global-search#settings-records-the-admin-search-also-finds` |
+| Which attribute holds the value a human gave me | `mcp/docs/api/attribute-value-search#what-one-row-of-the-answer-means` |
+| Why does a two-letter value search find nothing | `mcp/docs/api/attribute-value-search#how-the-query-is-matched` |
+| How do I get a user's orders or a product's buyers in one call | `mcp/docs/api/related-data#the-four-calls-and-the-order-to-make-them` |
+| Why does a related-data plan answer 400 | `mcp/docs/api/related-data#why-a-plan-answers-400` |
+| How do I count orders per month or group records | `mcp/docs/api/related-data-root-lists#grouping-root-records` |
 
 ## Answers about attributes and values
 
@@ -303,6 +312,9 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Does an empty `attributeValues` mean no values or not published yet | `mcp/docs/api/index-attributes#what-issync-tells-you-and-what-attributevalues-does-not` |
 | How long do I keep re-reading while `isSync` is false | `mcp/docs/api/index-attributes#an-unpublished-product-can-be-missing-rather-than-empty` |
 | How do I read one attribute value without the set | `mcp/docs/api/attribute-sets#reading-one-value-by-its-attribute-marker` |
+| How do I change one value of an order, a user or a submission | `mcp/docs/api/attribute-value-writes#writing-form-values-of-orders-users-and-submissions` |
+| Why did a batch of value writes change nothing | `mcp/docs/api/attribute-value-writes#a-batch-write-is-all-or-nothing` |
+| Why does a product update answer 409 after a value write | `mcp/docs/api/attribute-value-writes#a-value-write-moves-the-product-revision` |
 | Why are my validators empty when a site reads the form | `mcp/docs/api/attribute-sets#two-reads-two-answers` |
 | How do I put an image or a colour on a list option | `mcp/docs/api/list-options-and-extra-values#extra-values-sit-in-extended-with-no-locale-key` |
 | Why does the panel show one selected option out of four | `mcp/docs/api/list-options-and-extra-values#several-selected-options-need-multiselect` |

@@ -1,6 +1,6 @@
 # Interface modules
 
-An interface module is a saved setup of the admin panel: a simplified copy of one section — catalogue, pages, orders, payments or users — shown in the panel menu as its own top-level item, and only to the admins it lists.
+An interface module is a saved setup of the admin panel: a simplified copy of one section — catalogue, pages, orders, payments or users — or a custom screen, shown in the panel menu as its own top-level item, and only to the admins it lists.
 
 Read this before creating or changing one, or when an admin asks why a module shows them less than the section it copies. What each base keeps in `config.scope` and how to read a module's data live in their own documents.
 
@@ -45,11 +45,25 @@ Interface modules are not rows of the module listing. That listing carries one s
 
 `config` is checked strictly:
 
-- `base` is one of `catalog`, `pages`, `orders`, `payments`, `users`; anything else answers `400` listing them.
+- `base` is one of `catalog`, `pages`, `orders`, `payments`, `users`, `screen`; anything else answers `400` listing them.
 - `base` cannot change: an update whose `config.base` differs from the stored one answers `400` saying `config.base cannot be changed`. Screen settings and screen templates belong to the base, so a module for another base is a new module.
 - An unknown key answers `400` naming it, and so does a key that belongs to another base — `pageDefaults` on a catalogue module, for instance.
 - The whole `config` is limited to 256 KB.
 - `screens` is optional on every base: an object of objects that the panel owns. Leave it as you read it.
+
+## The screen base holds a custom screen
+
+`config.base: "screen"` makes a module that shows a screen of its own instead of copying a section. Its `config` takes only `base` and `screen`; a `scope` answers `400` saying it is not allowed with that base.
+
+`screen` holds `version`, a whole number of 1 or more, the objects `context`, `sources` and `widgets`, and the array `rows` — any other key answers `400` naming it. What lives inside them belongs to the panel: build it there and send it back as you read it.
+
+A screen copies no section, so it has no records of its own. Its widgets read through related-data plans with the permissions of the admin looking at it, and a screen module cannot be passed as a plan's `module`.
+
+```json
+{ "base": "screen", "screen": { "version": 1, "context": {}, "sources": {}, "widgets": {}, "rows": [] } }
+```
+
+→ `mcp/docs/api/related-data#narrowing-a-plan-to-an-interface-module`
 
 ## Settings that only change what the panel offers
 
