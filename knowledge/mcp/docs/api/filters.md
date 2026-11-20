@@ -145,7 +145,7 @@ Hiding a page or a product does not remove it from the filters that include it. 
 ```text
 GET /api/content/filters/marker/catalog?langCode=en_US
 → items: [ {type: "product", value: "83",   isVisible: true,  …},
-           {type: "product", value: "3393", isVisible: false, …} ]
+           {type: "product", value: "303", isVisible: false, …} ]
 ```
 
 - Skip items with `isVisible: false` when rendering a facet for visitors, as with menus.
