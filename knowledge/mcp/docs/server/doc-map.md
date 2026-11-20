@@ -202,6 +202,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why is my page create or delete refused with 403 | `mcp/docs/api/admin-page-scope#what-a-refusal-tells-you` |
 | How do I lift a page scope restriction | `mcp/docs/api/admin-page-scope#there-is-no-empty-list` |
 | Which permission does rolling back a record need | `mcp/docs/api/version-history#which-permission-each-call-needs` |
+| Why does reading a version history answer 403 | `mcp/docs/api/version-history#which-permission-each-call-needs` |
 | Why does a version history call answer 400 | `mcp/docs/api/version-history#which-records-have-a-version-history` |
 | Why does rolling back a status answer 400 or keep its default flag | `mcp/docs/api/version-history#rolling-back-a-product-or-order-status` |
 | Does rolling back an order storage bring back its payment accounts | `mcp/docs/api/version-history#rolling-back-an-order-storage` |

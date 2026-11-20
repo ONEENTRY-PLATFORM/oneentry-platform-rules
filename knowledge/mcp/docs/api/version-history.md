@@ -27,27 +27,27 @@ Any other value answers `400` on all four operations, for every account. There i
 
 ## Which permission each call needs
 
-Taking a snapshot and rolling back need the **update** permission of that kind of record, the same key as an ordinary update of it. Reading the history needs the read permission only where reading that kind of record is itself gated; elsewhere any signed-in admin may read it.
+Taking a snapshot and rolling back need the **update** permission of that kind of record, the same key as an ordinary update of it. Reading the history always needs a key as well: the read permission of that kind of record, or, where that kind has no read permission of its own, its update permission. No history is readable by a signed-in admin without one.
 
 | `entityName` | Read history | Snapshot and rollback |
 |---|---|---|
 | `admins` | `admins.get` | `admins.update` |
 | `attributes_sets` | `settings.attributesSets.get` | `settings.attributesSets.update` |
+| `blocks` | `blocks.get` | `blocks.update` |
+| `discounts` | `discounts.get` | `discounts.update` |
+| `forms` | `forms.get` | `forms.update` |
 | `menus` | `menu.get` | `menu.update` |
+| `order_statuses` | `orders.storage.get` | `orders.storage.order-status.update` |
+| `orders_storage` | `orders.storage.get` | `orders.storage.update` |
 | `pages` | `pages.get` | `pages.update` |
+| `payment_accounts` | `payments.accounts.get` | `payments.accounts.update` |
+| `product_statuses` | `catalog.status.update` | `catalog.status.update` |
+| `products` | `catalog.products.get` | `catalog.products.update` |
+| `template_previews` | `settings.templatePreview.update` | `settings.templatePreview.update` |
+| `templates` | `settings.templates.update` | `settings.templates.update` |
+| `user_groups` | `userGroups.get` | `userGroups.update` |
 | `users` | `users.get` | `users.update` |
-| `blocks` | open | `blocks.update` |
-| `discounts` | open | `discounts.update` |
-| `forms` | open | `forms.update` |
-| `order_statuses` | open | `orders.storage.order-status.update` |
-| `orders_storage` | open | `orders.storage.update` |
-| `payment_accounts` | open | `payments.accounts.update` |
-| `product_statuses` | open | `catalog.status.update` |
-| `products` | open | `catalog.products.update` |
-| `template_previews` | open | `settings.templatePreview.update` |
-| `templates` | open | `settings.templates.update` |
-| `user_groups` | open | `userGroups.update` |
-| `users_auth_providers` | open | `usersAuthProvider.update` |
+| `users_auth_providers` | `usersAuthProvider.get` | `usersAuthProvider.update` |
 
 A read permission never allows a rollback. Without the key the call answers `403` and nothing changes.
 
