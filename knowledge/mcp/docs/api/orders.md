@@ -45,6 +45,8 @@ An order's state is not one field. It moves along axes — the lifecycle of the 
 
 Read `mcp/docs/api/order-statuses` before changing any status. There is no transition entity to look for: a status moves either by firing a trigger the storage's map pairs with it, or by writing it with `change-status`. Which of the two is right, and which axis actually moves, depends on the storage's `statusMode`.
 
+A visitor cannot move a status. Their own update, `PUT /api/content/orders-storage/marker/{marker}/orders/{id}`, ignores `statusIdentifier`. It answers `200`, applies the other fields and leaves the status as it was, so a site that sends a status there and trusts the `200` is wrong. Status changes go through the Admin API.
+
 ## Attaching a payment
 
 A payment is a separate entity linked to the order, with its own session and lifecycle. The order's payment axis reflects that lifecycle, and on a provider-backed order it is not something you write — only where the account is of type `custom` is a hand-written payment status the intended mechanism.

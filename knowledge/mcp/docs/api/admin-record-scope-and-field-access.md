@@ -37,6 +37,8 @@ A scope governs reads as well as writes.
 - A bulk operation with one id outside the scope is refused whole, and nothing is changed.
 - A scoped account cannot create a new record in an area with a flat list, because the new record cannot be in its list. Pages and categories can be created under a parent inside the scope.
 - Creating a product, or changing its categories, needs every category it is placed in to be inside the scope.
+- Slides follow `blocks.scope` through their block. Listing, reading, changing, deleting or creating a slide of a block outside the scope answers `403` with `SCOPE_DENIED`; a slide can be created in a block inside it.
+- Under `userGroups.scope`, a user update whose `groupIds` adds a group outside the scope answers `403` with `SCOPE_DENIED`, and nothing changes. Groups outside the scope that the user already holds are kept when `groupIds` leaves them out, so the account cannot remove them either.
 
 For `pages.scope`, the list of root pages becomes the pages named in the scope, so the tree still opens at the branches the account owns.
 

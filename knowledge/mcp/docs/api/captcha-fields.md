@@ -75,7 +75,9 @@ So a submission you expected to be refused and that came back accepted is the fi
 
 Nothing in the API takes a token and answers valid or invalid. A token is checked while the submission carrying it is accepted, and that submission's own status code is the verdict. Build the client around one call, not two.
 
-Only the visitor-facing routes check it: creating form data, creating or updating an order through a storage marker, and creating or updating a row of an integration collection through the collection's marker. Where the collection's form carries a captcha field that is not hidden, a row write with no value for its marker answers `400 formData doesn't have spam attribute`.
+Only the visitor-facing routes check it: creating form data, a visitor editing their own submission with `PUT /api/content/form-data/{id}`, creating or updating an order through a storage marker, and creating or updating a row of an integration collection through the collection's marker. Where the collection's form carries a captcha field that is not hidden, a row write with no value for its marker answers `400 formData doesn't have spam attribute`.
+
+The visitor's edit is checked exactly like a new submission. It needs a fresh token, every required field, and only markers the form has, and its values are cleaned of markup the same way. So an edit form needs its own captcha widget.
 
 On the operator API the check does not run at all. The same row write, sent to the operator route for the same collection and with no entry for the captcha marker, answers `201`. So a submission you make as an operator is no evidence that a visitor's would pass.
 

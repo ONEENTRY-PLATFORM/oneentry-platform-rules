@@ -41,7 +41,9 @@ Reading rows answers `{ "items": [...], "total": <number> }`; each row carries `
 
 ## Deleting rows needs the row key not the collection key
 
-Both delete operations — the single row and the bulk one — require **`collections.row.delete`**. That is the one worth checking against an assumption: `collections.collection.delete` opens neither of them, and an admin holding only that key gets `403 Forbidden resource` from both, with the message naming nothing.
+Both delete operations — the single row and the bulk one — require **`collections.row.delete`**. That is the one worth checking against an assumption: `collections.collection.delete` opens neither of them, and an admin holding only that key gets `403` from both, with `code: PERMISSION_DENIED` and `permission: collections.row.delete` in the body, and nothing is deleted.
+
+→ `mcp/docs/api/admin-permission-catalog#a-403-names-the-missing-permission`
 
 So the key that deletes a whole collection does not let you empty one, and clearing rows is not a weaker form of the same right. Ask for `collections.row.delete` by name.
 

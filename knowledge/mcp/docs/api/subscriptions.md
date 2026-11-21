@@ -108,7 +108,7 @@ A plan carries `isUsed`, and it is `true` while at least one enrolment on it is 
 
 Sending the fields back unchanged answers `200`, so a read-modify-write that touches nothing else still works. Read `isUsed` before promising a human that a plan can be edited.
 
-## Reading a customer's enrolments
+## Reading the enrolments of a customer
 
 `GET /subscriptions/user/{userId}` lists every enrolment of one customer, finished ones included, nearest `dueDate` first. Each row carries its plan, and the plan carries its payment account — identified by `id`, `identifier`, `type` and `localizeInfos`. The account's `settings` and `testSettings` are not part of this response; read the account itself through the payment account routes when you need its configuration.
 

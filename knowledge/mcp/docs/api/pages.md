@@ -142,7 +142,7 @@ Blocks are attached to a page rather than owned by it: the same block can appear
 - `blocks` — the blocks shown on the page itself;
 - `nestedBlocks` — the blocks child products inherit automatically.
 
-A marker in either array is not a dangling reference; it is a `5xx` that attaches nothing, because the value is read as a number. So read the block and take its `id`, and treat a marker you were given as something to resolve first.
+A marker in either array answers `400` and attaches nothing: both arrays take numeric ids only. So read the block and take its `id`, and treat a marker you were given as something to resolve first.
 
 Both arrays are replace-in-full. Sending `blocks` without `nestedBlocks` leaves the nested set alone, and sending either as `[]` detaches everything in it.
 

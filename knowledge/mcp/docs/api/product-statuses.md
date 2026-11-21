@@ -30,12 +30,14 @@ There is no platform-wide set of markers. `in_stock` is a plausible marker and a
 
 There is an operation that checks whether a marker is free before you create a status with it. Use it rather than discovering the collision from a failed create, especially when a human has asked for a specific name.
 
+A marker must start with a Latin letter and hold only Latin letters, digits, `_` and `-`; anything else, a space included, answers `400`.
+
 ## Create a status
 
 Statuses are customer data, so creating one is legitimate. Before you do:
 
 - confirm the concept is not already covered by an existing status under a different name;
-- pick a marker that reads well and will not need renaming, because things reference it;
+- pick a marker that reads well and will not need renaming, because things reference it.;
 - provide localized labels for every active locale — the label is what a human sees in the admin panel and on a site.
 
 Dry run, send, then read the list back and confirm the marker is what you intended.
