@@ -80,7 +80,7 @@ Two kinds of row need a look before a run, because the match field cannot do its
 - **A row with the match field empty is skipped.** It could never be matched on a later run, so importing it would add a new record every time. Fill the value in the file if the row matters.
 - **A value repeated within one file yields one record.** The rows are applied in order, so the last one wins. The run still succeeds; the repetition is reported as a warning.
 
-The finished job reports both, together with rows skipped for an empty name: `skipped` lists each row with a `reason` (`empty_unique_key`, `empty_name`), `warnings` lists each repeated value (`duplicate_unique_key`) with the rows that carried it, and `skippedCount` / `warningsCount` give the totals. Row numbers count data rows from 1, the header row not included. A successful job with a non-zero `skippedCount` did not import every row.
+The finished job reports both, together with rows skipped for an empty name: `skipped` lists each row with a `reason` (`empty_unique_key`, `empty_name`, `out_of_scope`), `warnings` lists each repeated value (`duplicate_unique_key`) with the rows that carried it, and `skippedCount` / `warningsCount` give the totals. Row numbers count data rows from 1, the header row not included. A successful job with a non-zero `skippedCount` did not import every row.
 
 ## Number and price cells
 
@@ -89,6 +89,20 @@ A cell mapped onto a number attribute, or onto the attribute marked as the produ
 A cell that is not a number after that, such as `12 USD` or `abc`, and a negative price, is imported empty. It is never turned into `0`, because a price of zero sells the product for free. The run still succeeds and lists the cell in `warnings` with `reason` `invalid_number` or `negative_price`, its row, column header and original value. An empty number cell stays empty.
 
 After a catalog run, read `warningsCount`: a non-zero value means some products have no price or an empty number field. Fix the cells in the file and run the import again.
+
+## Starting an import needs the rights of what it writes
+
+A run writes as the account that starts it, so besides the right to import it needs the rights the same write needs by hand. Without them the start answers `403` naming the missing permissions:
+
+- **Catalog and content imports** need `catalog.products.create`. A template that matches existing records by a unique key also needs `catalog.products.update`. A run that only uploads additional files needs `catalog.products.update` alone.
+- **Order imports** need `orders.storage.order.update`.
+- **User imports** need `users.create`, and **form submission imports** need `forms.data.update`.
+
+An unknown storage type is refused with `400`.
+
+Scope applies too. A catalog-scoped account imports only into a category inside its scope, an order-scoped one only into a storage it may reach; otherwise `403`. A row whose unique key matches a product outside the catalog scope is not applied and is listed in `skipped` with `reason` `out_of_scope`.
+
+→ `mcp/docs/api/admins-and-permissions`
 
 ## Rolling back an import needs the rights of what it removes
 
