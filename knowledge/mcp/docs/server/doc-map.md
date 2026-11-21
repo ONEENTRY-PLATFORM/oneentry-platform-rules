@@ -255,6 +255,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why did my write answer 200 and change nothing | `mcp/docs/api/silent-no-ops` |
 | Why did my menu item jump to the top level after an update | `mcp/docs/server/payload-conventions#an-omitted-field-can-mean-clear-it` |
 | Why does a re-run of my import duplicate everything | `mcp/docs/api/import#re-running-an-import` |
+| Why is rolling back an import refused with 403 | `mcp/docs/api/import#rolling-back-an-import-needs-the-rights-of-what-it-removes` |
 | Why did my block disappear from its pages after an edit | `mcp/docs/api/blocks#what-an-update-does-to-the-pages-a-block-is-on` |
 | Why did submissions vanish after a form edit | `mcp/docs/api/forms-and-form-data#an-update-drops-every-config-you-do-not-send-back` |
 | How do I delete something safely | `mcp/docs/server/confirm-and-dry-run` |
