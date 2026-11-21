@@ -90,6 +90,19 @@ A cell that is not a number after that, such as `12 USD` or `abc`, and a negativ
 
 After a catalog run, read `warningsCount`: a non-zero value means some products have no price or an empty number field. Fix the cells in the file and run the import again.
 
+## Rolling back an import needs the rights of what it removes
+
+Deleting an entry from the import history rolls the run back: the records it created are removed. That call checks the caller against every section the entry holds records of, not just the right to import.
+
+- **The delete right of each section.** An entry that created products needs the product delete right, one that created pages needs the page delete right, and so on for statuses, users, form submissions, orders and attribute sets. A missing right answers `403` with `PERMISSION_DENIED` and the `permission` it lacks. Nothing is removed.
+- **The records must be in the caller's scope.** Pages must be in the caller's page scope, orders in a storage they may reach, form submissions in a form they may reach. A product is removed whole, so every category it sits in must be in the caller's catalog scope. One record outside scope answers `403` with `SCOPE_DENIED`, and nothing is removed.
+
+So an account that may import is not automatically an account that may undo an import. Read the history entry first to see which sections it touches, and roll back with an account that holds the delete rights and scope for all of them.
+
+The right to import does not let an account write into sections directly. Creating, changing and deleting records outside a run still needs the section's own rights.
+
+→ `mcp/docs/api/admins-and-permissions`
+
 ## Reading what a session did
 
 Read the session rather than inferring from the data. It tells you what was processed and what failed, which is the difference between "the file had bad rows" and "the mapping is wrong".
@@ -103,6 +116,7 @@ If a run reports failures, fix the template or the file. Do not re-run the same 
 - **Refreshing a listing to check progress.** Sample by id instead.
 - **Re-running after a partial failure** without checking what already exists.
 - **Mapping labels onto choice attributes.** They need ids.
+- **Rolling back with an account that may only import.** The rollback needs the delete rights and scope of every section the run wrote to.
 - **Renaming headers in a file a template runs on.** The run is refused with `400`; keep the headers or build a new template.
 
 → `mcp/docs/api/verification-recipes`
