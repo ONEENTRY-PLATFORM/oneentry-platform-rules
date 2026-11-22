@@ -138,6 +138,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/catalog-area-page-reads` | Setting up a catalogue editor without `pages.get`, or a catalogue page read refused with 403 |
 | `mcp/docs/api/admin-account-ownership` | Changing another administrator's login, e-mail, password or permissions, or a write on the project owner refused with 403 |
 | `mcp/docs/api/admin-sign-in` | Administrator sign-in answered a challenge instead of tokens, or a sign-in code is refused |
+| `mcp/docs/api/admin-client-certificate` | An Admin API call or sign-in answered 403 about a client certificate, or an instance is switching to certificate mode |
 
 ## Instance configuration
 
@@ -172,6 +173,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does a public read answer 429 | `mcp/docs/api/content-api-reads#what-a-429-on-a-public-read-is-telling-you` |
 | Why does sign-in answer 429 | `mcp/docs/server/authentication#why-sign-in-answers-429` |
 | Why does password recovery answer 429 | `mcp/docs/server/authentication#why-sign-in-answers-429` |
+| Why does every Admin API call answer 403 Client certificate required | `mcp/docs/api/admin-client-certificate#every-call-answers-403-client-certificate-required` |
+| Why is my client certificate refused as another admin's | `mcp/docs/api/admin-client-certificate#answers-403-when-the-certificate-belongs-to-another-admin` |
 | Why did sign-in answer mfaRequired instead of a token | `mcp/docs/api/admin-sign-in#sign-in-answers-a-challenge-instead-of-tokens` |
 | Why is my sign-in code refused | `mcp/docs/api/admin-sign-in#finish-the-sign-in-with-the-e-mailed-code` |
 | Why does the sign-in code call answer 429 | `mcp/docs/api/admin-sign-in#too-many-attempts-answers-429` |
