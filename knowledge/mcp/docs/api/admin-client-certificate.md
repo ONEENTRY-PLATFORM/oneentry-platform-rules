@@ -18,6 +18,8 @@ The call reached the instance without a verified client certificate. The access 
 
 Present the certificate in the TLS handshake to the Admin API host: the `.cert` and `.key` pair, or the `.p12` file from the same archive (it has no password).
 
+Real-time connections of the admin panel follow the same rule: the event channel, the workflow channel and the live co-editing channel refuse the handshake without the account's own certificate.
+
 A liveness probe of the instance answers without a certificate. Nothing else does.
 
 ## Answers 403 when the certificate belongs to another admin
