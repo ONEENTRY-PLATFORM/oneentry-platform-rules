@@ -18,6 +18,8 @@ Retention lives in the general settings, under `user.journalRetention`, and is w
 | `autoCleanupEnabled` | boolean; whether the scheduled cleanup removes records older than those periods |
 | `immutable` | boolean; makes all three journals append-only, permanently |
 
+The day counts are whole numbers, `0` or more; `0` never means "delete everything": the cleanup does not clear on a zero period. A fraction, a negative number, a string in place of a number or of a boolean answers `400` and saves nothing.
+
 ```json
 {
   "user": {
