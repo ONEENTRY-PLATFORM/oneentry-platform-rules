@@ -146,6 +146,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 |---|---|
 | `mcp/docs/api/modules` | Explaining why an admin section is missing |
 | `mcp/docs/api/journal` | Finding who changed something, or clearing the instance's own record of it |
+| `mcp/docs/api/journal-retention-and-export` | How long the journals are kept, making them append-only, or copying the journal into another system |
 | `mcp/docs/api/content-api-journal` | Showing what the public API has been asked for, or chasing an error a site reports |
 | `mcp/docs/api/events` | Sending a mail or a push when something happens |
 | `mcp/docs/api/event-mailing-checks` | A recurring mailing on an event refused with 400, or what such a refusal leaves stored |
@@ -270,6 +271,9 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why did my block attachment by marker fail | `mcp/docs/api/pages#attaching-blocks` |
 | Why is my block still nested after I sent blockPages | `mcp/docs/api/blocks#a-bare-page-id-in-blockpages-keeps-the-nesting` |
 | Why does clearing the journal answer 400 | `mcp/docs/api/journal#clearing-the-journal-needs-an-explicit-window` |
+| Why does clearing the journal answer 403 with journal delete | `mcp/docs/api/journal-retention-and-export#why-clearing-the-journal-answers-403-with-journal-delete` |
+| Can the journal be turned back from append-only | `mcp/docs/api/journal-retention-and-export#the-append-only-switch-cannot-be-turned-off` |
+| How do I export the journal to another system | `mcp/docs/api/journal-retention-and-export#exporting-the-journal-to-another-system` |
 | Why is the session traffic listing empty | `mcp/docs/api/journal#reading-the-session-traffic-listing` |
 | Why is my public API error window being ignored | `mcp/docs/api/content-api-journal#this-listing-takes-a-flat-window-not-a-nested-one` |
 | Why did deleting a few collection rows empty the collection | `mcp/docs/api/collections#deleteall-overrides-the-ids-you-send-with-it` |

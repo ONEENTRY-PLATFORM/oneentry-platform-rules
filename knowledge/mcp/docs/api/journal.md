@@ -56,6 +56,8 @@ Clearing requires `journal.delete`. Without it the call answers `403 Forbidden r
 
 **The permission is checked before the window is validated.** A call with no `from` and no `to`, made without the grant, answers `403` rather than `400` — so the missing window is still there once the grant arrives. Fix the permission, then expect to fix the window too, and read the `400` as a second problem rather than a sign the first one was misdiagnosed.
 
+A `403` that names an immutable journal is not a permission problem: the journal on that instance is append-only, and no key opens the clear. → `mcp/docs/api/journal-retention-and-export#why-clearing-the-journal-answers-403-with-journal-delete`
+
 `journal.delete` and `journal.get` are both keys an older admin account will not hold. Check it against the list of keys the instance recognises before treating the refusal as a configuration fault.
 
 → `mcp/docs/api/admins-and-permissions#a-key-can-exist-without-any-admin-holding-it`
