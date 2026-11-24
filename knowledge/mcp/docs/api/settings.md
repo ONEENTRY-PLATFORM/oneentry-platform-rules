@@ -22,6 +22,7 @@ Three keys in the `user` section change what every administrator gets rather tha
 
 - `user.highContrastDefault` (boolean, `false` when unset) makes the high-contrast presentation the default for every administrator whose own `highContrast` is still `null`. An administrator who has chosen a mode keeps it.
 - `user.adminMfaRequired` (boolean, off when unset) makes administrator sign-in two-step. Turning it on does not end sessions that are already open, but every sign-in after it needs an e-mailed code.
+- `user.journalRetention` decides how long the admin journals are kept and carries `immutable`, a one-way switch that makes them append-only. Never set `immutable` without the operator's explicit yes: see `mcp/docs/api/journal-retention-and-export#making-the-journal-append-only`.
 - `user.dateFormat` and the rest of the section behave like any other setting: send only the keys you are changing, and the keys you leave out keep their stored values.
 
 `user.ipCheck.apiKey`, the key of the visitor IP check service, reads back as `********` once it is set. Sending `********` back keeps the stored key; only a new value replaces it.

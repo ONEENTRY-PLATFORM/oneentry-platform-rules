@@ -63,7 +63,7 @@ Treat the detail as sensitive: `ip`, `userAgent` and `requestBodyPreview` descri
 
 ## Clearing the error journal takes an optional window
 
-`DELETE /journal/content-api-errors` needs `journal.delete`. The read key `journal.viewContentApiErrors` does not open it: an admin who can only read this listing gets `403 Forbidden resource`, so a read-only grant really is read-only.
+`DELETE /journal/content-api-errors` needs `journal.delete`. The read key `journal.viewContentApiErrors` does not open it: an admin who can only read this listing gets `403 Forbidden resource`, so a read-only grant really is read-only. On an instance whose journals are append-only it answers `403` to every caller — see `mcp/docs/api/journal-retention-and-export#making-the-journal-append-only`.
 
 The window goes in the query, with the same flat `from` and `to` the listing takes:
 
