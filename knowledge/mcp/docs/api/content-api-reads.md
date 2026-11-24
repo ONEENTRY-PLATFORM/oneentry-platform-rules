@@ -185,8 +185,8 @@ The Content API does not serve a page, block or form whose `isVisible` is `false
 
 - The Admin API still reads and edits the record. An admin read that works says nothing about the site.
 - A change of visibility, by hand or by a publication date, applies at once to reads by id, URL or marker. A list can show the previous state for a few seconds.
-- A hidden form still accepts submissions.
-- Public filters keep hidden pages and products, flagged with `isVisible`.
+- A submission to a hidden form answers `404`; its form bindings (`moduleFormConfigs`) are left out.
+- Public filters, the sitemap and the error page's blocks leave hidden records out too.
 
 ## Common mistakes
 
