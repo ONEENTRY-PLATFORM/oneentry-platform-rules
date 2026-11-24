@@ -138,26 +138,24 @@ Filters and their items are ordered, and as everywhere in this API that ordering
 
 Items and custom items of a filter are numbered separately, so one id can name one of each. A parent is the pair `newParentId` + `newParentType` (`filter-item` or `filter-custom-item`), on `PUT /filters/{id}/items/reparent` and on both item position operations. Send the type every time: without it the id is taken as a filter item first. Read back, every item and custom item reports its parent as `parentId` + `parentType`; the site tree follows the same pair.
 
-## Hidden pages and products stay in a public filter
+## Hidden pages and products leave a public filter
 
-Hiding a page or a product does not remove it from the filters that include it. The public filter read returns the item as before, and page and product items carry `isVisible` with the entity's own visibility. A hidden page or product is not readable on its own (its public read, such as `GET /api/content/products/{id}`, answers `404`), so a link from its item leads nowhere.
+The public filter read leaves out the items of hidden pages, hidden products and hidden payment accounts, the same way their own public reads answer `404`. The item stays in the filter configuration and comes back as soon as the entity is visible again. Children of a left-out item move to the top level of the tree.
 
 ```text
 GET /api/content/filters/marker/catalog?langCode=en_US
-→ items: [ {type: "product", value: "83",   isVisible: true,  …},
-           {type: "product", value: "303", isVisible: false, …} ]
+→ items: [ {type: "product", value: "83", isVisible: true, …} ]   // product 303 is hidden
 ```
 
-- Skip items with `isVisible: false` when rendering a facet for visitors. Menus and page lists leave hidden pages out on their own; a filter does not.
-- Payment-method items carry `isVisible` too (see the next section); other item types carry none.
-- To drop an entity from a filter for everyone, remove the item from the filter.
+- Page, product and payment-method items still carry `isVisible`; on the public read it is always `true`. Other item types carry none.
+- The Admin API filter reads keep every item.
 
 ## Discounts and payment methods in a public filter
 
 The public filter read serves a discount item only while that discount applies to the caller, by the same rules as prices: the current time is inside its `startDate`…`endDate` window, and a `PERSONAL_DISCOUNT` limited to user groups is served only to a signed-in user of one of those groups who is not in its exclusions. Anonymous callers count as the guest group. Send the user's `Authorization: Bearer` token with the read to get their personal discounts.
 
 - A discount whose window has not started or has ended is absent, not flagged; it appears on its own once the window opens.
-- A payment-method item carries `isVisible` of the payment account, and `value` is the account type (`stripe`, `custom`, …), not its id.
+- A payment-method item is served only for a visible payment account, and `value` is the account type (`stripe`, `custom`, …), not its id.
 
 ## Reading available values
 
@@ -174,7 +172,7 @@ Use it before reporting that a filter returns nothing — often the value simply
 - **Assuming a truncated result means "no more matches".** The response was capped; page it.
 - **Patching a position field on a filter item.** Use the position operation.
 - **Nesting by parent id alone.** Send `newParentType` too; ids overlap.
-- **Rendering every public filter item.** Hidden pages and products arrive with `isVisible: false`.
+- **Looking for a hidden product in a public filter.** It is left out until it is visible.
 - **Reading personal discounts from a filter without the user's token.** They are served only to their user groups.
 - **Expecting a pinned item to have products behind it.** Pinning is presentation only.
 - **Looking for a way to pin one value.** Pinning is set on the attribute.
