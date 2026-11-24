@@ -140,7 +140,7 @@ Items and custom items of a filter are numbered separately, so one id can name o
 
 ## Hidden pages and products stay in a public filter
 
-Hiding a page or a product does not remove it from the filters that include it. The public filter read returns the item as before, and page and product items carry `isVisible` with the entity's own visibility. A hidden product is not readable on its own (`GET /api/content/products/{id}` answers `404`), so a link from its item leads nowhere.
+Hiding a page or a product does not remove it from the filters that include it. The public filter read returns the item as before, and page and product items carry `isVisible` with the entity's own visibility. A hidden page or product is not readable on its own (its public read, such as `GET /api/content/products/{id}`, answers `404`), so a link from its item leads nowhere.
 
 ```text
 GET /api/content/filters/marker/catalog?langCode=en_US
@@ -148,7 +148,7 @@ GET /api/content/filters/marker/catalog?langCode=en_US
            {type: "product", value: "303", isVisible: false, …} ]
 ```
 
-- Skip items with `isVisible: false` when rendering a facet for visitors, as with menus.
+- Skip items with `isVisible: false` when rendering a facet for visitors. Menus and page lists leave hidden pages out on their own; a filter does not.
 - Payment-method items carry `isVisible` too (see the next section); other item types carry none.
 - To drop an entity from a filter for everyone, remove the item from the filter.
 
