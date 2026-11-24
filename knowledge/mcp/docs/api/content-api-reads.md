@@ -179,11 +179,21 @@ So check the work through the public route the site itself will call, with the l
 
 → `mcp/docs/api/verification-recipes` · `mcp/docs/api/bulk-content-migration`
 
+## A hidden page block or form answers 404
+
+The Content API does not serve a page, block or form whose `isVisible` is `false`, the same way it never serves a hidden product. A read by id, URL or marker answers `404` with the message of a record that does not exist, and so does every route under a hidden block's marker. Lists, menus, the blocks of a page or product, quick search and search by meaning leave the record out. The children route of a hidden page answers `404`; its visible children stay readable on their own.
+
+- The Admin API still reads and edits the record. An admin read that works says nothing about the site.
+- A change of visibility, by hand or by a publication date, applies at once to reads by id, URL or marker. A list can show the previous state for a few seconds.
+- A hidden form still accepts submissions.
+- Public filters keep hidden pages and products, flagged with `isVisible`.
+
 ## Common mistakes
 
 - **Sending the application token as a bearer.** Every route answers `401 Invalid or missing app token`.
 - **Reading a token `401` as a closed project** and rewriting the group permissions.
 - **Repeating a write because the public read still shows the old value.** Wait and read again.
+- **Taking a `404` on a hidden page, block or form for a failed migration.** The record is there; check `isVisible` in the admin read.
 - **Treating a trimmed list as the whole list.** The restricted read says nothing about being cut.
 - **Reading a `503` as missing content.** Respect `Retry-After` and send the read again.
 - **Rewriting group rules after a `503` that mentions permissions.** It clears on a retry.

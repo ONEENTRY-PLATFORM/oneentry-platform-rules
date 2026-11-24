@@ -172,7 +172,7 @@ The answer is `{ "items": [...], "total": n }`, and a `POST` that worked answers
 - **A search by meaning never answers "nothing like that exists".** Every query lands somewhere, and a nonsense string can score closer than a real word, so no fixed threshold separates the two: rank on `distance` and cut the tail yourself.
 - The search covers **the whole instance**. There is no site, branch or parent parameter, so a project holding several sites gets all of them back and must narrow the results itself.
 - Form data follows what the caller may read. Submissions of a private form never come back. Of the rest, only submissions in `sent` or `approved`, or with no status, are returned; `moderation`, `banned` and `deleted` are left out. When the form's binding limits visitors to their own data, a signed-in visitor gets only their own submissions and a guest gets none.
-- Pages come back whether or not they are visible. Each item carries `isVisible`; a site that shows results unfiltered will publish pages that were deliberately hidden.
+- Hidden pages (`isVisible: false`) never come back, and `total` does not count them.
 
 One more thing to know: it depends on a capability an instance may not have available, and when it is missing the call answers `503` — a temporary state, not a malformed request, so retry later or fall back to a filtered listing rather than rewriting the body. A `405` with a JSON body is the other answer entirely, and means you sent it to the admin address; a `405` with an HTML body on the public address is the instance under load, and the same request succeeds when resent after a pause.
 

@@ -172,6 +172,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does a public read answer 503 | `mcp/docs/api/content-api-reads#what-a-503-on-a-public-read-is-telling-you` |
 | Why does a public call answer 405 with an HTML page | `mcp/docs/api/content-api-reads#a-405-with-an-html-body-means-the-instance-is-overloaded` |
 | Why does a public read answer 429 | `mcp/docs/api/content-api-reads#what-a-429-on-a-public-read-is-telling-you` |
+| Why does a hidden page, block or form answer 404 on the site | `mcp/docs/api/content-api-reads#a-hidden-page-block-or-form-answers-404` |
 | Why does sign-in answer 429 | `mcp/docs/server/authentication#why-sign-in-answers-429` |
 | Why does password recovery answer 429 | `mcp/docs/server/authentication#why-sign-in-answers-429` |
 | Why does every Admin API call answer 403 Client certificate required | `mcp/docs/api/admin-client-certificate#every-call-answers-403-client-certificate-required` |
@@ -340,7 +341,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Where is the product list operation and why does it want `langCode` | `mcp/docs/api/products#listing-products` |
 | How do I create a menu with its pages | `mcp/docs/api/menus#creating-a-menu-with-its-pages` |
 | Why did my menu arrive with more items than it has | `mcp/docs/api/menus#parent-references-are-polymorphic` |
-| Why does a hidden page still show in my menu | `mcp/docs/api/menus#why-a-hidden-page-still-shows-in-a-public-menu` |
+| Why is a hidden page missing from my menu | `mcp/docs/api/menus#why-a-hidden-page-is-missing-from-a-public-menu` |
 | How do I set the order of menu items | `mcp/docs/api/menus#ordering-items` |
 | How do I order products on a page and why did my reorder do nothing | `mcp/docs/api/pages#ordering-products-on-a-page` |
 | Why is my product price still the old number | `mcp/docs/api/products#prices-and-the-price-attribute` |
