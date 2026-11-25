@@ -17,11 +17,12 @@ Read it before you build a permission map for a new admin, and whenever an opera
       "sensitive": false, "valueType": "boolean", "gated": true }
   ],
   "scopes": [{ "key": "forms.scope", "section": "forms", "isTree": false }],
-  "fields": { "discounts": ["startDate", "endDate", "gifts"] }
+  "fields": { "discounts": ["startDate", "endDate", "gifts"] },
+  "titles": { "blocks.delete": "Delete blocks" }
 }
 ```
 
-`permissions` has one entry for every key that `AdminsController_getAllAvailablePermissionsKeys` lists, and no others. `scopes` lists the keys that confine an account to chosen records, and `fields` lists, per area, the field names a field rule may name.
+`permissions` has one entry for every key that `AdminsController_getAllAvailablePermissionsKeys` lists, and no others. `scopes` lists the keys that confine an account to chosen records, and `fields` lists, per area, the field names a field rule may name. `titles` maps every key to a short English name. Use it when you tell a person which permission you need or hold, instead of the dotted key alone.
 
 → `mcp/docs/api/admin-record-scope-and-field-access#which-records-an-admin-may-touch`
 
