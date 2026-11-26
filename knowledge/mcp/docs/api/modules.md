@@ -24,7 +24,7 @@ cms_api_search { "query": "modules", "method": "get" }
 
 The identifier is the stable handle. Ids are local to the instance, and while these particular ones tend to be stable, nothing guarantees it.
 
-Identifiers here are **not unique**, which is the dangerous part: creating a second module called `catalog` succeeds, produces a shadow module wired to nothing, and everything keyed off the real one carries on ignoring it.
+Each identifier belongs to one module. Creating a module, or renaming one, with an identifier another module already holds — a provisioned section such as `catalog` included — answers `400 There is already a module with that marker`. Saving a module with the identifier it already has is not a conflict. An identifier starts with a letter and continues with letters, digits, `_` or `-`; anything else answers `400`, and so does a create call without a non-empty `title`.
 
 ## Why mutations are gated
 
@@ -150,7 +150,7 @@ Two refusals here belong to the read and not to the module. A bound that is not 
 
 ## Common mistakes
 
-- **Creating a module.** Identifiers are not unique; you get a shadow.
+- **Reusing an identifier.** Another module's identifier, a provisioned one included, answers `400`; choose a new one.
 - **Changing module wiring to fix a missing entity.** Look at the general type instead.
 - **Confusing visibility with permissions.** Two independent mechanisms.
 - **Treating the gate as a formality.** It exists because these changes are wide.

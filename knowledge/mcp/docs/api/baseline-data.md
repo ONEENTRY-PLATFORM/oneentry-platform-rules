@@ -22,9 +22,9 @@ A hard failure is self-correcting: you learn the thing exists and move on. A sil
 |---|---|
 | locale code, general type name, template, menu, import template | **fails** — all unique |
 | order status identifier | **fails** — unique across the whole instance |
+| module identifier, on create and on rename | **fails** — `400 There is already a module with that marker` |
 | a permission path in a group, a group-to-permission link | **fails** |
 | **user group identifier** | **succeeds silently** — a second group nothing references |
-| **module identifier** | **succeeds silently** — a shadow module |
 | **attribute set type name** | **succeeds silently** — an ambiguous type |
 | **a singleton settings record** | **succeeds silently** — a second record, only one of which is read |
 
@@ -64,7 +64,7 @@ These admin modules are provisioned, addressed by identifier:
 
 `settings`, `forms`, `catalog`, `content`, `admins`, `blocks`, `journal`, `menu`, `users`, `payments`, `events`, `orders`, `workflows`, `collections`, `discounts`, `import-data`, `subscriptions`, `filters`, `file-search`, `interface-modules`
 
-Module identifiers are **not unique**, so a duplicate create succeeds and produces a shadow module that appears in listings and is wired to nothing. Module mutations are permanently confirm-gated for that reason.
+Module identifiers are unique: creating or renaming a module to an identifier another module holds answers `400`. Module mutations are still permanently confirm-gated, because they change what an operator can see and reach.
 
 → `mcp/docs/api/modules`
 
