@@ -31,6 +31,8 @@ An instance may have no order storage at all — it is not baseline data. Withou
 
 Before working with orders, list the storages and read the one you will use. Its identifier is how everything else refers to it.
 
+A storage's identifier is unique, because a storefront reaches its storage by that identifier alone. A create, or an update that gives a storage an identifier another storage holds, answers `409` and stores nothing; keeping a storage's own identifier in an update is fine. Check a candidate first with `GET /api/admin/orders-storage/marker-validation/{marker}`, which answers `valid: false` when it is taken, and do not retry the same body.
+
 ## Create an order
 
 Creating an order through the Admin API is not the normal path — orders usually arrive from a storefront. When you do need to, expect to supply the storage, the products with their quantities and prices, the customer, and the initial status.
