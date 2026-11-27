@@ -57,6 +57,15 @@ When an instance reaches its total record limit, **every** create fails, includi
 
 Two things follow: check the counters before concluding that a specific create is broken, and treat accidental duplicates as something to clean up rather than tolerate.
 
+## What the monthly request counters count
+
+`GET /api/admin/immutable-settings` returns `requestsCountForAdmin` and `requestsCountForContent`: the requests the instance answered on the Admin API and on the Content API in the current billing month, which starts at `monthStart`.
+
+- Every answered request counts, refusals such as `400`, `401` and `403` included. Health checks, `429` and `503` answers do not.
+- The values trail live traffic by a few seconds. Do not poll them to confirm one call.
+- The month moves forward in 30-day steps from `monthStart`. The step resets both counters and `eventEmailsCount`, whether or not the instance sent any e-mail.
+- They report usage. No monthly request cap stops calls; the request limits work per time window.
+
 ## Discount settings
 
 Whether discounts stack is an instance setting, not a property of a discount. Any promise about what a customer will pay depends on it.

@@ -145,6 +145,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | docId | Read it when |
 |---|---|
 | `mcp/docs/api/modules` | Explaining why an admin section is missing |
+| `mcp/docs/api/module-groups` | Reading or changing the groups of the admin menu |
 | `mcp/docs/api/journal` | Finding who changed something, or clearing the instance's own record of it |
 | `mcp/docs/api/journal-retention-and-export` | How long the journals are kept, making them append-only, or copying the journal into another system |
 | `mcp/docs/api/content-api-journal` | Showing what the public API has been asked for, or chasing an error a site reports |
@@ -232,6 +233,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why is highContrast null on an admin account | `mcp/docs/api/admins-and-permissions#personal-settings-live-on-the-admin-account` |
 | How do I set the high-contrast default for every administrator | `mcp/docs/api/settings#general-settings` |
 | Which general setting can be read without a token | `mcp/docs/api/settings#one-general-setting-can-be-read-without-a-token` |
+| Which requests do requestsCountForAdmin and requestsCountForContent count | `mcp/docs/api/settings#what-the-monthly-request-counters-count` |
 | Why does every public list stop at ten | `mcp/docs/api/content-api-permission-rules#a-restricted-read-caps-the-list-at-ten` |
 | Why can a public token upload a file | `mcp/docs/api/content-api-permission-rules#why-a-public-token-can-upload-a-file` |
 | Where is the restricted read length set | `mcp/docs/api/content-api-permission-rules#where-the-restricted-length-is-set-and-read` |
@@ -343,6 +345,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why did my menu arrive with more items than it has | `mcp/docs/api/menus#parent-references-are-polymorphic` |
 | Why is a hidden page missing from my menu | `mcp/docs/api/menus#why-a-hidden-page-is-missing-from-a-public-menu` |
 | How do I set the order of menu items | `mcp/docs/api/menus#ordering-items` |
+| How do I move an admin section to another menu group | `mcp/docs/api/module-groups#moving-a-section-to-another-group` |
+| Why did a section stay in its group after a module update | `mcp/docs/api/module-groups#moving-a-section-to-another-group` |
 | How do I order products on a page and why did my reorder do nothing | `mcp/docs/api/pages#ordering-products-on-a-page` |
 | Why is my product price still the old number | `mcp/docs/api/products#prices-and-the-price-attribute` |
 
