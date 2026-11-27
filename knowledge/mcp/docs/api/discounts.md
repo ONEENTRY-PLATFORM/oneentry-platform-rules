@@ -49,6 +49,8 @@ So the effect of adding a discount depends on the setting as well as on the disc
 
 When discounts stack, `maxDiscountValue` caps the whole reduction, not each discount on its own: product discounts and order discounts together never take more than that percentage off the original price of the items. With a 30% cap, a product discounted by 30% gets nothing more from a 20% order discount. Predict a total from the cap first, then from the individual discounts.
 
+Gifts follow the same rule: only a discount that is applied gives its gift. With stacking off, that is the highest-priority discount of each product and the highest-priority order discount, so a lower-priority discount adds no gift even when its conditions match. `allowGiftStacking` is a separate setting and only decides what happens when several applied discounts give the same gift product: off, it is given once; on, its quantity adds up, one per discount. Different gift products from applied discounts are all given in both cases.
+
 → `mcp/docs/api/settings`
 
 ## How discounted amounts are rounded
