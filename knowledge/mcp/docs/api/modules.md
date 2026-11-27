@@ -40,6 +40,10 @@ A module can be hidden, which removes its section from the admin panel without d
 
 So "the orders section is missing" may be visibility rather than data, and hiding a module is a reversible way to simplify a panel — unlike deleting anything inside it.
 
+The menu also sorts sections into groups, and a group can be hidden as well. Moving a section between groups goes only through its position call.
+
+→ `mcp/docs/api/module-groups`
+
 ## Modules and permissions
 
 What an admin can do inside a module is governed by permission keys, not by the module record. Hiding a module does not remove rights, and granting rights does not reveal a hidden module.
