@@ -106,7 +106,7 @@ Scope applies too. A catalog-scoped account imports only into a category inside 
 
 ## Rolling back an import needs the rights of what it removes
 
-Deleting an entry from the import history rolls the run back: the records it created are removed. That call checks the caller against every section the entry holds records of, not just the right to import.
+Deleting an entry from the import history rolls the run back: the records it created are removed, products with or without a category. Products it only updated stay, and a listed attribute set goes only once no product uses it. That call checks the caller against every section the entry holds records of, not just the right to import.
 
 - **The delete right of each section.** An entry that created products needs the product delete right, one that created pages needs the page delete right, and so on for statuses, users, form submissions, orders and attribute sets. A missing right answers `403` with `PERMISSION_DENIED` and the `permission` it lacks. Nothing is removed.
 - **The records must be in the caller's scope.** Pages must be in the caller's page scope, orders in a storage they may reach, form submissions in a form they may reach. A product is removed whole, so every category it sits in must be in the caller's catalog scope. One record outside scope answers `403` with `SCOPE_DENIED`, and nothing is removed.
