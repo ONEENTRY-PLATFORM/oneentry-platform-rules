@@ -81,11 +81,11 @@ Send no window and every record on the instance goes; the listing's last-24-hour
 
 `statusCodes` and `path` are refused on this call with `400` rather than ignored: the clear narrows by time only. Nothing on the instance brings removed records back, so read what you need first, and confirm a window by sending it to the listing and checking `total` before you clear it.
 
-## The request count summary and when it answers 503
+## The request count summary when counts are unavailable
 
 `GET /journal/content-api-stats` takes one parameter, `period`, with exactly three values — `HOUR_1`, `HOURS_24` and `DAYS_7`. It defaults to `HOURS_24`, so a call with no `period` is the last day. Anything else answers `400 period must be one of the following values: HOUR_1, HOURS_24, DAYS_7`.
 
-This is the one call in the area that depends on something outside the instance's own records. When that source cannot be reached the call answers **`503`**, with the grant in place and the parameter correct — so read a `503` here as the counts being unavailable right now, not as a permission or a parameter problem. Retrying later is reasonable; changing the request is not. Read the body of a successful call rather than assuming its shape.
+This is the one call in the area that depends on something outside the instance's own records. When that source cannot be reached the call still answers **`200`**, in the same shape: every route is listed with `requestsCount: 0`, `metricName` is `null` and `fromCache` is `false`. A `null` `metricName` is the signal — read it as the counts being unavailable right now, not as a quiet period on every route, and not as a permission or a parameter problem. Such an answer is not reused, so the first call after the source is back returns real counts. Retrying later is reasonable; changing the request is not. When `metricName` is a string, the counts are real.
 
 ## Common mistakes
 
@@ -95,7 +95,7 @@ This is the one call in the area that depends on something outside the instance'
 - **Sending a status class other than `4xx` or `5xx`.** Any other token answers `400`; there is no `2xx` here.
 - **Calling the clear with the view key.** It needs `journal.delete`.
 - **Calling the clear with no window by accident.** Without `from` and `to` it removes every record.
-- **Reading a `503` on the summary as a missing permission.** The grant is fine; the counts are not available.
+- **Reading all-zero counts on the summary as no traffic.** Check `metricName` first: `null` means the counts are unavailable, not that nothing was requested.
 - **Putting a request detail into a report.** It contains a visitor's address and body.
 
 → `mcp/docs/api/journal#not-the-same-record-as-the-servers-audit-log` · `mcp/docs/api/silent-no-ops`
