@@ -33,7 +33,7 @@ Read it before you build a permission map for a new admin, and whenever an opera
 
 ## Which permissions count as sensitive
 
-An entry with `sensitive: true` controls something destructive, or something that reaches beyond the account itself: another admin's permissions or credentials, deleting the journal, reading sensitive form fields, managing data environments, payment refunds.
+An entry with `sensitive: true` controls something destructive, or something that reaches beyond the account itself: another admin's permissions or credentials, deleting the journal, reading sensitive form fields, managing data environments, payment refunds, exporting all project data (`project.export`).
 
 When you provision an admin with "everything", leave the sensitive keys out and grant them only when a person explicitly asked for that key. A full map is every `boolean` entry with `sensitive: false` that you are allowed to grant. Add `admins.modules` too, or the account has no sections to work in. You can only grant what your own account holds, so build the map from your own grants, not from the catalog alone.
 

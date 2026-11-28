@@ -148,6 +148,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/module-groups` | Reading or changing the groups of the admin menu |
 | `mcp/docs/api/journal` | Finding who changed something, or clearing the instance's own record of it |
 | `mcp/docs/api/journal-retention-and-export` | How long the journals are kept, making them append-only, or copying the journal into another system |
+| `mcp/docs/api/project-data-export` | Downloading, backing up or handing over all data of a project as one archive |
 | `mcp/docs/api/content-api-journal` | Showing what the public API has been asked for, or chasing an error a site reports |
 | `mcp/docs/api/events` | Sending a mail or a push when something happens |
 | `mcp/docs/api/event-mailing-checks` | A recurring mailing on an event refused with 400, or what such a refusal leaves stored |
@@ -199,6 +200,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why does creating an admin answer 405 | `mcp/docs/api/admins-and-permissions#creating-an-admin-can-answer-405` |
 | Which permission is a 403 asking for | `mcp/docs/api/admin-permission-catalog#a-403-names-the-missing-permission` |
 | Which admin permissions are sensitive | `mcp/docs/api/admin-permission-catalog#which-permissions-count-as-sensitive` |
+| Why does a project export answer 409, 410 or 429 | `mcp/docs/api/project-data-export#why-a-project-export-answers-409-410-429-or-404` |
 | How do I limit an admin to some forms, discounts or categories | `mcp/docs/api/admin-record-scope-and-field-access#which-records-an-admin-may-touch` |
 | How do I make discount dates read-only for an admin | `mcp/docs/api/admin-record-scope-and-field-access#making-a-field-or-attribute-read-only` |
 | What does a 403 with SCOPE_DENIED or FIELD_DENIED mean | `mcp/docs/api/admin-record-scope-and-field-access#what-the-refusal-codes-tell-you` |
