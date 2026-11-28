@@ -41,6 +41,16 @@ On update, omit `apiKey` to keep the stored key, send a string to replace it, an
 
 → `mcp/docs/api/payments#never-read-or-write-credentials-casually`
 
+## Where the content of an AI job goes
+
+The provider of an account is reached with the operator's own provider credential. A job sends the content it needs, such as the text to translate or rewrite, out of the instance to that provider account, which passes it on to the selected model.
+
+What happens to that content next is set by the provider and by the model's own vendor, not by the instance. Some vendors keep prompts or train on them, on free and paid models alike. The operator controls this in the privacy settings of the provider account.
+
+An account without `apiKey` sends nothing to any model: a job against it ends `failed`.
+
+Before you put personal or confidential data into a job, ask the human whether their provider privacy settings and the model's terms allow it. That is their decision, not yours.
+
 ## Jobs are asynchronous
 
 Work is submitted as a job and completed later. The submission answers `201` with `jobId` and `status`, usually `queued`.
@@ -111,3 +121,4 @@ If a task needs a model that is not allowed, or a limit that is not there, say s
 - **Reading `completed` as success.** Check `warningCode` first.
 - **Retrying a `429`.** The account is out of budget; nothing changes until a human acts.
 - **Assuming the feature is configured.** No accounts are provisioned.
+- **Sending personal data without asking.** The content leaves the instance for the operator's provider account.

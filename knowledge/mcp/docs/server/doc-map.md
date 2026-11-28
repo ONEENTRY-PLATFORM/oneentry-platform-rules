@@ -240,6 +240,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | Why is changing an AI account refused with 403 | `mcp/docs/api/ai-gateway#who-may-create-change-or-delete-an-account` |
 | Why is every AI job refused with 429 | `mcp/docs/api/ai-gateway#refused-with-429-because-the-account-limit-is-used-up` |
 | Why did an AI job complete with an empty result | `mcp/docs/api/ai-gateway#a-completed-job-with-an-empty-result-ran-out-of-budget` |
+| Where does the content of an AI job go | `mcp/docs/api/ai-gateway#where-the-content-of-an-ai-job-goes` |
 | Why can I not delete a screen template | `mcp/docs/api/ui-component-configs#a-template-that-is-still-assigned-cannot-be-deleted` |
 | Why is saving the constructor agent's template refused with 400 | `mcp/docs/api/ui-component-configs#saving-a-template-that-refers-to-an-unsaved-recipe` |
 | Why did assigning a template wipe the rest of the screen | `mcp/docs/api/ui-component-configs#a-record-page-template-covers-one-part-of-the-page` |
