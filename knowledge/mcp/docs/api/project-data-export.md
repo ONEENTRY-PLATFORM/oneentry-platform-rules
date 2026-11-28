@@ -30,7 +30,7 @@ The admin panel socket may also send a `projectExport` event with `action` `comp
 | `429` on request | less than an hour since the last export started; `retryAfter` gives the seconds left | download the previous archive, or retry after `retryAfter` |
 | `409` on download | the archive is not ready yet | keep polling until `completed` |
 | `410` on download | the archive is older than 24 hours and was deleted | start a new export |
-| `404` | the export belongs to another admin or another data environment, or does not exist | only the admin who requested an export can read or download it |
+| `404` | the export belongs to another admin or another data environment, does not exist, or expired more than a week ago | only the admin who requested an export can read or download it; otherwise start a new export |
 
 ## What the project export archive contains
 
