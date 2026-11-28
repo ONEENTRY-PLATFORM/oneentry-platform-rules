@@ -134,6 +134,7 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | `mcp/docs/api/admin-page-scope` | Delegating one branch of the page tree, or a page write refused for an admin who holds the key |
 | `mcp/docs/api/admin-permission-catalog` | Building a permission map for a new admin, or finding which key a 403 names |
 | `mcp/docs/api/admin-record-scope-and-field-access` | Confining an admin to chosen records, or making fields and attributes read-only or hidden |
+| `mcp/docs/api/admin-field-masking` | Showing an admin only part of a phone, e-mail or document number, or viewing masked values in full |
 | `mcp/docs/api/admin-scope-by-action-and-type` | Letting an admin see records it may not change or delete, or confining discounts and blocks to some types |
 | `mcp/docs/api/catalog-area-page-reads` | Setting up a catalogue editor without `pages.get`, or a catalogue page read refused with 403 |
 | `mcp/docs/api/admin-account-ownership` | Changing another administrator's login, e-mail, password or permissions, or a write on the project owner refused with 403 |
@@ -202,6 +203,8 @@ Start with `mcp/operating-rules`. Everything else is detail behind one of its ru
 | How do I limit an admin to some forms, discounts or categories | `mcp/docs/api/admin-record-scope-and-field-access#which-records-an-admin-may-touch` |
 | How do I make discount dates read-only for an admin | `mcp/docs/api/admin-record-scope-and-field-access#making-a-field-or-attribute-read-only` |
 | What does a 403 with SCOPE_DENIED or FIELD_DENIED mean | `mcp/docs/api/admin-record-scope-and-field-access#what-the-refusal-codes-tell-you` |
+| How do I show an admin only the last digits of a phone | `mcp/docs/api/admin-field-masking#how-to-mask-a-field-or-attribute` |
+| How does an admin see a masked value in full | `mcp/docs/api/admin-field-masking#viewing-masked-values-in-full` |
 | How do I let an admin view records but not change or delete them | `mcp/docs/api/admin-scope-by-action-and-type#how-to-give-separate-lists-for-view-change-and-delete` |
 | How do I limit an admin to bonus discounts or one block type | `mcp/docs/api/admin-scope-by-action-and-type#how-to-confine-discounts-or-blocks-to-some-types` |
 | Why can I not edit the project owner account | `mcp/docs/api/admin-account-ownership#nobody-but-the-owner-changes-the-owner-account` |

@@ -58,6 +58,7 @@ For `pages.scope`, the list of root pages becomes the pages named in the scope, 
 ```
 
 - `read` shows the value but refuses a change to it. `hidden` leaves the value out of responses and refuses a change to it.
+- `masked` shows only part of the value: `mcp/docs/api/admin-field-masking`.
 - Area keys and field names come from `fields` in the permission catalog. A name not listed there is refused with `400`.
 - Attributes are named by the marker of their attribute set and the marker of the attribute. `*` stands for every attribute of the set, and a rule on one attribute wins over `*`.
 - An attribute set or attribute marker that does not exist is refused with `400`, so a typo is never stored as a rule that does nothing.
